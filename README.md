@@ -5,7 +5,7 @@ means in that verse, the rhetorical point, the grammar, why that exact word was
 chosen, and a memory hook — plus flashcards, a quiz, never-forget traps, and the
 threads that run between surahs.
 
-Currently **18 surahs, 405 words**.
+Currently **19 surahs, 451 words**.
 
 ---
 
