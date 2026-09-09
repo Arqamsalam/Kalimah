@@ -51,6 +51,12 @@ Only *Here it means* and the Arabic word are required; anything missing is simpl
 left out of that word's card. Stars, warning signs and bold markers are stripped
 automatically — write the guide however you normally would.
 
+**Length is handled for you.** The guides run several paragraphs per field; the
+site shows the opening claim only — one or two sentences per category — and puts
+everything else behind a "Show the full note" tap on the word's card. Nothing is
+lost, and no card is a wall of text. The limits are the `BUDGET` line near the top
+of `build.py` if you ever want them looser or tighter.
+
 ---
 
 ## Running it on your own machine (optional)

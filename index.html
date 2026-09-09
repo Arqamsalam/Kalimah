@@ -230,6 +230,11 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .keepsake .dlabel{color:var(--gold)}
 .keepsake p{margin:0;font-family:"Newsreader",Georgia,serif;font-size:18px;line-height:1.5;color:var(--ink)}
 
+.morebtn{width:100%;background:var(--surface);border:1px solid var(--hair);border-radius:13px;padding:11px;
+  font-size:15px;font-weight:600;color:var(--accent);box-shadow:var(--shadow);margin-bottom:14px}
+.morebox{margin-bottom:14px}
+.morebox .dval{font-size:15px}
+
 .sheet-actions{display:flex;gap:10px;padding-bottom:6px}
 .abtn{flex:1;background:var(--surface);border:1px solid var(--hair);border-radius:13px;padding:11px;
   font-size:15px;font-weight:600;color:var(--accent);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;gap:7px}
@@ -773,6 +778,12 @@ function openSheet(id){
     '<div class="detail">' + rows.map(r =>
       '<div class="drow"><div class="dlabel">' + r[0] + '</div><div class="dval">' + r[1] + '</div></div>').join('') + '</div>' +
     '<div class="keepsake"><div class="dlabel">Never forget</div><p>' + esc(w.note) + '</p></div>' +
+    (w.more && w.more.length
+      ? '<button class="morebtn" id="moreBtn">Show the full note</button>' +
+        '<div class="detail morebox" id="moreBox" hidden>' +
+        w.more.map(p => '<div class="drow"><div class="dval">' + esc(p) + '</div></div>').join('') +
+        '</div>'
+      : '') +
     '<div class="sheet-actions">' +
       '<button class="abtn' + (saved.has(w.id) ? ' saved' : '') + '" id="saveBtn">' +
       '<svg viewBox="0 0 24 24" fill="' + (saved.has(w.id) ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.6l2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L3.6 9.8l5.8-.9z"/></svg>' +
@@ -848,6 +859,11 @@ document.addEventListener("click", e => {
     threadMode = thr.dataset.thread;
     $$("[data-thread]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.thread === threadMode)));
     renderThreads(); return;
+  }
+
+  if (t.closest("#moreBtn")){
+    $("#moreBox").hidden = false;
+    t.closest("#moreBtn").remove(); return;
   }
 
   if (t.closest("#moreOne")){
