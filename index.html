@@ -341,6 +341,37 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .dval p{margin:0 0 9px}
 .dval p:last-child{margin-bottom:0}
 
+/* ---------- the verse, word by word ---------- */
+.pill-btn{cursor:pointer;font-weight:650;color:var(--accent);background:var(--accent-soft);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  display:inline-flex;align-items:center;gap:5px}
+.pill-btn .caret{width:9px;height:6px;transition:transform .22s}
+.pill-btn[aria-expanded="true"] .caret{transform:rotate(180deg)}
+
+.versebox{margin-bottom:14px}
+.verse{background:var(--surface);border:1px solid var(--hair);border-radius:14px;
+  box-shadow:var(--shadow);padding:15px 16px;margin-bottom:10px}
+.verse:last-child{margin-bottom:0}
+.verse-no{font-size:11.5px;font-weight:680;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:9px}
+.verse-ar{font-size:27px;line-height:2.05;color:var(--ink);text-align:right}
+
+.wbw{direction:rtl;display:flex;flex-wrap:wrap;gap:10px 15px;justify-content:flex-start;
+  border-top:1px solid var(--hair);margin-top:13px;padding-top:13px}
+.wbw-w{display:flex;flex-direction:column;align-items:center;gap:1px;max-width:160px}
+.wbw-w .wa{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;direction:rtl;
+  font-size:23px;line-height:1.65;color:var(--ink);white-space:nowrap}
+.wbw-w .we{direction:ltr;font-size:12.5px;line-height:1.35;color:var(--ink-2);
+  text-align:center;text-wrap:balance}
+.wbw-w .wt{direction:ltr;font-family:"Newsreader",Georgia,serif;font-style:italic;
+  font-size:11.5px;line-height:1.3;color:var(--faint);text-align:center}
+.wbw-w.hit .wa{color:var(--gold)}
+.wbw-w.hit .we{color:var(--gold);font-weight:660}
+
+.verse-en{border-top:1px solid var(--hair);margin-top:13px;padding-top:12px;
+  font-family:"Newsreader",Georgia,serif;font-size:16.5px;line-height:1.55;color:var(--ink-2)}
+.verse-src{font-size:11px;color:var(--faint);margin-top:9px;letter-spacing:.015em}
+
 /* ---------- tab bar ---------- */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--nav);
   -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border-top:1px solid var(--sep);
@@ -452,7 +483,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 </div>
 
 
-<script src="data/surahs.js?v=19"></script>
+<script src="data/verses.js?v=20"></script>
+<script src="data/surahs.js?v=20"></script>
 <script>
 
 /* ===================== helpers ===================== */
@@ -756,6 +788,82 @@ function renderSaved(){
     : '<div class="empty"><div class="ar">★</div><p>No saved words yet. Tap the star on any word&rsquo;s card to keep it here.</p></div>';
 }
 
+/* ===================== the verse, word by word ===================== */
+const HAVE_VERSES = typeof VERSES !== "undefined" && VERSES;
+
+/* "1" · "1–2" · "17 · 37" · "19 · 26, 45"  ->  [1] · [1,2] · [17,37] · [19,26,45] */
+function verseNums(v){
+  const out = [], re = /(\d+)\s*[–—-]\s*(\d+)|(\d+)/g;
+  let m;
+  while ((m = re.exec(String(v || "")))){
+    if (m[1]){
+      let a = +m[1], b = +m[2];
+      if (b < a){ const t = a; a = b; b = t; }
+      if (b - a > 12) b = a;                     // a stray number, not a range
+      for (let i = a; i <= b; i++) out.push(i);
+    } else out.push(+m[3]);
+  }
+  return out.filter((n, i) => out.indexOf(n) === i);
+}
+
+/* strip harakat and flatten the letters that vary between scripts, so the
+   guide's spelling can be matched against the Uthmani text */
+function skeleton(s){
+  return String(s || "")
+    .replace(/\u0649\u0670/g, "\u0627")   // alef maqsura + dagger alef = one long \u0101
+    .replace(/\u0670/g, "\u0627")          // dagger alef on its own = long \u0101
+    .replace(/[\u064B-\u065F\u06D6-\u06ED\u0640\u0653-\u0655]/g, "")  // marks, tatweel
+    .replace(/[\u0622\u0623\u0625\u0671\u0624]/g, "\u0627")            // hamza carriers -> alef
+    .replace(/\u0626/g, "\u064A")          // hamza on ya -> ya
+    .replace(/\u0621/g, "")                // bare hamza
+    .replace(/\u0629/g, "\u0647")          // ta marbuta -> ha
+    .replace(/[^\u0600-\u06FF]/g, "")
+    .replace(/[\u0627\u0649\u064A]+$/, "\u0627")   // whatever long vowel ends the word
+    .replace(/\u0649/g, "\u064A");         // any alef maqsura left inside
+}
+const squeeze = t => t.replace(/(.)\1/g, "$1");   // a shadda doubles a letter in one text, not the other
+
+/* the verse carries prefixes the vocabulary entry doesn't: wa-, li-, al- ... */
+function variants(t){
+  const out = [t];
+  const withoutArticle = t.replace(/^(?:\u0648|\u0641)?(?:\u0628|\u0643|\u0644)?\u0627\u0644/, "");
+  if (withoutArticle !== t && withoutArticle.length >= 4) out.push(withoutArticle);
+  const withoutPrefix = t.replace(/^[\u0648\u0641\u0628\u0643\u0644]/, "");
+  if (withoutPrefix !== t && withoutPrefix.length >= 4) out.push(withoutPrefix);
+  return out;
+}
+function sameWord(verseWord, entryTokens){
+  const a = skeleton(verseWord), a2 = squeeze(a);
+  if (a.length < 3) return false;
+  return entryTokens.some(b => {
+    const b2 = squeeze(b);
+    return (b.length  >= 3 && (a.indexOf(b)   >= 0 || b.indexOf(a)   >= 0)) ||
+           (b2.length >= 3 && (a2.indexOf(b2) >= 0 || b2.indexOf(a2) >= 0));
+  });
+}
+function verseHTML(surahNum, nums, entryAr){
+  if (!HAVE_VERSES) return "";
+  const book = VERSES[surahNum]; if (!book) return "";
+  const tokens = [].concat.apply([], String(entryAr || "").split(/\s+/)
+                   .map(skeleton).filter(t => t.length >= 3).map(variants));
+  const blocks = nums.map(n => {
+    const v = book[n]; if (!v) return "";
+    return '<div class="verse">' +
+      '<div class="verse-no">Verse ' + surahNum + ':' + n + '</div>' +
+      '<div class="ar verse-ar">' + esc(v.t) + '</div>' +
+      '<div class="wbw">' + v.w.map(w =>
+        '<span class="wbw-w' + (sameWord(w[0], tokens) ? ' hit' : '') + '">' +
+          '<span class="wa">' + esc(w[0]) + '</span>' +
+          '<span class="we">' + esc(w[1]) + '</span>' +
+          (w[2] ? '<span class="wt">' + esc(w[2]) + '</span>' : '') +
+        '</span>').join('') + '</div>' +
+      (v.e ? '<div class="verse-en">' + esc(v.e) + '</div>' : '') +
+      '<div class="verse-src">Saheeh International &middot; word-by-word from the Quranic Arabic Corpus</div>' +
+      '</div>';
+  }).filter(Boolean);
+  return blocks.length ? '<div class="versebox" id="verseBox" hidden>' + blocks.join('') + '</div>' : "";
+}
+
 /* ===================== sheet ===================== */
 let sheetWord = null, lastFocus = null;
 function openSheet(id){
@@ -769,12 +877,21 @@ function openSheet(id){
     ["Grammar bite", w.grammar ? esc(w.grammar) : null],
     ["Why this exact word", w.why ? esc(w.why) : null]
   ].filter(r => r[1]);
+  const ref    = esc(s.name) + ' ' + s.num + ':' + esc(w.v);
+  const vHTML  = verseHTML(w.surah, verseNums(w.v), w.ar);
+  const CARET  = '<svg class="caret" viewBox="0 0 10 6" fill="none" stroke="currentColor" ' +
+                 'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l4 4 4-4"/></svg>';
+  const verseLabel = vHTML
+    ? '<button class="pill pill-btn" id="verseBtn" aria-expanded="false" aria-controls="verseBox">' +
+      ref + ' &middot; read it' + CARET + '</button>'
+    : '<span class="pill">' + ref + '</span>';
   $("#sheetBody").innerHTML =
     '<div class="word-hero"><div class="ar">' + esc(w.ar) + '</div>' +
       '<div class="tr">' + esc(w.tr) + '</div>' +
       '<div class="mean">' + esc(w.meaning) + '</div>' +
-      '<div class="meta"><span class="pill">' + esc(s.name) + ' ' + s.num + ':' + esc(w.v) + '</span>' +
+      '<div class="meta">' + verseLabel +
       (w.rk ? '<span class="pill">√' + esc(w.rk) + '</span>' : '') + '</div></div>' +
+    vHTML +
     '<div class="detail">' + rows.map(r =>
       '<div class="drow"><div class="dlabel">' + r[0] + '</div><div class="dval">' + r[1] + '</div></div>').join('') + '</div>' +
     '<div class="keepsake"><div class="dlabel">Never forget</div><p>' + esc(w.note) + '</p></div>' +
@@ -818,6 +935,17 @@ function syncNav(){
 /* ===================== events ===================== */
 document.addEventListener("click", e => {
   const t = e.target;
+
+  const verseBtn = t.closest("#verseBtn");
+  if (verseBtn){
+    const box  = $("#verseBox");
+    const open = box.hidden;
+    box.hidden = !open;
+    verseBtn.setAttribute("aria-expanded", String(open));
+    if (open) box.scrollIntoView({block: "nearest", behavior: "smooth"});
+    return;
+  }
+
   const surahBtn = t.closest("[data-surah]");
   if (surahBtn){ openSurah(+surahBtn.dataset.surah); return; }
 

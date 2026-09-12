@@ -5,7 +5,11 @@ means in that verse, the rhetorical point, the grammar, why that exact word was
 chosen, and a memory hook — plus flashcards, a quiz, never-forget traps, and the
 threads that run between surahs.
 
-Currently **19 surahs, 451 words**.
+Tap the verse pill on any word's card and the verse itself opens underneath it:
+the Arabic, every word glossed in English below it, and the translation. The word
+you are studying is picked out in gold.
+
+Currently **19 surahs, 451 words, 463 verses**.
 
 ---
 
@@ -20,6 +24,9 @@ That's it. About a minute later the website has the new surah in it — the word
 list, the flashcards, the quiz, the traps and the threads, all built automatically.
 
 You never touch the HTML.
+
+If you are building locally rather than letting GitHub do it, run both scripts —
+`build.py` for the vocabulary, then `fetch_verses.py` for that surah's Qur'an text.
 
 ### What the file has to look like
 
@@ -62,11 +69,14 @@ of `build.py` if you ever want them looser or tighter.
 ## Running it on your own machine (optional)
 
 ```bash
-python3 build.py        # rebuilds data/surahs.js from guides/
-python3 -m http.server  # then open http://localhost:8000
+python3 build.py         # rebuilds data/surahs.js from guides/
+python3 fetch_verses.py  # pulls the Qur'an text for any surah not yet fetched
+python3 -m http.server   # then open http://localhost:8000
 ```
 
-No installs, no dependencies — just Python 3 and a browser.
+No installs, no dependencies — just Python 3 and a browser. `fetch_verses.py` is
+the only part that needs the internet; add `--all` to re-pull every surah, which
+is what you do after changing which translation it uses.
 
 ---
 
@@ -74,13 +84,29 @@ No installs, no dependencies — just Python 3 and a browser.
 
 ```
 index.html              the whole website (HTML, CSS and JavaScript in one file)
-data/surahs.js          generated — every surah's data. Don't edit by hand.
+data/surahs.js          generated — every surah's vocabulary. Don't edit by hand.
+data/verses.js          generated — the Qur'an text and word-by-word. Same.
 build.py                turns guides/*.md into data/surahs.js
+fetch_verses.py         pulls data/verses.js from the Quran.com API
 guides/*.md             the source guides
 guides/_manual.json     Al-Qiyāmah (75) and Al-Mursalāt (77), typed in by hand
                         rather than parsed — they came from image sheets
 .github/workflows/      rebuilds and republishes on every push
 ```
+
+### Where the Qur'an text comes from
+
+`fetch_verses.py` reads the Quran.com API, which serves the Uthmani text and the
+word-by-word glosses of the Quranic Arabic Corpus. The verse translation is
+**Saheeh International**; the translation number is the `TRANSLATION` line near
+the top of the script, with the other options listed beside it. The Clear Quran
+(Khattab) is not among them — it isn't openly licensed, so no free API carries it.
+
+One deliberate change is made to the text on the way in: the Qur'anic recitation
+marks (waqf signs and the small superscript letters, U+06D6–U+06ED) are removed.
+They are pause and tajwīd aids rather than part of a word's spelling, and the
+Amiri webfont has no glyphs for several of them, which breaks the letter joins on
+screen. The dagger alef, which is a real long ā, is kept.
 
 `build.py` also holds a table of all 114 surah names (Arabic name, English name,
 Makkan/Madinan). If a name ever needs correcting, it's near the top of that file.
