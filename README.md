@@ -9,7 +9,7 @@ Tap the verse pill on any word's card and the verse itself opens underneath it:
 the Arabic, every word glossed in English below it, and the translation. The word
 you are studying is picked out in gold.
 
-Currently **19 surahs, 451 words, 463 verses**.
+Currently **20 surahs, 480 words, 492 verses**.
 
 ---
 
