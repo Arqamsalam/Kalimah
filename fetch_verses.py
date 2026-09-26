@@ -31,7 +31,7 @@ API         = ("https://api.quran.com/api/v4/verses/by_chapter/{n}"
                "?words=true&word_fields=text_uthmani&fields=text_uthmani"
                "&translations={t}&per_page=300&language=en")
 
-SUP_RE = re.compile(r"<sup\\b[^>]*>.*?</sup>", re.S)   # footnote markers, number and all
+SUP_RE = re.compile(r"<sup\b[^>]*>.*?</sup>", re.S)   # footnote markers, number and all
 # Qur'anic recitation marks (waqf signs, small letters). They are pause and
 # tajwid aids, not part of a word's spelling, and the Amiri webfont has no
 # glyphs for several of them \u2014 which breaks the letter joins on screen. The

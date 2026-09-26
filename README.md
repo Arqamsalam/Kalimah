@@ -5,11 +5,23 @@ means in that verse, the rhetorical point, the grammar, why that exact word was
 chosen, and a memory hook — plus flashcards, a quiz, never-forget traps, and the
 threads that run between surahs.
 
-Tap the verse pill on any word's card and the verse itself opens underneath it:
-the Arabic, every word glossed in English below it, and the translation. The word
-you are studying is picked out in gold.
+Tap the verse pill on any word's card — or open a surah's **Read** tab — and the
+verse itself opens: the Arabic, every word glossed in English below it, and the
+translation. The word you are studying is picked out in gold.
 
-Currently **20 surahs, 480 words, 492 verses**.
+Then tap any word inside a verse. A card opens under it with that word's
+three-letter root, its dictionary form, what it is grammatically (verb Form II,
+past tense, passive, "she/it"), and the little pieces stuck to its front and
+back — the *wa-*, the *al-*, the attached pronoun. If the root turns up anywhere
+else on the site, it says where.
+
+Currently **20 surahs, 480 words, 492 verses, 2,078 words of Qur'an text**.
+
+The surfaces are glass: every panel is translucent and blurs whatever is
+behind it, lit by a soft colour wash fixed to the page, with a bright hairline
+along its top edge. The whole effect lives in one block at the end of the
+stylesheet, marked `liquid glass`, and is driven by tokens — turn `--glass-blur`
+down or drop the block entirely and everything falls back to solid cards.
 
 ---
 
@@ -25,8 +37,9 @@ list, the flashcards, the quiz, the traps and the threads, all built automatical
 
 You never touch the HTML.
 
-If you are building locally rather than letting GitHub do it, run both scripts —
-`build.py` for the vocabulary, then `fetch_verses.py` for that surah's Qur'an text.
+If you are building locally rather than letting GitHub do it, run the three
+scripts in order — `build.py` for the vocabulary, `fetch_verses.py` for that
+surah's Qur'an text, then `build_morph.py` for its roots and grammar.
 
 ### What the file has to look like
 
@@ -71,12 +84,15 @@ of `build.py` if you ever want them looser or tighter.
 ```bash
 python3 build.py         # rebuilds data/surahs.js from guides/
 python3 fetch_verses.py  # pulls the Qur'an text for any surah not yet fetched
+python3 build_morph.py   # rebuilds data/morph.js — root and grammar per word
 python3 -m http.server   # then open http://localhost:8000
 ```
 
-No installs, no dependencies — just Python 3 and a browser. `fetch_verses.py` is
-the only part that needs the internet; add `--all` to re-pull every surah, which
-is what you do after changing which translation it uses.
+No installs, no dependencies — just Python 3 and a browser. `fetch_verses.py` and
+`build_morph.py` are the parts that need the internet; add `--all` to
+`fetch_verses.py` to re-pull every surah, which is what you do after changing
+which translation it uses. `build_morph.py` keeps its 6 MB source file in
+`.morph-cache.txt` so it only downloads it once.
 
 ---
 
@@ -86,8 +102,10 @@ is what you do after changing which translation it uses.
 index.html              the whole website (HTML, CSS and JavaScript in one file)
 data/surahs.js          generated — every surah's vocabulary. Don't edit by hand.
 data/verses.js          generated — the Qur'an text and word-by-word. Same.
+data/morph.js           generated — root, base form and grammar per word. Same.
 build.py                turns guides/*.md into data/surahs.js
 fetch_verses.py         pulls data/verses.js from the Quran.com API
+build_morph.py          builds data/morph.js from the Quranic Arabic Corpus
 guides/*.md             the source guides
 guides/_manual.json     Al-Qiyāmah (75) and Al-Mursalāt (77), typed in by hand
                         rather than parsed — they came from image sheets
@@ -107,6 +125,16 @@ marks (waqf signs and the small superscript letters, U+06D6–U+06ED) are remove
 They are pause and tajwīd aids rather than part of a word's spelling, and the
 Amiri webfont has no glyphs for several of them, which breaks the letter joins on
 screen. The dagger alef, which is a real long ā, is kept.
+
+### Where the root and grammar come from
+
+`build_morph.py` reads the Quranic Arabic Corpus morphology — the scholarly
+word-by-word tagging of the whole Qur'an. Every word there is split into
+segments (the *wa-*, the *al-*, the stem that carries the root, the attached
+pronoun), each with its own tag. The script glues the segments back into one
+word and turns the corpus shorthand into plain English: `PERF|VF:2|PASS|3FS`
+becomes "Form II · past tense · passive · she / it". The translation table sits
+near the top of the script if any wording needs changing.
 
 `build.py` also holds a table of all 114 surah names (Arabic name, English name,
 Makkan/Madinan). If a name ever needs correcting, it's near the top of that file.

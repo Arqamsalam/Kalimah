@@ -145,7 +145,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .searchbar.has .clr{display:block}
 
 /* ---------- grouped lists ---------- */
-.group{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px}
+.group{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:30px}
 .grouplabel{font-size:12.5px;font-weight:600;letter-spacing:.055em;text-transform:uppercase;
   color:var(--faint);margin:0 0 8px 4px}
 .row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;
@@ -156,6 +156,21 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .chev{width:8px;height:14px;color:var(--faint);flex:none}
 
 /* word row */
+/* A word in a list gets three calm lines of its own: the Arabic, then what
+   it sounds like, then what it means. Nothing is squeezed side by side, so
+   nothing has to be cut off. */
+.wordrow{display:block;padding:15px 17px 16px}
+.wordrow .wr-ar{display:block;max-width:none;font-size:29px;line-height:1.6;
+  color:var(--ink);text-align:right;white-space:normal;overflow:visible}
+.wordrow .wr-line{display:flex;align-items:baseline;gap:10px;margin-top:5px}
+.wordrow .wr-tr{font-family:"Newsreader",Georgia,serif;font-style:italic;font-weight:500;
+  font-size:17.5px;letter-spacing:0;color:var(--accent);flex:1;min-width:0;white-space:normal;overflow:visible}
+.wordrow .wr-mean{display:block;font-size:14.5px;line-height:1.45;color:var(--muted);
+  margin-top:5px;white-space:normal;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wordrow .wr-badge{flex:none;align-self:center}
+.wordrow .wr-star{align-self:center}
+
 .wr-main{flex:1;min-width:0;display:block;overflow:hidden}
 .wr-tr{display:block;font-size:16.5px;font-weight:600;letter-spacing:-.008em;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -177,7 +192,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   display:grid;place-items:center;font-size:17px;font-weight:700;flex:none;font-variant-numeric:tabular-nums}
 .surah-body{flex:1;min-width:0;display:block}
 .surah-name{display:block;font-size:19px;font-weight:660;letter-spacing:-.015em}
-.surah-sub{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.surah-sub{display:block;font-size:13.5px;color:var(--muted);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .surah-ar{display:block;font-size:26px;color:var(--gold);flex:none;white-space:nowrap}
 
 /* ---------- segmented ---------- */
@@ -186,12 +202,15 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .segmented button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(20,24,45,.14)}
 
 /* ---------- surah header ---------- */
-.surah-hero{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-bottom:20px;border:1px solid var(--hair)}
+/* The surah header says who this is and gets out of the way. Everything it
+   used to carry — the hook, the summary — now lives in cards further down,
+   where you meet it one at a time. */
+.surah-hero{padding:4px 2px 22px;margin-bottom:4px}
 .hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.hero-name{font-size:27px;font-weight:720;letter-spacing:-.022em;line-height:1.15}
-.hero-en{color:var(--muted);font-size:15px;margin-top:3px}
-.hero-ar{font-size:38px;color:var(--gold);line-height:1.2;flex:none}
-.hero-blurb{margin:14px 0 0;font-size:15px;color:var(--ink-2);line-height:1.55;font-family:"Newsreader",Georgia,serif;font-size:17px}
+.hero-name{font-size:31px;font-weight:730;letter-spacing:-.024em;line-height:1.14}
+.hero-en{color:var(--muted);font-size:14.5px;margin-top:5px;line-height:1.45}
+.hero-ar{font-size:40px;color:var(--gold);line-height:1.2;flex:none}
+.hero-blurb{margin:14px 0 0;color:var(--ink-2);line-height:1.55;font-family:"Newsreader",Georgia,serif;font-size:17px}
 .hero-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .pill{font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--muted);background:var(--surface-2);
   border:1px solid var(--hair);border-radius:20px;padding:3.5px 10px}
@@ -202,7 +221,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .scrim.open{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:92vh;
   background:var(--ground);border-radius:20px 20px 0 0;box-shadow:var(--sheet-shadow);
-  transform:translateY(101%);transition:transform .36s cubic-bezier(.22,.9,.28,1);
+  transform:translateY(calc(101% + 40px));transition:transform .36s cubic-bezier(.22,.9,.28,1);
   display:flex;flex-direction:column;overflow:hidden}
 .sheet.open{transform:none}
 @media (min-width:700px){.sheet{max-width:600px;margin:0 auto;border-radius:20px;bottom:24px;left:16px;right:16px}}
@@ -356,17 +375,47 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   color:var(--faint);margin-bottom:9px}
 .verse-ar{font-size:27px;line-height:2.05;color:var(--ink);text-align:right}
 
-.wbw{direction:rtl;display:flex;flex-wrap:wrap;gap:10px 15px;justify-content:flex-start;
-  border-top:1px solid var(--hair);margin-top:13px;padding-top:13px}
-.wbw-w{display:flex;flex-direction:column;align-items:center;gap:1px;max-width:160px}
+.wbw{direction:rtl;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start;
+  border-top:1px solid var(--hair);margin-top:14px;padding-top:12px}
+.wbw-w{display:flex;flex-direction:column;align-items:center;gap:0;max-width:168px;
+  padding:5px 7px 6px;border-radius:10px;border:1px solid transparent;transition:.14s;cursor:pointer}
+.wbw-w:active{background:var(--surface-2)}
+@media (hover:hover){.wbw-w:hover{background:var(--surface-2);border-color:var(--hair)}}
+.wbw-w.open{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 32%,transparent)}
 .wbw-w .wa{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;direction:rtl;
-  font-size:23px;line-height:1.65;color:var(--ink);white-space:nowrap}
-.wbw-w .we{direction:ltr;font-size:12.5px;line-height:1.35;color:var(--ink-2);
+  font-size:23px;line-height:1.6;color:var(--ink);white-space:nowrap}
+.wbw-w .we{direction:ltr;font-size:12px;line-height:1.3;color:var(--muted);
   text-align:center;text-wrap:balance}
-.wbw-w .wt{direction:ltr;font-family:"Newsreader",Georgia,serif;font-style:italic;
-  font-size:11.5px;line-height:1.3;color:var(--faint);text-align:center}
 .wbw-w.hit .wa{color:var(--gold)}
 .wbw-w.hit .we{color:var(--gold);font-weight:660}
+.wbw-hint{direction:ltr;font-size:11.5px;color:var(--faint);margin-top:10px;letter-spacing:.01em}
+
+/* ---------- tap a word: its root and its grammar ---------- */
+.wcard{direction:ltr;margin-top:12px;border:1px solid color-mix(in srgb,var(--accent) 26%,transparent);
+  background:var(--accent-soft);border-radius:14px;padding:15px 16px 14px;animation:fade .18s ease}
+.wcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.wcard-ar{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;direction:rtl;
+  font-size:34px;line-height:1.45;color:var(--ink);flex:none}
+.wcard-gloss{flex:1;min-width:0}
+.wcard-tr{font-family:"Newsreader",Georgia,serif;font-style:italic;font-size:17px;color:var(--accent)}
+.wcard-en{font-size:15px;font-weight:560;color:var(--ink);margin-top:2px;line-height:1.4}
+.wcard-rows{margin-top:13px;border-top:1px solid color-mix(in srgb,var(--accent) 20%,transparent);padding-top:11px}
+.wgrid{display:grid;grid-template-columns:86px 1fr;gap:5px 12px;align-items:baseline}
+.wgrid dt{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding-top:3px}
+.wgrid dd{margin:0;font-size:14.5px;line-height:1.5;color:var(--ink-2)}
+.wroot{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;direction:rtl;unicode-bidi:isolate;
+  font-size:23px;color:var(--gold);letter-spacing:.06em}
+.wlem{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;direction:rtl;unicode-bidi:isolate;font-size:20px;color:var(--ink-2)}
+.wkind{font-weight:640;color:var(--ink)}
+.wbits{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.wbit{font-size:12px;font-weight:580;color:var(--ink-2);background:var(--surface);
+  border:1px solid var(--hair);border-radius:20px;padding:3px 9px}
+.wattach{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;unicode-bidi:isolate;font-size:17px;color:var(--ink)}
+.walso{margin-top:11px;border-top:1px solid color-mix(in srgb,var(--accent) 20%,transparent);padding-top:10px;
+  font-size:13px;color:var(--muted);line-height:1.55}
+.walso b{color:var(--ink-2);font-weight:620}
+.walso .ar{font-size:17px;unicode-bidi:isolate}
+.wclose{position:absolute;right:10px;top:10px}
 
 .verse-en{border-top:1px solid var(--hair);margin-top:13px;padding-top:12px;
   font-family:"Newsreader",Georgia,serif;font-size:16.5px;line-height:1.55;color:var(--ink-2)}
@@ -380,6 +429,172 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--faint);padding:4px 0;font-size:10.5px;font-weight:600;letter-spacing:.01em}
 .tab svg{width:23px;height:23px}
 .tab[aria-selected="true"]{color:var(--accent)}
+
+/* ================= liquid glass =================
+   Surfaces stop being flat paint and start behaving like frosted glass held
+   over a soft coloured light. Three things do the work: a blurred,
+   semi-transparent fill; a bright hairline along the top edge, where the
+   light catches the bevel; and a wide soft shadow underneath, so a panel
+   floats above the page instead of sitting flat on it.
+   Everything here is expressed as tokens, so the whole effect can be dialled
+   up, dialled down, or removed from this one block.                         */
+:root{
+  --glass:rgba(255,255,255,.58);
+  --glass-quiet:rgba(255,255,255,.40);
+  --glass-strong:rgba(255,255,255,.80);
+  --glass-border:rgba(255,255,255,.58);
+  --glass-edge:rgba(255,255,255,.95);
+  --glass-under:rgba(20,24,45,.05);
+  --glass-ring:rgba(20,24,45,.07);
+  --glass-drop:rgba(20,24,45,.26);
+  --glass-blur:saturate(180%) blur(20px);
+  --glass-blur-lg:saturate(200%) blur(40px);
+  --glass-chrome:rgba(255,255,255,.90);
+  --tint-a:rgba(124,156,255,.34);
+  --tint-b:rgba(246,196,122,.32);
+  --tint-c:rgba(160,192,255,.26);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --glass:rgba(34,38,52,.56);
+    --glass-quiet:rgba(34,38,52,.38);
+    --glass-strong:rgba(26,30,42,.74);
+    --glass-border:rgba(255,255,255,.10);
+    --glass-edge:rgba(255,255,255,.17);
+    --glass-under:rgba(0,0,0,.34);
+    --glass-ring:rgba(0,0,0,.45);
+    --glass-drop:rgba(0,0,0,.78);
+    --glass-chrome:rgba(14,17,25,.86);
+    --tint-a:color-mix(in srgb, var(--accent) 20%, transparent);
+    --tint-b:color-mix(in srgb, var(--gold) 15%, transparent);
+    --tint-c:color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+}
+:root[data-theme="dark"]{
+  --glass:rgba(34,38,52,.56);
+  --glass-quiet:rgba(34,38,52,.38);
+  --glass-strong:rgba(26,30,42,.74);
+  --glass-border:rgba(255,255,255,.10);
+  --glass-edge:rgba(255,255,255,.17);
+  --glass-under:rgba(0,0,0,.34);
+  --glass-ring:rgba(0,0,0,.45);
+  --glass-drop:rgba(0,0,0,.78);
+  --glass-chrome:rgba(14,17,25,.86);
+  --tint-a:color-mix(in srgb, var(--accent) 20%, transparent);
+  --tint-b:color-mix(in srgb, var(--gold) 15%, transparent);
+  --tint-c:color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* the light the glass sits on — fixed, so panels refract it as you scroll */
+body{
+  background:
+    radial-gradient(760px 480px at 2% -4%, var(--tint-a), transparent 62%),
+    radial-gradient(640px 430px at 102% 3%, var(--tint-b), transparent 60%),
+    radial-gradient(700px 580px at 40% 106%, var(--tint-c), transparent 64%),
+    var(--ground);
+  background-attachment:fixed;
+}
+
+/* the panes */
+.group,
+.surah-card,
+.verse,
+.rootcard,
+.face,
+.quiz-q,
+.opt,
+.score,
+.abtn,
+.morebtn,
+.searchbar input,
+.flash-controls .fbtn{
+  background:var(--glass);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 var(--glass-under),
+    0 1px 2px var(--glass-ring),
+    0 18px 40px -22px var(--glass-drop);
+}
+.group{border-radius:20px}
+.surah-card{border-radius:20px}
+.verse{border-radius:18px}
+.rootcard{border-radius:18px}
+.opt{border-radius:16px;border-width:1px}
+.searchbar input{border-radius:14px}
+
+/* chrome floats highest, so it is the clearest glass of all */
+.navbar,
+.tabbar{
+  background:var(--glass-chrome);
+  -webkit-backdrop-filter:var(--glass-blur-lg);backdrop-filter:var(--glass-blur-lg);
+}
+.tabbar{box-shadow:inset 0 1px 0 var(--glass-edge), 0 -10px 30px -20px var(--glass-drop)}
+
+.sheet{
+  background:var(--glass-strong);
+  -webkit-backdrop-filter:var(--glass-blur-lg);backdrop-filter:var(--glass-blur-lg);
+  border-radius:26px 26px 0 0;
+  border:1px solid var(--glass-border);border-bottom:0;
+  box-shadow:inset 0 1px 0 var(--glass-edge), var(--sheet-shadow);
+}
+@media (min-width:700px){.sheet{border-radius:24px;border-bottom:1px solid var(--glass-border)}}
+.scrim{background:rgba(8,10,18,.34);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+
+/* the segmented control: a glass trough with a glass lozenge sliding in it */
+.segmented{
+  background:var(--glass-quiet);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-border);border-radius:15px;padding:3px;
+  box-shadow:inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-under)
+}
+.segmented button{border-radius:12px}
+.segmented button[aria-selected="true"]{
+  background:var(--glass-strong);
+  border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge), 0 2px 8px -3px var(--glass-drop)
+}
+
+/* small chips */
+.pill,.wr-badge,.wbit,.rootcount{
+  background:var(--glass);
+  -webkit-backdrop-filter:saturate(170%) blur(12px);backdrop-filter:saturate(170%) blur(12px);
+  border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge)
+}
+.closebtn,.wbw-w.open{
+  -webkit-backdrop-filter:saturate(170%) blur(12px);backdrop-filter:saturate(170%) blur(12px)
+}
+
+/* tinted panes keep their colour but gain the same bevel and float */
+.callout,.keepsake{
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border-radius:18px;
+  box-shadow:inset 0 1px 0 var(--glass-edge), 0 18px 40px -24px var(--glass-drop)
+}
+.wcard{
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border-radius:16px;
+  box-shadow:inset 0 1px 0 var(--glass-edge), 0 16px 34px -22px var(--glass-drop)
+}
+.cta{box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 12px 28px -14px var(--glass-drop)}
+
+/* rows inside a pane must not paint over the glass, so they tint instead */
+.row:active,.surah-card:active{background:color-mix(in srgb, var(--ink) 7%, transparent)}
+@media (hover:hover){
+  .row:hover{background:color-mix(in srgb, var(--ink) 5%, transparent)}
+  .wbw-w:hover{background:color-mix(in srgb, var(--ink) 6%, transparent)}
+}
+.wbw-w:active{background:color-mix(in srgb, var(--ink) 9%, transparent)}
+
+/* if a browser can't blur behind an element, fall back to solid panels so
+   nothing turns into unreadable grey-on-grey */
+@supports not ((backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px))){
+  :root{--glass:var(--surface);--glass-quiet:var(--surface-2);--glass-strong:var(--ground);
+        --glass-chrome:var(--ground)}
+  .navbar,.tabbar{background:var(--nav)}
+}
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
@@ -483,8 +698,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 </div>
 
 
-<script src="data/verses.js?v=22"></script>
-<script src="data/surahs.js?v=22"></script>
+<script src="data/verses.js?v=23"></script>
+<script src="data/morph.js?v=23"></script>
+<script src="data/surahs.js?v=23"></script>
 <script>
 
 /* ===================== helpers ===================== */
@@ -522,12 +738,12 @@ const byId = id => ALL.find(w => w.id === id);
 
 /* ===================== word rows ===================== */
 function wordRow(w, showSurah){
-  return '<button class="row" data-word="' + w.id + '">' +
-    '<span class="wr-badge">' + (showSurah ? w.surah + ':' + w.v : 'v. ' + w.v) + '</span>' +
-    '<span class="wr-main"><span class="wr-tr">' + esc(w.tr) + '</span>' +
-    '<span class="wr-mean">' + esc(w.meaning) + '</span></span>' +
-    STAR.replace('wr-star', 'wr-star' + (saved.has(w.id) ? ' on' : '')) +
-    '<span class="ar wr-ar">' + esc(w.ar) + '</span>' + CHEV + '</button>';
+  return '<button class="row wordrow" data-word="' + w.id + '">' +
+    '<span class="ar wr-ar">' + esc(w.ar) + '</span>' +
+    '<span class="wr-line"><span class="wr-tr">' + esc(w.tr) + '</span>' +
+      STAR.replace('wr-star', 'wr-star' + (saved.has(w.id) ? ' on' : '')) +
+      '<span class="wr-badge">' + (showSurah ? w.surah + ':' + w.v : 'v. ' + w.v) + '</span></span>' +
+    '<span class="wr-mean">' + esc(w.meaning) + '</span></button>';
 }
 function wordGroup(list, showSurah){
   return '<div class="group">' + list.map(w => wordRow(w, showSurah)).join('') + '</div>';
@@ -541,7 +757,7 @@ function renderSurahList(){
     '<button class="surah-card" data-surah="' + s.num + '">' +
       '<span class="surah-num">' + s.num + '</span>' +
       '<span class="surah-body"><span class="surah-name">' + esc(s.name) + '</span>' +
-      '<span class="surah-sub">' + esc(s.en) + ' \u00b7 ' + s.words.length + ' words \u00b7 ' + s.verses + ' verses</span></span>' +
+      '<span class="surah-sub">' + esc(s.en) + ' \u00b7 ' + s.words.length + ' words</span></span>' +
       '<span class="ar surah-ar">' + esc(s.ar) + '</span>' + CHEV +
     '</button>').join('');
 }
@@ -587,30 +803,18 @@ function openSurah(num){
 
 function renderSurah(){
   const s = cur;
-  const one = s.special && s.special.length
-    ? '<div class="callout' + (s.special.length > 1 ? '' : ' open') + '" id="oneThing">' +
-        '<div class="dlabel">What makes this surah</div>' +
-        '<p>' + esc(s.special[0]) + '</p>' +
-        (s.special.length > 1
-          ? '<div class="rest">' + s.special.slice(1).map(p => '<p>' + esc(p) + '</p>').join('') + '</div>' +
-            '<button class="more" id="moreOne">Read the rest</button>'
-          : '') +
-      '</div>'
-    : '';
   const head =
     '<div class="surah-hero">' +
       '<div class="hero-top"><div><div class="hero-name">' + esc(s.name) + '</div>' +
-      '<div class="hero-en">Surah ' + s.num + ' &middot; ' + esc(s.en) + '</div></div>' +
+      '<div class="hero-en">Surah ' + s.num + ' &middot; ' + esc(s.en) + '<br>' +
+      esc(s.place) + ' &middot; ' + s.verses + ' verses &middot; ' + s.words.length + ' words</div></div>' +
       '<div class="ar hero-ar">' + esc(s.ar) + '</div></div>' +
-      '<p class="hero-blurb">' + esc(s.blurb) + '</p>' +
-      '<div class="hero-meta"><span class="pill">' + esc(s.place) + '</span><span class="pill">' + s.verses + ' verses</span>' +
-      '<span class="pill">' + s.words.length + ' words</span></div>' +
-      one +
+      (s.blurb ? '<p class="hero-blurb">' + esc(s.blurb) + '</p>' : '') +
     '</div>' +
     '<div class="segmented" role="tablist">' +
-      ['words','cards','quiz'].map(m =>
+      ['words','read','cards','quiz'].map(m =>
         '<button role="tab" data-mode="' + m + '" aria-selected="' + (mode === m) + '">' +
-        ({words:'Words', cards:'Flashcards', quiz:'Quiz'})[m] + '</button>').join('') +
+        ({words:'Words', read:'Read', cards:'Cards', quiz:'Quiz'})[m] + '</button>').join('') +
     '</div><div id="modeBody"></div>';
   $("#surahBody").innerHTML = head;
   renderMode();
@@ -626,6 +830,16 @@ function linkRow(l, from){
 function wordsView(){
   const s = cur;
   let html = '';
+  if (s.special && s.special.length){
+    html += '<div class="callout' + (s.special.length > 1 ? '' : ' open') + '" id="oneThing" style="margin:0 0 30px">' +
+        '<div class="dlabel">What makes this surah</div>' +
+        '<p>' + esc(s.special[0]) + '</p>' +
+        (s.special.length > 1
+          ? '<div class="rest">' + s.special.slice(1).map(p => '<p>' + esc(p) + '</p>').join('') + '</div>' +
+            '<button class="more" id="moreOne">Read the rest</button>'
+          : '') +
+      '</div>';
+  }
   if (s.big && s.big.length){
     html += '<p class="grouplabel">The surah in ' + s.big.length + ' moves</p>' +
       '<div class="group"><ol class="steps">' +
@@ -646,6 +860,7 @@ function wordsView(){
 
 function renderMode(){
   if (mode === "words") $("#modeBody").innerHTML = wordsView();
+  else if (mode === "read") $("#modeBody").innerHTML = readView();
   else if (mode === "cards") startCards();
   else startQuiz();
 }
@@ -841,27 +1056,123 @@ function sameWord(verseWord, entryTokens){
            (b2.length >= 3 && (a2.indexOf(b2) >= 0 || b2.indexOf(a2) >= 0));
   });
 }
+function oneVerseHTML(surahNum, n, tokens, showSrc){
+  const v = (VERSES[surahNum] || {})[n];
+  if (!v) return "";
+  return '<div class="verse" data-verse="' + surahNum + ':' + n + '">' +
+    '<div class="verse-no">Verse ' + surahNum + ':' + n + '</div>' +
+    '<div class="ar verse-ar">' + esc(v.t) + '</div>' +
+    '<div class="wbw">' + v.w.map((w, i) =>
+      '<span class="wbw-w' + (tokens && sameWord(w[0], tokens) ? ' hit' : '') + '" role="button" tabindex="0"' +
+        ' data-s="' + surahNum + '" data-v="' + n + '" data-i="' + i + '">' +
+        '<span class="wa">' + esc(w[0]) + '</span>' +
+        '<span class="we">' + esc(w[1]) + '</span>' +
+      '</span>').join('') + '</div>' +
+    '<div class="wpanel"></div>' +
+    (v.e ? '<div class="verse-en">' + esc(v.e) + '</div>' : '') +
+    (showSrc ? '<div class="verse-src">Saheeh International &middot; word-by-word and grammar ' +
+               'from the Quranic Arabic Corpus</div>' : '') +
+    '</div>';
+}
+
 function verseHTML(surahNum, nums, entryAr){
   if (!HAVE_VERSES) return "";
-  const book = VERSES[surahNum]; if (!book) return "";
+  if (!VERSES[surahNum]) return "";
   const tokens = [].concat.apply([], String(entryAr || "").split(/\s+/)
                    .map(skeleton).filter(t => t.length >= 3).map(variants));
-  const blocks = nums.map(n => {
-    const v = book[n]; if (!v) return "";
-    return '<div class="verse">' +
-      '<div class="verse-no">Verse ' + surahNum + ':' + n + '</div>' +
-      '<div class="ar verse-ar">' + esc(v.t) + '</div>' +
-      '<div class="wbw">' + v.w.map(w =>
-        '<span class="wbw-w' + (sameWord(w[0], tokens) ? ' hit' : '') + '">' +
-          '<span class="wa">' + esc(w[0]) + '</span>' +
-          '<span class="we">' + esc(w[1]) + '</span>' +
-          (w[2] ? '<span class="wt">' + esc(w[2]) + '</span>' : '') +
-        '</span>').join('') + '</div>' +
-      (v.e ? '<div class="verse-en">' + esc(v.e) + '</div>' : '') +
-      '<div class="verse-src">Saheeh International &middot; word-by-word from the Quranic Arabic Corpus</div>' +
-      '</div>';
-  }).filter(Boolean);
-  return blocks.length ? '<div class="versebox" id="verseBox" hidden>' + blocks.join('') + '</div>' : "";
+  const blocks = nums.map((n, i) => oneVerseHTML(surahNum, n, tokens, i === nums.length - 1)).filter(Boolean);
+  return blocks.length
+    ? '<div class="versebox" id="verseBox" hidden>' +
+      '<p class="wbw-hint" style="margin:0 0 10px">Tap any word below for its root and grammar.</p>' +
+      blocks.join('') + '</div>'
+    : "";
+}
+
+/* ---------- the whole surah, to read ---------- */
+function readView(){
+  const s = cur;
+  if (!HAVE_VERSES || !VERSES[s.num])
+    return '<div class="empty"><p>The text of this surah isn’t loaded.</p></div>';
+  const nums = Object.keys(VERSES[s.num]).map(Number).sort((a, b) => a - b);
+  return '<p class="grouplabel">' + esc(s.name) + ' · ' + nums.length + ' verses</p>' +
+    '<p class="wbw-hint" style="margin:-6px 0 14px">Tap any word in a verse to see its root and how it is working in the sentence.</p>' +
+    '<div class="versebox">' + nums.map((n, i) => oneVerseHTML(s.num, n, null, i === nums.length - 1)).join('') + '</div>';
+}
+
+/* ---------- tap a word: root, lemma, grammar ---------- */
+const HAVE_MORPH = typeof MORPH !== "undefined" && MORPH;
+
+/* every place a root shows up across the surahs on this site */
+let ROOTMAP = null;
+function rootMap(){
+  if (ROOTMAP) return ROOTMAP;
+  ROOTMAP = {};
+  if (!HAVE_MORPH) return ROOTMAP;
+  Object.keys(MORPH).forEach(s => Object.keys(MORPH[s]).forEach(v =>
+    MORPH[s][v].forEach((m, i) => {
+      if (!m || !m.r) return;
+      (ROOTMAP[m.r] = ROOTMAP[m.r] || []).push([s, v, i]);
+    })));
+  return ROOTMAP;
+}
+
+function morphHTML(s, v, i){
+  const verse = (VERSES[s] || {})[v];
+  const word  = verse && verse.w[i];
+  const m     = HAVE_MORPH ? ((MORPH[s] || {})[v] || [])[i] : null;
+  if (!word) return "";
+  const rows = [];
+
+  if (m && m.r){
+    const uses = (rootMap()[m.r] || []).filter(u => !(u[0] === String(s) && u[1] === String(v) && u[2] === i));
+    rows.push(["Root", '<span class="wroot">' + esc(m.r) + '</span>' +
+      (uses.length ? '<span style="color:var(--faint);font-size:13px"> &nbsp;' + uses.length +
+        ' other word' + (uses.length === 1 ? '' : 's') + ' here share it</span>' : '')]);
+  }
+  if (m && m.l && skeleton(m.l) !== skeleton(word[0]))
+    rows.push(["Base form", '<span class="wlem">' + esc(m.l) + '</span>']);
+  if (m && m.k)
+    rows.push(["Grammar", '<span class="wkind">' + esc(m.k) + '</span>' +
+      (m.d && m.d.length ? '<span class="wbits">' + m.d.map(d => '<span class="wbit">' + esc(d) + '</span>').join('') + '</span>' : '')]);
+  if (m && m.x && m.x.length)
+    rows.push(["Attached", m.x.map(x => '<div class="wattach">' + esc(x) + '</div>').join('')]);
+  if (!rows.length)
+    rows.push(["Grammar", '<span style="color:var(--muted)">Not recorded for this word.</span>']);
+
+  let also = "";
+  if (m && m.r){
+    const uses = (rootMap()[m.r] || [])
+      .filter(u => !(u[0] === String(s) && u[1] === String(v) && u[2] === i)).slice(0, 4);
+    if (uses.length){
+      also = '<div class="walso"><b>Same root elsewhere:</b> ' + uses.map(u => {
+        const uw = ((VERSES[u[0]] || {})[u[1]] || { w: [] }).w[u[2]];
+        return uw ? '<span class="ar">' + esc(uw[0]) + '</span> <span style="color:var(--faint)">' +
+          u[0] + ':' + u[1] + '</span>' : '';
+      }).filter(Boolean).join(' &nbsp;&middot;&nbsp; ') + '</div>';
+    }
+  }
+
+  return '<div class="wcard">' +
+    '<div class="wcard-top"><div class="wcard-ar">' + esc(word[0]) + '</div>' +
+      '<div class="wcard-gloss">' +
+        (word[2] ? '<div class="wcard-tr">' + esc(word[2]) + '</div>' : '') +
+        '<div class="wcard-en">' + esc(word[1]) + '</div></div></div>' +
+    '<dl class="wcard-rows wgrid">' +
+      rows.map(r => '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>').join('') +
+    '</dl>' + also + '</div>';
+}
+
+/* open, close, or swap the little grammar card under a verse */
+function tapVerseWord(el){
+  const s = el.dataset.s, v = el.dataset.v, i = +el.dataset.i;
+  const verse = el.closest(".verse");
+  const panel = verse && verse.querySelector(".wpanel");
+  if (!panel) return;
+  const already = el.classList.contains("open");
+  verse.querySelectorAll(".wbw-w.open").forEach(o => o.classList.remove("open"));
+  if (already){ panel.innerHTML = ""; return; }
+  el.classList.add("open");
+  panel.innerHTML = morphHTML(s, v, i);
 }
 
 /* ===================== sheet ===================== */
@@ -945,6 +1256,9 @@ document.addEventListener("click", e => {
     if (open) box.scrollIntoView({block: "nearest", behavior: "smooth"});
     return;
   }
+
+  const verseWord = t.closest(".wbw-w");
+  if (verseWord){ tapVerseWord(verseWord); return; }
 
   const surahBtn = t.closest("[data-surah]");
   if (surahBtn){ openSurah(+surahBtn.dataset.surah); return; }
@@ -1044,6 +1358,10 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && $("#sheet").classList.contains("open")) closeSheet();
   if (e.key === "Enter" && document.activeElement && document.activeElement.id === "flashCard"){
     deck.flipped = !deck.flipped; $("#flashCard").classList.toggle("flipped", deck.flipped);
+  }
+  if ((e.key === "Enter" || e.key === " ") && document.activeElement &&
+      document.activeElement.classList.contains("wbw-w")){
+    e.preventDefault(); tapVerseWord(document.activeElement);
   }
 });
 
