@@ -627,6 +627,26 @@ body{font-size:17.5px;line-height:1.55}
 .wcard-en{font-size:16.5px}
 .hero-blurb{font-size:17.5px;line-height:1.6}
 
+/* ---------- the headword at the top of a word card ---------- */
+.word-hero{position:relative}
+.hero-word.has-morph{display:inline-block;cursor:pointer;border-radius:14px;
+  padding:2px 14px;transition:background .16s,box-shadow .16s}
+@media (hover:hover){
+  .hero-word.has-morph:hover{background:var(--accent-soft);
+    box-shadow:inset 0 1px 0 var(--glass-edge)}
+}
+.hero-word.has-morph.open{background:var(--accent-soft);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.hero-hint{font-size:11.5px;letter-spacing:.015em;color:var(--faint);margin-top:-2px}
+.hero-hint .tap{display:none}
+@media (hover:none){.hero-hint .hov{display:none}.hero-hint .tap{display:inline}}
+.hero-anchor{position:relative}
+.heromorph{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 6px);z-index:8;
+  width:min(100%,430px);text-align:left;max-height:min(58vh,540px);overflow-y:auto;
+  -webkit-overflow-scrolling:touch}
+.heromorph .wcard{margin-bottom:8px;
+  box-shadow:inset 0 1px 0 var(--glass-edge), 0 24px 54px -20px var(--glass-drop)}
+.heromorph .wcard:last-child{margin-bottom:0}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
@@ -1158,7 +1178,8 @@ function morphHTML(s, v, i){
     const uses = (rootMap()[m.r] || []).filter(u => !(u[0] === String(s) && u[1] === String(v) && u[2] === i));
     rows.push(["Root", '<span class="wroot">' + esc(m.r) + '</span>' +
       (uses.length ? '<span style="color:var(--faint);font-size:13px"> &nbsp;' + uses.length +
-        ' other word' + (uses.length === 1 ? '' : 's') + ' here share it</span>' : '')]);
+        (uses.length === 1 ? ' other word here shares it' : ' other words here share it') +
+        '</span>' : '')]);
   }
   if (m && m.l && skeleton(m.l) !== skeleton(word[0]))
     rows.push(["Base form", '<span class="wlem">' + esc(m.l) + '</span>']);
@@ -1206,6 +1227,41 @@ function tapVerseWord(el){
   panel.innerHTML = morphHTML(s, v, i);
 }
 
+/* ---------- the headword at the top of a card ----------
+   The vocabulary entry's Arabic is sometimes one word, sometimes a short
+   phrase. Find it inside its own verse — the same fuzzy match that paints a
+   word gold — and we can show its root and grammar without storing anything
+   extra. Up to three distinct words, so a phrase like "iktālū… yastawfūn"
+   explains both of its verbs.                                              */
+function headwordTargets(w){
+  if (!HAVE_VERSES || !HAVE_MORPH) return [];
+  const book = VERSES[w.surah]; if (!book) return [];
+  const tokens = [].concat.apply([], String(w.ar || "").split(/\s+/)
+                   .map(skeleton).filter(t => t.length >= 3).map(variants));
+  if (!tokens.length) return [];
+  const out = [], seen = {};
+  verseNums(w.v).forEach(n => {
+    const v = book[n]; if (!v) return;
+    v.w.forEach((word, i) => {
+      if (out.length >= 3 || !sameWord(word[0], tokens)) return;
+      const key = skeleton(word[0]);
+      if (seen[key]) return;
+      seen[key] = 1;
+      out.push([w.surah, n, i]);
+    });
+  });
+  return out;
+}
+
+let headPinned = false;
+function showHeadword(on){
+  const box = $("#heroMorph"), el = $("#heroWord");
+  if (!box || !el) return;
+  box.hidden = !on;
+  el.classList.toggle("open", on);
+  el.setAttribute("aria-expanded", String(on));
+}
+
 /* ===================== sheet ===================== */
 let sheetWord = null, lastFocus = null;
 function openSheet(id){
@@ -1227,8 +1283,22 @@ function openSheet(id){
     ? '<button class="pill pill-btn" id="verseBtn" aria-expanded="false" aria-controls="verseBox">' +
       ref + ' &middot; read it' + CARET + '</button>'
     : '<span class="pill">' + ref + '</span>';
+  const heads = headwordTargets(w);
+  const headCard = heads.length
+    ? '<div class="heromorph" id="heroMorph" hidden>' +
+      heads.map(t => morphHTML(t[0], t[1], t[2])).join('') + '</div>'
+    : '';
+  const headHint = heads.length
+    ? '<div class="hero-hint"><span class="hov">Hover the word for its root and grammar</span>' +
+      '<span class="tap">Tap the word for its root and grammar</span></div>'
+    : '';
   $("#sheetBody").innerHTML =
-    '<div class="word-hero"><div class="ar">' + esc(w.ar) + '</div>' +
+    '<div class="word-hero">' +
+      '<div class="hero-anchor">' +
+        '<div class="ar hero-word' + (heads.length ? ' has-morph" id="heroWord" tabindex="0" ' +
+          'role="button" aria-expanded="false" aria-controls="heroMorph"' : '"') + '>' +
+          esc(w.ar) + '</div>' + headHint + headCard +
+      '</div>' +
       '<div class="tr">' + esc(w.tr) + '</div>' +
       '<div class="mean">' + esc(w.meaning) + '</div>' +
       '<div class="meta">' + verseLabel +
@@ -1251,6 +1321,15 @@ function openSheet(id){
     '</div>';
   $("#sheet").classList.add("open"); $("#scrim").classList.add("open");
   $("#sheetClose").focus();
+
+  headPinned = false;
+  const head = $("#heroWord");
+  if (head && window.matchMedia("(hover:hover)").matches){
+    head.addEventListener("mouseenter", () => showHeadword(true));
+    head.closest(".hero-anchor").addEventListener("mouseleave", () => {
+      if (!headPinned) showHeadword(false);
+    });
+  }
 }
 function closeSheet(){
   $("#sheet").classList.remove("open"); $("#scrim").classList.remove("open");
@@ -1287,6 +1366,9 @@ document.addEventListener("click", e => {
     if (open) box.scrollIntoView({block: "nearest", behavior: "smooth"});
     return;
   }
+
+  const head = t.closest("#heroWord");
+  if (head){ headPinned = !headPinned; showHeadword(headPinned); return; }
 
   const verseWord = t.closest(".wbw-w");
   if (verseWord){ tapVerseWord(verseWord); return; }
@@ -1393,6 +1475,10 @@ document.addEventListener("keydown", e => {
   if ((e.key === "Enter" || e.key === " ") && document.activeElement &&
       document.activeElement.classList.contains("wbw-w")){
     e.preventDefault(); tapVerseWord(document.activeElement);
+  }
+  if ((e.key === "Enter" || e.key === " ") && document.activeElement &&
+      document.activeElement.id === "heroWord"){
+    e.preventDefault(); headPinned = !headPinned; showHeadword(headPinned);
   }
 });
 
