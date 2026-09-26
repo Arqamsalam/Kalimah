@@ -17,6 +17,11 @@ else on the site, it says where.
 
 Currently **20 surahs, 480 words, 492 verses, 2,078 words of Qur'an text**.
 
+English is set in Source Serif 4 — the surah names, the meanings, the notes and
+the translations all read like a printed book, while the sans-serif stays on the
+controls. The whole type scheme is one block at the end of the stylesheet marked
+`the reading voice`.
+
 The surfaces are glass: every panel is translucent and blurs whatever is
 behind it, lit by a soft colour wash fixed to the page, with a bright hairline
 along its top edge. The whole effect lives in one block at the end of the
