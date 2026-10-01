@@ -647,6 +647,16 @@ body{font-size:17.5px;line-height:1.55}
   box-shadow:inset 0 1px 0 var(--glass-edge), 0 24px 54px -20px var(--glass-drop)}
 .heromorph .wcard:last-child{margin-bottom:0}
 
+/* ---------- quiz: questions that aren't only translation ---------- */
+.quiz-q .qtext{font-family:"Source Serif 4",Georgia,serif;font-size:18px;line-height:1.5;
+  color:var(--ink);margin:4px 0 0;text-wrap:balance}
+.opt.opt-ar{justify-content:center;padding:14px 15px}
+.opt.opt-ar .ar{font-size:27px;line-height:1.6}
+.quiz-actions{display:flex;gap:10px;align-items:stretch}
+.quiz-actions .abtn{flex:none;min-width:142px}
+.quiz-actions .cta{flex:1}
+.fbtn.on{color:var(--gold)}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
@@ -772,6 +782,15 @@ let saved = new Set();
 try { saved = new Set(JSON.parse(localStorage.getItem("kalimah.saved") || "[]")); } catch (e) {}
 function persist(){ try { localStorage.setItem("kalimah.saved", JSON.stringify([...saved])); } catch (e) {} }
 const byId = id => ALL.find(w => w.id === id);
+function toggleSaved(id){
+  const on = !saved.has(id);
+  on ? saved.add(id) : saved.delete(id);
+  persist();
+  refreshStars();
+  if (document.querySelector("#scr-saved.active")) renderSaved();
+  return on;
+}
+
 
 /* ===================== theme ===================== */
 (function(){
@@ -917,6 +936,10 @@ function renderMode(){
 }
 
 /* ---------- flashcards ---------- */
+const STARBTN = on => '<svg viewBox="0 0 24 24" fill="' + (on ? 'currentColor' : 'none') +
+  '" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">' +
+  '<path d="M12 3.6l2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L3.6 9.8l5.8-.9z"/></svg>';
+
 let deck = { order:[], i:0, flipped:false };
 function startCards(){
   deck = { order: cur.words.map((_, i) => i), i:0, flipped:false };
@@ -939,25 +962,132 @@ function drawCards(){
       '<span class="progress"><i style="width:' + ((deck.i + 1) / deck.order.length * 100) + '%"></i></span>' +
       '<span class="flash-count">' + (deck.i + 1) + ' / ' + deck.order.length + '</span>' +
       '<button class="fbtn" id="nextCard" aria-label="Next card"' + (deck.i === deck.order.length - 1 ? ' disabled' : '') + '><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l8 8-8 8"/></svg></button>' +
+      '<button class="fbtn' + (saved.has(w.id) ? ' on' : '') + '" id="saveCard" aria-label="' +
+        (saved.has(w.id) ? 'Saved \u2014 tap to remove' : 'Save this word') + '">' + STARBTN(saved.has(w.id)) + '</button>' +
       '<button class="fbtn" id="shuffleCards" aria-label="Shuffle deck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h4l4 12h6"/><path d="M3 18h4l2-6"/><path d="M17 3l3 3-3 3"/><path d="M17 15l3 3-3 3"/></svg></button>' +
     '</div>';
 }
 
-/* ---------- quiz ---------- */
+/* ---------- quiz ----------
+   A word is more than its translation, so the quiz asks about everything the
+   card holds: what it means, which word carries a meaning, the three-letter
+   root, the root family, the grammar, why this word was chosen, and which
+   word a memory hook belongs to. Wrong answers are always real answers
+   borrowed from other words in the same surah, so nothing is a giveaway. */
 let quiz = null;
 function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function firstSentence(s){
+  const t = String(s || "").trim();
+  const m = t.match(/^[^.!?]*[.!?]["\u201d')\]]?/);
+  return (m ? m[0] : t).trim();
+}
+function brief(s, cap){
+  let t = firstSentence(s).replace(/\s+/g, " ");
+  cap = cap || 105;
+  if (t.length > cap){
+    t = t.slice(0, cap);
+    const sp = t.lastIndexOf(" ");
+    if (sp > 45) t = t.slice(0, sp);
+    t += "…";
+  }
+  return t;
+}
+/* a hook usually says the word out loud — hide it, or there's nothing to ask */
+function maskWord(text, w){
+  let out = String(text || "");
+  String(w.tr || "").split(/[^A-Za-zÀ-ɏḀ-ỿʿʾ'-]+/)
+    .filter(b => b.length >= 4)
+    .forEach(b => {
+      out = out.replace(new RegExp(b.replace(/[.*+?^${}()|[\]\\\-]/g, "\\$&"), "gi"), "——");
+    });
+  String(w.ar || "").split(/\s+/).forEach(a => {
+    if (a.length >= 3) out = out.split(a).join("——");
+  });
+  return out;
+}
+/* the three letters, borrowed from the morphology of the verse itself */
+function rootLetters(w){
+  if (typeof MORPH === "undefined" || !MORPH) return "";
+  const t = headwordTargets(w)[0];
+  if (!t) return "";
+  const m = ((MORPH[t[0]] || {})[t[1]] || [])[t[2]];
+  return (m && m.r) || "";
+}
+
+const QUIZ_KINDS = {
+  meaning: { ask: "What does this mean?",
+             get: w => brief(w.meaning) },
+  rootfamily: { ask: "Which root family is this word from?",
+                get: w => brief(w.root) },
+  grammar: { ask: "Which of these is true of this word?",
+             get: w => brief(w.grammar) },
+  why: { ask: "Why was this exact word chosen?",
+         get: w => brief(w.why) },
+  rootletters: { ask: "Which three-letter root is it built on?",
+                 get: rootLetters, arOptions: true },
+  reverse: { ask: "Which word carries this meaning?",
+             prompt: w => brief(w.meaning), get: w => w.ar, arOptions: true },
+  hook: { ask: "Which word does this hook belong to?",
+          prompt: w => maskWord(w.note, w), get: w => w.ar, arOptions: true }
+};
+
+function makeQuestion(w, kind, pool){
+  const spec = QUIZ_KINDS[kind];
+  const right = spec.get(w);
+  if (!right) return null;
+  if (spec.prompt && !spec.prompt(w)) return null;
+
+  const seen = { [right]: 1 }, wrong = [];
+  shuffle(pool.slice()).forEach(x => {
+    if (wrong.length >= 3 || x === w) return;
+    const v = spec.get(x);
+    if (!v || seen[v]) return;
+    seen[v] = 1; wrong.push(v);
+  });
+  if (wrong.length < 3 && pool !== ALL){
+    shuffle(ALL.slice()).forEach(x => {
+      if (wrong.length >= 3 || x === w) return;
+      const v = spec.get(x);
+      if (!v || seen[v]) return;
+      seen[v] = 1; wrong.push(v);
+    });
+  }
+  if (wrong.length < 3) return null;
+
+  return {
+    w: w, kind: kind, ask: spec.ask,
+    ar: spec.prompt ? "" : w.ar,
+    tr: spec.prompt ? "" : w.tr,
+    text: spec.prompt ? spec.prompt(w) : "",
+    arOptions: !!spec.arOptions,
+    options: shuffle([{ text: right, ok: true }].concat(wrong.map(v => ({ text: v, ok: false }))))
+  };
+}
+
 function startQuiz(){
-  const pool = shuffle(cur.words.slice());
-  const n = Math.min(10, pool.length);
-  const brief = m => String(m).split(/\s+[—–]\s+/)[0];
-  quiz = { qs: pool.slice(0, n).map(w => {
-      const wrong = shuffle(cur.words.filter(x => x.meaning !== w.meaning)).slice(0, 3)
-        .map(x => ({ text: brief(x.meaning), ok:false }));
-      return { w, options: shuffle([{ text: brief(w.meaning), ok:true }, ...wrong]) };
-    }), i:0, score:0, answered:false };
+  const pool = cur.words;
+  const order = shuffle(pool.slice());
+  const kinds = shuffle(Object.keys(QUIZ_KINDS));
+  const qs = [];
+  for (let i = 0; i < order.length && qs.length < 10; i++){
+    const w = order[i];
+    /* walk the kinds so one round covers several angles, not ten translations */
+    const tries = kinds.slice(qs.length % kinds.length).concat(kinds);
+    for (let k = 0; k < tries.length; k++){
+      const q = makeQuestion(w, tries[k], pool);
+      if (q){ qs.push(q); break; }
+    }
+  }
+  quiz = { qs: qs, i: 0, score: 0, answered: false };
   drawQuiz();
 }
+
 function drawQuiz(){
+  if (!quiz.qs.length){
+    $("#modeBody").innerHTML = '<div class="empty"><p>This surah is too short for a quiz.</p></div>';
+    return;
+  }
   if (quiz.i >= quiz.qs.length){
     const pct = Math.round(quiz.score / quiz.qs.length * 100);
     const msg = pct === 100 ? "Perfect. These words are yours now."
@@ -975,10 +1105,14 @@ function drawQuiz(){
     '<div class="quiz-bar"><span>Question ' + (quiz.i + 1) + ' of ' + quiz.qs.length + '</span>' +
     '<span class="progress"><i style="width:' + (quiz.i / quiz.qs.length * 100) + '%"></i></span>' +
     '<span>Score ' + quiz.score + '</span></div>' +
-    '<div class="quiz-q"><div class="ask">What does this mean?</div>' +
-    '<div class="ar">' + esc(q.w.ar) + '</div><div class="tr">' + esc(q.w.tr) + '</div></div>' +
+    '<div class="quiz-q"><div class="ask">' + esc(q.ask) + '</div>' +
+      (q.ar ? '<div class="ar">' + esc(q.ar) + '</div>' : '') +
+      (q.tr ? '<div class="tr">' + esc(q.tr) + '</div>' : '') +
+      (q.text ? '<p class="qtext">' + esc(q.text) + '</p>' : '') + '</div>' +
     '<div class="opts">' + q.options.map((o, k) =>
-      '<button class="opt" data-opt="' + k + '">' + esc(o.text) + '</button>').join('') + '</div>' +
+      '<button class="opt' + (q.arOptions ? ' opt-ar' : '') + '" data-opt="' + k + '">' +
+      (q.arOptions ? '<span class="ar">' + esc(o.text) + '</span>' : esc(o.text)) +
+      '</button>').join('') + '</div>' +
     '<div id="quizNext"></div>';
 }
 
@@ -1441,6 +1575,7 @@ document.addEventListener("click", e => {
   if (t.closest("#prevCard")){ deck.i = Math.max(0, deck.i - 1); deck.flipped = false; drawCards(); return; }
   if (t.closest("#nextCard")){ deck.i = Math.min(deck.order.length - 1, deck.i + 1); deck.flipped = false; drawCards(); return; }
   if (t.closest("#shuffleCards")){ deck.order = shuffle(deck.order); deck.i = 0; deck.flipped = false; drawCards(); return; }
+  if (t.closest("#saveCard")){ toggleSaved(cur.words[deck.order[deck.i]].id); drawCards(); return; }
 
   /* quiz */
   const opt = t.closest(".opt");
@@ -1454,9 +1589,30 @@ document.addEventListener("click", e => {
       if (q.options[+b.dataset.opt].ok) b.classList.add("correct");
       else if (b === opt) b.classList.add("wrong");
     });
+    const on = saved.has(q.w.id);
     $("#quizNext").innerHTML =
-      '<div class="keepsake" style="margin-top:4px"><div class="dlabel">' + (right ? "Correct" : "The hook") + '</div><p>' + esc(q.w.note) + '</p></div>' +
-      '<button class="cta" id="nextQ">' + (quiz.i === quiz.qs.length - 1 ? "See score" : "Next question") + '</button>';
+      '<div class="keepsake" style="margin-top:4px">' +
+        '<div class="dlabel">' + (right ? "Correct" :
+          (q.kind === "hook" ? "The answer" : "The hook")) + '</div>' +
+        '<p class="ar" style="font-size:26px;margin-bottom:4px">' + esc(q.w.ar) + '</p>' +
+        '<p style="font-size:15px;color:var(--ink-2);margin-bottom:8px">' +
+          esc(q.w.tr) + ' \u2014 ' + esc(brief(q.w.meaning)) + '</p>' +
+        '<p>' + esc(q.kind === "hook" ? firstSentence(q.w.root) : q.w.note) + '</p></div>' +
+      '<div class="quiz-actions">' +
+        '<button class="abtn' + (on ? ' saved' : '') + '" id="quizSave">' + STARBTN(on) +
+          '<span>' + (on ? 'Saved' : 'Save word') + '</span></button>' +
+        '<button class="cta" id="nextQ">' + (quiz.i === quiz.qs.length - 1 ? "See score" : "Next question") + '</button>' +
+      '</div>';
+    $("#quizNext").scrollIntoView({ block: "nearest", behavior: "smooth" });
+    return;
+  }
+  const qs = t.closest("#quizSave");
+  if (qs){
+    const w = quiz.qs[quiz.i].w;
+    const on = toggleSaved(w.id);
+    qs.classList.toggle("saved", on);
+    qs.querySelector("span").textContent = on ? "Saved" : "Save word";
+    qs.querySelector("svg").setAttribute("fill", on ? "currentColor" : "none");
     return;
   }
   if (t.closest("#nextQ")){ quiz.i++; quiz.answered = false; drawQuiz(); return; }
