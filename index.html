@@ -759,9 +759,9 @@ body{font-size:17.5px;line-height:1.55}
 </div>
 
 
-<script src="data/verses.js?v=23"></script>
-<script src="data/morph.js?v=23"></script>
-<script src="data/surahs.js?v=23"></script>
+<script src="data/verses.js?v=24"></script>
+<script src="data/morph.js?v=24"></script>
+<script src="data/surahs.js?v=24"></script>
 <script>
 
 /* ===================== helpers ===================== */
@@ -1232,8 +1232,22 @@ function variants(t){
   if (withoutPrefix !== t && withoutPrefix.length >= 4) out.push(withoutPrefix);
   return out;
 }
+/* The tokens an entry is matched by. Normally only words of three letters or
+   more are usable — a two-letter particle would light up half the verse. But
+   an entry made ENTIRELY of short words (qul · qul huwa) would then have
+   nothing to match on at all and would silently lose its verse link, so for
+   those we keep the short skeletons and demand an exact match instead. */
+function matchTokens(ar){
+  const parts = String(ar || "").split(/\s+/).map(skeleton).filter(Boolean);
+  const long  = [].concat.apply([], parts.filter(t => t.length >= 3).map(variants));
+  if (long.length) return long;
+  const short = parts.slice();
+  short.exact = true;
+  return short;
+}
 function sameWord(verseWord, entryTokens){
   const a = skeleton(verseWord), a2 = squeeze(a);
+  if (entryTokens && entryTokens.exact) return entryTokens.indexOf(a) >= 0;
   if (a.length < 3) return false;
   return entryTokens.some(b => {
     const b2 = squeeze(b);
@@ -1263,8 +1277,7 @@ function oneVerseHTML(surahNum, n, tokens, showSrc){
 function verseHTML(surahNum, nums, entryAr){
   if (!HAVE_VERSES) return "";
   if (!VERSES[surahNum]) return "";
-  const tokens = [].concat.apply([], String(entryAr || "").split(/\s+/)
-                   .map(skeleton).filter(t => t.length >= 3).map(variants));
+  const tokens = matchTokens(entryAr);
   const blocks = nums.map((n, i) => oneVerseHTML(surahNum, n, tokens, i === nums.length - 1)).filter(Boolean);
   return blocks.length
     ? '<div class="versebox" id="verseBox" hidden>' +
@@ -1370,8 +1383,7 @@ function tapVerseWord(el){
 function headwordTargets(w){
   if (!HAVE_VERSES || !HAVE_MORPH) return [];
   const book = VERSES[w.surah]; if (!book) return [];
-  const tokens = [].concat.apply([], String(w.ar || "").split(/\s+/)
-                   .map(skeleton).filter(t => t.length >= 3).map(variants));
+  const tokens = matchTokens(w.ar);
   if (!tokens.length) return [];
   const out = [], seen = {};
   verseNums(w.v).forEach(n => {
