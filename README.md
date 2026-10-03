@@ -15,7 +15,7 @@ past tense, passive, "she/it"), and the little pieces stuck to its front and
 back — the *wa-*, the *al-*, the attached pronoun. If the root turns up anywhere
 else on the site, it says where.
 
-Currently **20 surahs, 480 words, 492 verses, 2,078 words of Qur'an text**.
+Currently **38 surahs, 617 words, 603 verses, 2,590 words of Qur'an text**.
 
 English is set in Source Serif 4 — the surah names, the meanings, the notes and
 the translations all read like a printed book, while the sans-serif stays on the
