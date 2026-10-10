@@ -657,6 +657,207 @@ body{font-size:17.5px;line-height:1.55}
 .quiz-actions .cta{flex:1}
 .fbtn.on{color:var(--gold)}
 
+/* ================= the quiz, round by round =================
+   Ten words a round, walked in passes; slips go to a basket you can
+   practise; any question can open its word's card; and two hands-on
+   kinds — Match and Arrange — sit among the multiple choice.           */
+.segmented.five button{flex:1 1 auto;padding:7px 7px;white-space:nowrap}
+.quiz-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:-4px 0 12px;font-size:13px;color:var(--muted)}
+.basket-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px 6px 9px;border-radius:999px;
+  font-size:13px;font-weight:600;color:var(--gold);background:var(--gold-soft);
+  border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);
+  box-shadow:inset 0 1px 0 var(--glass-edge)}
+.basket-btn svg{width:15px;height:15px}
+.basket-btn:disabled{color:var(--faint);background:var(--glass-quiet);border-color:var(--glass-border)}
+.qwrap{position:relative}
+.qstudy{position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px 5px 8px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--accent);
+  background:var(--glass);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:saturate(170%) blur(12px);backdrop-filter:saturate(170%) blur(12px);
+  box-shadow:inset 0 1px 0 var(--glass-edge)}
+.qstudy svg{width:14px;height:14px}
+.quiz-q{position:relative}
+.quiz-q .ask{padding-right:84px}
+.quiz-actions .fbtn{width:50px;height:auto;min-height:50px;border-radius:14px;color:var(--ink-2)}
+.quiz-actions .fbtn.on{color:var(--gold)}
+.quiz-actions .fbtn svg{width:19px;height:19px}
+.keepsake.fb{margin-bottom:12px}
+.keepsake.fb-miss{background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 26%,transparent)}
+.keepsake.fb-miss .dlabel{color:var(--bad)}
+.fb-verse{font-size:27px!important;line-height:1.9!important;text-align:center;margin:2px 0 6px!important}
+.fb-en{font-size:15.5px!important;color:var(--ink-2)!important}
+.peek-note{font-size:13.5px;color:var(--muted);margin:-4px 2px 12px;line-height:1.45}
+#quizNext .group{margin-bottom:12px}
+
+/* match */
+.mq{text-align:left}
+.mq .ask{text-align:center}
+.m-ar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.m-en{display:flex;flex-direction:column;gap:7px}
+.m-tile{border-radius:14px;border:1.5px solid var(--glass-border);background:var(--glass-quiet);
+  box-shadow:inset 0 1px 0 var(--glass-edge);transition:transform .12s,background .15s,border-color .15s;color:var(--ink)}
+.m-a{padding:6px 8px;min-height:62px;display:flex;align-items:center;justify-content:center}
+.m-a .ar{font-size:25px;line-height:1.5}
+.m-e{padding:10px 13px;text-align:left;font-family:"Source Serif 4",Georgia,serif;font-size:15.5px;line-height:1.38}
+.m-tile:active{transform:scale(.97)}
+.m-tile.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.m-tile.bad{border-color:var(--bad);background:var(--bad-soft);animation:wob .4s}
+.m-tile.p0{--pc:#1F9461}.m-tile.p1{--pc:#C0841A}.m-tile.p2{--pc:#9A4FC9}.m-tile.p3{--pc:#0F8C9C}
+.m-tile[class*=" p"]{border-color:var(--pc);background:color-mix(in srgb,var(--pc) 13%,transparent);color:var(--ink)}
+.m-tile[class*=" p"]::after{content:"\2713";float:right;color:var(--pc);font-weight:700;margin-left:6px}
+.m-a[class*=" p"]::after{float:none;margin-left:8px}
+.m-tile:disabled{cursor:default}
+.m-help{font-size:13px;color:var(--muted);text-align:center;margin:12px 0 0}
+
+/* arrange */
+.aq .ask{text-align:center}
+.arr-src{text-align:center;font-size:12.5px;color:var(--faint);margin:-8px 0 12px;letter-spacing:.02em}
+.arr-gloss{font-family:"Source Serif 4",Georgia,serif;font-size:15.5px;line-height:1.55;color:var(--ink-2);
+  text-align:center;margin-bottom:14px;text-wrap:balance}
+.arr-gloss .dlabel{display:block;margin-bottom:2px}
+.arr-gloss i{font-style:normal;color:var(--faint);margin:0 6px}
+.arr-line{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;min-height:62px;padding:9px;border-radius:16px;
+  border:1.5px dashed color-mix(in srgb,var(--accent) 38%,transparent);background:color-mix(in srgb,var(--accent) 5%,transparent);margin-bottom:14px}
+.arr-pool{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:14px}
+.arr-tile{padding:4px 13px;border-radius:12px;background:var(--glass);border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 6px 14px -10px var(--glass-drop);color:var(--ink);transition:transform .12s}
+.arr-tile .ar{font-size:24px;line-height:1.7}
+.arr-tile:active{transform:scale(.95)}
+.arr-tile.gone{visibility:hidden}
+.arr-tile.ok{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.arr-tile.no{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.arr-slot{width:46px;height:44px;border-radius:12px;border:1px dashed var(--sep)}
+.arr-btns{display:flex;gap:10px}
+.arr-btns .abtn{flex:none;min-width:96px}
+.arr-btns .cta:disabled,.arr-btns .abtn:disabled{opacity:.45}
+
+/* end of a round */
+.cycle{background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;padding:14px 16px 12px;
+  margin:12px 0 4px;box-shadow:inset 0 1px 0 var(--glass-edge)}
+.cycle .cyc-top{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;color:var(--muted);margin-bottom:8px;font-variant-numeric:tabular-nums}
+.cycle .progress{display:block;height:7px}
+.cycle .progress i{background:linear-gradient(90deg,var(--accent),var(--gold))}
+.cycle p{margin:9px 0 0;font-size:14px;color:var(--muted)}
+.cycle.done{background:var(--good-soft);border-color:color-mix(in srgb,var(--good) 28%,transparent)}
+.cycle.done .dlabel{color:var(--good)}
+.cycle.done p{color:var(--ink-2);font-family:"Source Serif 4",Georgia,serif;font-size:16px;margin-top:4px}
+.score-btns{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.abtn.wide{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;flex:none;padding:13px;font-size:15.5px;font-weight:600;color:var(--gold)}
+.abtn.wide svg{width:17px;height:17px}
+
+@keyframes wob{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ================= play & learn: Word Rain ================= */
+.game-intro{text-align:center;padding:6px 4px 8px}
+.gi-art{display:flex;justify-content:center;align-items:flex-start;gap:12px;height:104px;margin:0 auto 8px;overflow:hidden}
+.gi-art .ar{font-size:28px;padding:2px 14px;border-radius:16px;background:var(--glass);
+  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),0 14px 30px -18px var(--glass-drop);
+  animation:drift 3.2s ease-in-out infinite;white-space:nowrap}
+.gi-art .ar:nth-child(1){margin-top:6px}
+.gi-art .ar:nth-child(2){margin-top:38px;animation-delay:-1.1s;color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,transparent)}
+.gi-art .ar:nth-child(3){margin-top:14px;animation-delay:-2s}
+.gi-art .ar:empty{display:none}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(9px)}}
+.gi-kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent)}
+.gi-title{font-family:"Source Serif 4",Georgia,serif;font-size:38px;font-weight:600;margin:2px 0 6px;letter-spacing:-.01em}
+.gi-sub{font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.5;color:var(--ink-2);margin:0 auto 16px;max-width:30em;text-wrap:balance}
+.gi-rules{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:16px 0 4px}
+.gi-rules span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);padding:6px 11px;border-radius:999px;
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.gi-rules b{color:var(--ink);font-weight:700}
+.gi-h{color:#E0475B!important;display:inline-flex}.gi-h svg{width:14px;height:14px}
+.gi-gold{color:var(--gold)!important}
+.gi-scope{max-width:380px;margin:0 auto 16px}
+.gi-scope button{font-size:13.5px}
+.gi-scope button:disabled{opacity:.4}
+.gi-play{max-width:380px;margin:0 auto;display:block;font-size:18px;padding:15px;
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,var(--gold)))}
+.gi-best{font-size:14.5px;color:var(--muted);margin:14px 0 4px}
+.gi-best b{color:var(--gold);font-size:17px}
+.gi-foot{font-size:12.5px;color:var(--faint);margin:8px auto 0;max-width:32em;line-height:1.5}
+
+.game{position:relative}
+.game.shake{animation:wob .38s}
+.g-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.g-hud{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.g-score{display:flex;flex-direction:column;line-height:1}
+.g-score b{font-size:28px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.g-score b.bump{animation:bump .3s}
+.g-score span{font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-top:3px}
+@keyframes bump{50%{transform:scale(1.18)}}
+.g-combo{flex:1;text-align:center;font-weight:760;font-size:19px;color:var(--accent);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.g-combo small{font-size:12px;font-weight:600;color:var(--muted)}
+.g-combo.hot{color:var(--gold);text-shadow:0 0 14px color-mix(in srgb,var(--gold) 55%,transparent);animation:bump .35s}
+.g-lives{display:flex;gap:2px}
+.g-heart{display:inline-flex;color:#E0475B;animation:pulse 1.4s ease-in-out infinite}
+.g-heart svg{width:19px;height:19px}
+@keyframes pulse{50%{transform:scale(1.12)}}
+.g-icon{flex:none;width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.g-icon svg{width:17px;height:17px}
+.g-prompt{text-align:center;padding:11px 16px 13px;border-radius:18px;margin-bottom:10px;
+  background:var(--glass-strong);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 16px 34px -22px var(--glass-drop)}
+.g-mean{font-family:"Source Serif 4",Georgia,serif;font-size:20px;font-weight:600;line-height:1.35;min-height:27px;text-wrap:balance}
+.g-mean.pop{animation:popin .32s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popin{0%{opacity:0;transform:translateY(-6px) scale(.96)}100%{opacity:1;transform:none}}
+.g-arena{position:relative;height:clamp(380px,58vh,540px);border-radius:22px;overflow:hidden;touch-action:manipulation;
+  user-select:none;-webkit-user-select:none;
+  background:
+    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb,var(--accent) 20%,transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb,var(--accent) 7%,transparent), color-mix(in srgb,var(--gold) 9%,transparent));
+  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 -30px 50px -40px var(--glass-drop)}
+.g-ground{position:absolute;left:0;right:0;bottom:0;height:5px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 45%,transparent),transparent);transition:background .2s}
+.g-arena.danger .g-ground{background:linear-gradient(90deg,transparent,var(--bad),transparent);box-shadow:0 0 22px var(--bad)}
+.g-drop{position:absolute;left:0;top:0;padding:3px 14px;border-radius:16px;color:var(--ink);will-change:transform;
+  background:var(--glass-strong);border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 12px 26px -14px var(--glass-drop);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center}
+.g-drop .ar{font-size:26px;line-height:1.5;white-space:normal;text-align:center;max-width:100%}
+.g-drop.gold{background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 34%,var(--surface)),color-mix(in srgb,var(--gold) 14%,var(--surface)));
+  border-color:color-mix(in srgb,var(--gold) 70%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent),0 0 26px color-mix(in srgb,var(--gold) 45%,transparent)}
+.g-drop.caught{animation:catch .3s forwards;pointer-events:none}
+@keyframes catch{to{opacity:0;scale:1.35}}
+.g-drop.fade{opacity:0;transition:opacity .35s;pointer-events:none}
+.g-drop.wrongtap{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);pointer-events:none}
+.g-drop.landed{border-color:var(--bad);background:var(--bad-soft);opacity:1!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--bad) 30%,transparent)}
+.g-gloss{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:12.5px;line-height:1.25;color:var(--ink-2);
+  max-width:150px;white-space:normal;text-align:center;padding-bottom:3px}
+.g-spark{position:absolute;width:7px;height:7px;border-radius:50%;pointer-events:none;
+  background:var(--accent);animation:spark .65s ease-out forwards}
+.g-spark.gold{background:var(--gold)}
+.g-spark.good:nth-child(3n){background:var(--good)}
+@keyframes spark{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2);opacity:0}}
+.g-float{position:absolute;transform:translateX(-50%);font-weight:800;font-size:20px;pointer-events:none;
+  color:var(--good);animation:rise .9s ease-out forwards;text-shadow:0 2px 10px var(--glass-drop)}
+.g-float.gold{color:var(--gold);font-size:24px}
+@keyframes rise{to{transform:translate(-50%,-56px);opacity:0}}
+.g-over{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:5;padding:16px}
+.g-over.show{display:flex}
+.g-over.count,.g-over.banner{pointer-events:none}
+.g-over.final,.g-over.show:not(.count):not(.banner){background:color-mix(in srgb,var(--ground) 55%,transparent);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);overflow-y:auto;align-items:flex-start}
+.g-count{font-family:"Source Serif 4",Georgia,serif;font-size:96px;font-weight:700;color:var(--accent);animation:countin .62s ease-out}
+@keyframes countin{0%{transform:scale(1.8);opacity:0}40%{opacity:1}100%{transform:scale(.9);opacity:.15}}
+.g-banner{text-align:center;padding:14px 26px;border-radius:20px;background:var(--glass-strong);border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 20px 40px -18px var(--glass-drop);animation:popin .4s cubic-bezier(.2,1.4,.4,1)}
+.g-banner b{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:32px;color:var(--gold)}
+.g-banner span{font-size:13px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.g-card{width:100%;max-width:420px;margin:auto;text-align:center;padding:20px 16px 16px;border-radius:22px;
+  background:var(--glass-strong);border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 24px 50px -20px var(--glass-drop);display:flex;flex-direction:column;gap:10px}
+.g-card .group{text-align:left;margin:0}
+.g-card .grouplabel{text-align:left;margin:6px 0 -2px}
+.go-title{font-size:13px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.g-new{font-size:14px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--gold);animation:bump .6s 2}
+.go-score{font-family:"Source Serif 4",Georgia,serif;font-size:58px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.go-best{font-size:14px;color:var(--muted);margin-top:-4px}
+.go-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0}
+.go-stats span{display:flex;flex-direction:column;font-size:11.5px;color:var(--muted);padding:8px 2px;border-radius:12px;background:var(--glass-quiet)}
+.go-stats b{font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
@@ -687,7 +888,7 @@ body{font-size:17.5px;line-height:1.55}
         <div class="group">
           <div class="row" style="display:block"><div class="dlabel">Tap a word</div><div class="dval">Every entry opens a card with its root, what it means here, the grammar, and why this exact word was chosen.</div></div>
           <div class="row" style="display:block"><div class="dlabel">Star what you want back</div><div class="dval">Saved words gather in the Saved tab and stay in this browser.</div></div>
-          <div class="row" style="display:block"><div class="dlabel">Then test it</div><div class="dval">Each surah has flashcards and a ten-question quiz built from its own vocabulary.</div></div>
+          <div class="row" style="display:block"><div class="dlabel">Then test it</div><div class="dval">Each surah has flashcards, a quiz that walks through every word ten at a time and keeps a basket of your mistakes, and Play &amp; Learn &mdash; a game that drills the same words.</div></div>
         </div>
         <p class="footnote">Transliteration follows a light academic scheme. Meanings are study glosses, not a translation of the Qur&rsquo;an.</p>
       </div>
@@ -759,9 +960,9 @@ body{font-size:17.5px;line-height:1.55}
 </div>
 
 
-<script src="data/verses.js?v=24"></script>
-<script src="data/morph.js?v=24"></script>
-<script src="data/surahs.js?v=24"></script>
+<script src="data/verses.js?v=25"></script>
+<script src="data/morph.js?v=25"></script>
+<script src="data/surahs.js?v=25"></script>
 <script>
 
 /* ===================== helpers ===================== */
@@ -881,10 +1082,10 @@ function renderSurah(){
       '<div class="ar hero-ar">' + esc(s.ar) + '</div></div>' +
       (s.blurb ? '<p class="hero-blurb">' + esc(s.blurb) + '</p>' : '') +
     '</div>' +
-    '<div class="segmented" role="tablist">' +
-      ['words','read','cards','quiz'].map(m =>
+    '<div class="segmented five" role="tablist">' +
+      ['words','read','cards','quiz','play'].map(m =>
         '<button role="tab" data-mode="' + m + '" aria-selected="' + (mode === m) + '">' +
-        ({words:'Words', read:'Read', cards:'Cards', quiz:'Quiz'})[m] + '</button>').join('') +
+        ({words:'Words', read:'Read', cards:'Cards', quiz:'Quiz', play:'Play &amp; Learn'})[m] + '</button>').join('') +
     '</div><div id="modeBody"></div>';
   $("#surahBody").innerHTML = head;
   renderMode();
@@ -929,10 +1130,12 @@ function wordsView(){
 }
 
 function renderMode(){
+  gameStop();
   if (mode === "words") $("#modeBody").innerHTML = wordsView();
   else if (mode === "read") $("#modeBody").innerHTML = readView();
   else if (mode === "cards") startCards();
-  else startQuiz();
+  else if (mode === "play") $("#modeBody").innerHTML = playView();
+  else startQuiz(false);
 }
 
 /* ---------- flashcards ---------- */
@@ -972,8 +1175,9 @@ function drawCards(){
    A word is more than its translation, so the quiz asks about everything the
    card holds: what it means, which word carries a meaning, the three-letter
    root, the root family, the grammar, why this word was chosen, and which
-   word a memory hook belongs to. Wrong answers are always real answers
-   borrowed from other words in the same surah, so nothing is a giveaway. */
+   word a memory hook belongs to — plus two hands-on kinds, Match and
+   Arrange. Wrong answers are always real answers borrowed from other words
+   in the same surah, so nothing is a giveaway. */
 let quiz = null;
 function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
@@ -1065,55 +1269,767 @@ function makeQuestion(w, kind, pool){
   };
 }
 
-function startQuiz(){
-  const pool = cur.words;
-  const order = shuffle(pool.slice());
-  const kinds = shuffle(Object.keys(QUIZ_KINDS));
-  const qs = [];
-  for (let i = 0; i < order.length && qs.length < 10; i++){
-    const w = order[i];
-    /* walk the kinds so one round covers several angles, not ten translations */
-    const tries = kinds.slice(qs.length % kinds.length).concat(kinds);
-    for (let k = 0; k < tries.length; k++){
-      const q = makeQuestion(w, tries[k], pool);
-      if (q){ qs.push(q); break; }
-    }
+/* ---------- quiz memory: cycles and the mistakes basket ----------
+   A surah's words are walked in cycles, ten at a time: no word comes back
+   until every word in the surah has had its turn. Every slip — in the quiz
+   or in Play & Learn — drops the word into a mistakes basket, and getting it
+   right later takes it out again. All of it lives in this browser.          */
+const ROUND = 10;
+const QM_KEY = "kalimah.quiz.v1";
+let QM = { cycle:{}, basket:{}, best:{}, mute:false };
+try {
+  const raw = JSON.parse(localStorage.getItem(QM_KEY) || "null");
+  if (raw && typeof raw === "object") QM = Object.assign(QM, raw);
+} catch (e) {}
+function qmSave(){ try { localStorage.setItem(QM_KEY, JSON.stringify(QM)); } catch (e) {} }
+
+function basketIds(n){ return (QM.basket[n] || []).filter(id => byId(id)); }
+function toBasket(w){
+  if (!w) return;
+  const b = QM.basket[w.surah] || (QM.basket[w.surah] = []);
+  if (b.indexOf(w.id) < 0){ b.push(w.id); qmSave(); }
+}
+function outOfBasket(w){
+  const b = w && QM.basket[w.surah];
+  if (!b) return;
+  const i = b.indexOf(w.id);
+  if (i >= 0){ b.splice(i, 1); qmSave(); }
+}
+function cycleSeen(s){
+  const ids = s.words.map(w => w.id);
+  return (QM.cycle[s.num] || []).filter(id => ids.indexOf(id) >= 0);
+}
+/* returns true when this word was the last one the cycle was waiting for */
+function markSeen(w){
+  const s = SURAHS.find(x => x.num === w.surah);
+  const seen = cycleSeen(s);
+  if (seen.indexOf(w.id) < 0) seen.push(w.id);
+  if (seen.length >= s.words.length){ QM.cycle[s.num] = []; qmSave(); return true; }
+  QM.cycle[s.num] = seen; qmSave();
+  return false;
+}
+/* the next ten: unseen words first; if fewer than ten are left in the cycle,
+   top up with words from the next pass, which then count toward it */
+function pickRound(s){
+  const ids = s.words.map(w => w.id);
+  const size = Math.min(ROUND, ids.length);
+  const seen = cycleSeen(s);
+  let pick = shuffle(ids.filter(id => seen.indexOf(id) < 0)).slice(0, size);
+  if (pick.length < size)
+    pick = pick.concat(shuffle(ids.filter(id => pick.indexOf(id) < 0)).slice(0, size - pick.length));
+  return pick.map(byId);
+}
+
+/* ---------- the hands-on kinds ---------- */
+function makeMatch(w, roundWords, pool){
+  const arSeen = { [skeleton(w.ar)]: 1 }, enSeen = { [brief(w.meaning, 64)]: 1 };
+  const pick = [w];
+  [roundWords, pool, ALL].forEach(src => {
+    shuffle(src.slice()).forEach(x => {
+      if (pick.length >= 4 || x === w || !x.meaning) return;
+      const a = skeleton(x.ar), m = brief(x.meaning, 64);
+      if (!a || arSeen[a] || enSeen[m]) return;
+      arSeen[a] = 1; enSeen[m] = 1; pick.push(x);
+    });
+  });
+  if (pick.length < 4) return null;
+  return { type:"match", w: w, ask: "Match each word to its meaning", words: pick,
+           colA: shuffle(pick.slice()), colE: shuffle(pick.slice()),
+           pairs: {}, nextColor: 0, slips: 0, sel: null, flash: null, done: false };
+}
+
+function makeArrange(w){
+  if (!HAVE_VERSES || !VERSES[w.surah]) return null;
+  const n = verseNums(w.v)[0];
+  const v = VERSES[w.surah][n];
+  if (!v || !v.w || v.w.length < 3) return null;
+  let words = v.w.map(x => ({ ar: x[0], en: x[1] }));
+  let partial = false;
+  const MAX = 6;
+  if (words.length > MAX + 1){
+    const toks = matchTokens(w.ar);
+    let hit = v.w.findIndex(x => sameWord(x[0], toks));
+    if (hit < 0) hit = 0;
+    const start = Math.max(0, Math.min(hit - 2, words.length - MAX));
+    words = words.slice(start, start + MAX);
+    partial = true;
   }
-  quiz = { qs: qs, i: 0, score: 0, answered: false };
+  const want = words.map(x => x.ar).join(" ");
+  let order = words.map((_, i) => i);
+  for (let t = 0; t < 12; t++){
+    shuffle(order);
+    if (order.map(i => words[i].ar).join(" ") !== want) break;
+  }
+  if (order.map(i => words[i].ar).join(" ") === want) return null;   // every tile the same
+  return { type:"arrange", w: w, ask: "Put the words back in order", n: n, words: words,
+           partial: partial, order: order, placed: [], done: false, verse: v };
+}
+
+function buildQuestions(words, pool){
+  const kinds = shuffle(Object.keys(QUIZ_KINDS));
+  const n = words.length, special = {};
+  if (n >= 8){ special[3] = "arrange"; special[7] = "match"; }
+  else if (n >= 5){ special[2] = "arrange"; special[n - 1] = "match"; }
+  else if (n >= 3){ special[n - 1] = "match"; }
+  const qs = [];
+  words.forEach((w, i) => {
+    let q = null;
+    if (special[i] === "arrange") q = makeArrange(w);
+    if (special[i] === "match") q = makeMatch(w, words, pool);
+    if (!q){
+      /* walk the kinds so one round covers several angles, not ten translations */
+      const tries = kinds.slice(i % kinds.length).concat(kinds);
+      for (let k = 0; k < tries.length && !q; k++) q = makeQuestion(w, tries[k], pool);
+    }
+    if (q){ q.type = q.type || "choice"; qs.push(q); }
+  });
+  return qs;
+}
+
+function startQuiz(practice){
+  const s = cur;
+  const words = practice
+    ? shuffle(basketIds(s.num)).slice(0, ROUND).map(byId)
+    : pickRound(s);
+  quiz = { qs: buildQuestions(words, s.words), i: 0, score: 0, practice: !!practice,
+           misses: [], cycleDone: false, seenStart: cycleSeen(s).length };
   drawQuiz();
+}
+
+/* a question is settled: score it, remember the slip, move the cycle on */
+function settle(q, right){
+  q.done = true; q.right = right;
+  if (right) quiz.score++;
+  if (q.type === "match"){
+    if (right) outOfBasket(q.w);          /* the slips were already filed, word by word */
+  } else if (!right){
+    toBasket(q.w);
+    if (quiz.misses.indexOf(q.w.id) < 0) quiz.misses.push(q.w.id);
+  } else if (!q.peeked) outOfBasket(q.w);
+  if (!quiz.practice && markSeen(q.w)) quiz.cycleDone = true;
+}
+
+const BASKET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5h17l-1.6 9.1a2 2 0 01-2 1.6H7.1a2 2 0 01-2-1.6z"/><path d="M8 9.5l3-5.5M16 9.5l-3-5.5"/><path d="M9.5 13.5v3M14.5 13.5v3"/></svg>';
+const BOOK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 015.5 4H10a2 2 0 012 2v13a2 2 0 00-2-2H5.5A1.5 1.5 0 014 15.5z"/><path d="M20 5.5A1.5 1.5 0 0018.5 4H14a2 2 0 00-2 2v13a2 2 0 012-2h4.5a1.5 1.5 0 001.5-1.5z"/></svg>';
+
+function quizStrip(){
+  const b = basketIds(cur.num).length, total = cur.words.length;
+  const label = quiz.practice ? "Practising your mistakes"
+    : total <= ROUND ? "All " + total + " words, every round"
+    : "This pass: " + quiz.seenStart + " of " + total + " words done";
+  return '<div class="quiz-strip"><span>' + label + '</span>' +
+    '<button class="basket-btn" id="basketBtn"' + (b && !quiz.practice ? '' : ' disabled') +
+    ' title="Practise your mistakes">' + BASKET + '<span>' + b + (b === 1 ? ' mistake' : ' mistakes') + '</span></button></div>';
+}
+
+function choiceHTML(q){
+  return '<div class="quiz-q"><div class="ask">' + esc(q.ask) + '</div>' +
+      (q.ar ? '<div class="ar">' + esc(q.ar) + '</div>' : '') +
+      (q.tr ? '<div class="tr">' + esc(q.tr) + '</div>' : '') +
+      (q.text ? '<p class="qtext">' + esc(q.text) + '</p>' : '') + '</div>' +
+    '<div class="opts">' + q.options.map((o, k) => {
+      const cls = !q.done ? '' : o.ok ? ' correct' : (k === q.picked ? ' wrong' : '');
+      return '<button class="opt' + (q.arOptions ? ' opt-ar' : '') + cls + '" data-opt="' + k + '"' + (q.done ? ' disabled' : '') + '>' +
+        (q.arOptions ? '<span class="ar">' + esc(o.text) + '</span>' : esc(o.text)) + '</button>';
+    }).join('') + '</div>';
+}
+
+function matchHTML(q){
+  const cls = (side, id) => {
+    let c = '';
+    if (q.pairs[id] != null) c += ' p' + q.pairs[id];
+    if (q.sel && q.sel.side === side && q.sel.id === id) c += ' sel';
+    if (q.flash && q.flash.indexOf(side + id) >= 0) c += ' bad';
+    return c;
+  };
+  return '<div class="quiz-q mq"><div class="ask">' + esc(q.ask) + '</div>' +
+    '<div class="m-ar">' + q.colA.map(w =>
+      '<button class="m-tile m-a' + cls("a", w.id) + '" data-ma="' + w.id + '"' + (q.pairs[w.id] != null ? ' disabled' : '') + '>' +
+      '<span class="ar">' + esc(w.ar) + '</span></button>').join('') + '</div>' +
+    '<div class="m-en">' + q.colE.map(w =>
+      '<button class="m-tile m-e' + cls("e", w.id) + '" data-me="' + w.id + '"' + (q.pairs[w.id] != null ? ' disabled' : '') + '>' +
+      esc(plainMean(w.meaning, 70)) + '</button>').join('') + '</div>' +
+    (q.done ? '' : '<p class="m-help">Tap a word, then the meaning it carries. ' +
+      (q.slips ? q.slips + (q.slips === 1 ? ' slip' : ' slips') + ' so far.' : '') + '</p>') +
+    '</div>';
+}
+
+function arrangeHTML(q){
+  const want = q.words.map(x => x.ar);
+  const line = q.placed.map((i, k) =>
+      '<button class="arr-tile' + (q.done ? (q.words[i].ar === want[k] ? ' ok' : ' no') : '') + '" data-ap="' + k + '"' + (q.done ? ' disabled' : '') + '>' +
+      '<span class="ar">' + esc(q.words[i].ar) + '</span></button>').join('') +
+    Array(q.words.length - q.placed.length + 1).join('<span class="arr-slot"></span>');
+  const pool = q.order.map(i =>
+      '<button class="arr-tile' + (q.placed.indexOf(i) >= 0 ? ' gone' : '') + '" data-aq="' + i + '"' +
+      (q.placed.indexOf(i) >= 0 || q.done ? ' disabled' : '') + '><span class="ar">' + esc(q.words[i].ar) + '</span></button>').join('');
+  const full = q.placed.length === q.words.length;
+  return '<div class="quiz-q aq"><div class="ask">' + esc(q.ask) + '</div>' +
+    '<p class="arr-src">' + esc(cur.name) + ' ' + cur.num + ':' + q.n + (q.partial ? ' &middot; part of the verse' : '') + '</p>' +
+    '<div class="arr-gloss"><span class="dlabel">Word by word</span>' +
+      q.words.map(x => '<span>' + esc(x.en) + '</span>').join('<i>&middot;</i>') + '</div>' +
+    '<div class="arr-line" dir="rtl">' + line + '</div>' +
+    (q.done ? '' : '<div class="arr-pool" dir="rtl">' + pool + '</div>' +
+      '<div class="arr-btns"><button class="abtn" id="arrClear"' + (q.placed.length ? '' : ' disabled') + '>Clear</button>' +
+      '<button class="cta" id="arrCheck"' + (full ? '' : ' disabled') + '>Check</button></div>') +
+    '</div>';
+}
+
+function feedbackHTML(q){
+  const on = saved.has(q.w.id);
+  const actions =
+    '<div class="quiz-actions">' +
+      '<button class="fbtn' + (on ? ' on' : '') + '" id="quizSave" aria-label="' + (on ? 'Saved' : 'Save word') + '">' + STARBTN(on) + '</button>' +
+      '<button class="fbtn" id="qStudy" aria-label="Open this word’s card">' + BOOK + '</button>' +
+      '<button class="cta" id="nextQ">' + (quiz.i === quiz.qs.length - 1 ? "See score" : "Next question") + '</button>' +
+    '</div>';
+  const peek = q.peeked ? '<p class="peek-note">You opened the card first, so this word waits in your mistakes basket for one more look.</p>' : '';
+  if (q.type === "match"){
+    return '<div class="keepsake fb' + (q.right ? '' : ' fb-miss') + '"><div class="dlabel">' +
+        (q.right ? "All four, first time" : "Matched, with " + q.slips + (q.slips === 1 ? " slip" : " slips")) + '</div>' +
+        '<p>' + (q.right ? "Clean sweep." : "The ones you mixed up are in your mistakes basket.") + ' Tap any word to open its card.</p></div>' +
+      wordGroup(q.words, false) + actions;
+  }
+  if (q.type === "arrange"){
+    return '<div class="keepsake fb' + (q.right ? '' : ' fb-miss') + '"><div class="dlabel">' + (q.right ? "In order" : "The order is") + '</div>' +
+        '<p class="ar fb-verse">' + esc(q.words.map(x => x.ar).join(" ")) + '</p>' +
+        (q.verse.e && !q.partial ? '<p class="fb-en">' + esc(q.verse.e) + '</p>'
+          : '<p class="fb-en">' + q.words.map(x => esc(x.en)).join(' &middot; ') + '</p>') + '</div>' + peek + actions;
+  }
+  return '<div class="keepsake fb' + (q.right ? '' : ' fb-miss') + '">' +
+      '<div class="dlabel">' + (q.right ? "Correct" : (q.kind === "hook" ? "The answer" : "The hook")) + '</div>' +
+      '<p class="ar" style="font-size:26px;margin-bottom:4px">' + esc(q.w.ar) + '</p>' +
+      '<p style="font-size:15px;color:var(--ink-2);margin-bottom:8px">' + esc(q.w.tr) + ' — ' + esc(brief(q.w.meaning)) + '</p>' +
+      '<p>' + esc(q.kind === "hook" ? firstSentence(q.w.root) : q.w.note) + '</p></div>' + peek + actions;
 }
 
 function drawQuiz(){
   if (!quiz.qs.length){
-    $("#modeBody").innerHTML = '<div class="empty"><p>This surah is too short for a quiz.</p></div>';
+    $("#modeBody").innerHTML = quiz.practice
+      ? '<div class="empty"><p>Your mistakes basket for this surah is empty. Nothing to practise.</p></div><button class="cta" id="againQuiz">Back to new words</button>'
+      : '<div class="empty"><p>This surah is too short for a quiz.</p></div>';
     return;
   }
-  if (quiz.i >= quiz.qs.length){
-    const pct = Math.round(quiz.score / quiz.qs.length * 100);
-    const msg = pct === 100 ? "Perfect. These words are yours now."
-      : pct >= 70 ? "Solid. Star the ones that slipped and come back to them."
-      : pct >= 40 ? "Getting there. Run the flashcards once, then try again."
-      : "Early days. Read through the words first — the notes are the hooks.";
-    $("#modeBody").innerHTML =
-      '<div class="score"><div class="big">' + quiz.score + '<span style="font-size:26px;color:var(--muted)"> / ' + quiz.qs.length + '</span></div>' +
-      '<div class="lbl">' + pct + '% correct</div><p class="msg">' + msg + '</p></div>' +
-      '<button class="cta" id="againQuiz">New round</button>';
-    return;
-  }
+  if (quiz.i >= quiz.qs.length){ drawScore(); return; }
   const q = quiz.qs[quiz.i];
-  $("#modeBody").innerHTML =
+  const study = q.type === "match" || q.done ? '' :
+    '<button class="qstudy" id="qStudy" title="Open the word’s card to revise it">' + BOOK + '<span>Study</span></button>';
+  const body = q.type === "match" ? matchHTML(q) : q.type === "arrange" ? arrangeHTML(q) : choiceHTML(q);
+  $("#modeBody").innerHTML = quizStrip() +
     '<div class="quiz-bar"><span>Question ' + (quiz.i + 1) + ' of ' + quiz.qs.length + '</span>' +
-    '<span class="progress"><i style="width:' + (quiz.i / quiz.qs.length * 100) + '%"></i></span>' +
+    '<span class="progress"><i style="width:' + ((quiz.i + (q.done ? 1 : 0)) / quiz.qs.length * 100) + '%"></i></span>' +
     '<span>Score ' + quiz.score + '</span></div>' +
-    '<div class="quiz-q"><div class="ask">' + esc(q.ask) + '</div>' +
-      (q.ar ? '<div class="ar">' + esc(q.ar) + '</div>' : '') +
-      (q.tr ? '<div class="tr">' + esc(q.tr) + '</div>' : '') +
-      (q.text ? '<p class="qtext">' + esc(q.text) + '</p>' : '') + '</div>' +
-    '<div class="opts">' + q.options.map((o, k) =>
-      '<button class="opt' + (q.arOptions ? ' opt-ar' : '') + '" data-opt="' + k + '">' +
-      (q.arOptions ? '<span class="ar">' + esc(o.text) + '</span>' : esc(o.text)) +
-      '</button>').join('') + '</div>' +
-    '<div id="quizNext"></div>';
+    '<div class="qwrap">' + study + body + '</div>' +
+    '<div id="quizNext">' + (q.done ? feedbackHTML(q) : '') + '</div>';
+}
+
+function drawScore(){
+  const n = quiz.qs.length, pct = Math.round(quiz.score / n * 100);
+  const msg = pct === 100 ? "Perfect. These words are yours now."
+    : pct >= 70 ? "Solid. The slips are waiting in your basket."
+    : pct >= 40 ? "Getting there. Practise the basket, then go on."
+    : "Early days. Open the cards of the ones you missed — the notes are the hooks.";
+  const s = cur, total = s.words.length, seen = cycleSeen(s).length, b = basketIds(s.num).length;
+  let cycle = '';
+  if (!quiz.practice && total > ROUND){
+    cycle = quiz.cycleDone
+      ? '<div class="cycle done"><div class="dlabel">Pass complete</div><p>You have been through all ' + total + ' words. The next round starts a fresh pass.</p></div>'
+      : '<div class="cycle"><div class="cyc-top"><span class="dlabel">This pass</span><span>' + seen + ' / ' + total + ' words</span></div>' +
+        '<span class="progress"><i style="width:' + (seen / total * 100) + '%"></i></span>' +
+        '<p>No word comes back until all ' + total + ' have had their turn.</p></div>';
+  }
+  const misses = quiz.misses.map(byId).filter(Boolean);
+  const primary = quiz.practice
+    ? (b ? '<button class="cta" id="practiceQuiz">Practise again &middot; ' + b + ' left</button>' : '<button class="cta" id="againQuiz">Back to new words</button>')
+    : '<button class="cta" id="againQuiz">' + (total > ROUND ? 'Next ' + ROUND + ' words' : 'New round') + '</button>';
+  const secondary = quiz.practice
+    ? (b ? '<button class="abtn wide" id="againQuiz">Back to new words</button>' : '')
+    : (b ? '<button class="abtn wide" id="practiceQuiz">' + BASKET + '<span>Practise ' + b + (b === 1 ? ' mistake' : ' mistakes') + '</span></button>' : '');
+  $("#modeBody").innerHTML =
+    '<div class="score"><div class="big">' + quiz.score + '<span style="font-size:26px;color:var(--muted)"> / ' + n + '</span></div>' +
+    '<div class="lbl">' + pct + '% correct' + (quiz.practice ? ' &middot; practice' : '') + '</div><p class="msg">' + msg + '</p></div>' +
+    cycle +
+    (misses.length ? '<p class="grouplabel">Slipped this round &middot; tap to revise</p>' + wordGroup(misses, false) : '') +
+    '<div class="score-btns">' + primary + secondary + '</div>';
+}
+
+/* all quiz taps land here; returns true when it handled one */
+function quizClick(t){
+  if (!quiz || mode !== "quiz") return false;
+  const q = quiz.qs[quiz.i];
+
+  if (t.closest("#basketBtn")){ startQuiz(true); return true; }
+  if (t.closest("#practiceQuiz")){ startQuiz(true); return true; }
+  if (t.closest("#againQuiz")){ startQuiz(false); return true; }
+  if (!q) return false;
+
+  if (t.closest("#qStudy")){
+    if (!q.done && !q.peeked){ q.peeked = true; toBasket(q.w); }
+    openSheet(q.w.id); return true;
+  }
+  if (t.closest("#quizSave")){ toggleSaved(q.w.id); drawQuiz(); return true; }
+  if (t.closest("#nextQ")){ quiz.i++; drawQuiz(); window.scrollTo({ top: 0, behavior: "smooth" }); return true; }
+
+  const opt = t.closest(".opt");
+  if (opt && q.type === "choice" && !q.done){
+    q.picked = +opt.dataset.opt;
+    settle(q, q.options[q.picked].ok);
+    drawQuiz();
+    const nx = $("#quizNext"); if (nx) nx.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    return true;
+  }
+
+  /* match: a word, then a meaning (or the other way round) */
+  const ma = t.closest("[data-ma]"), me = t.closest("[data-me]");
+  if ((ma || me) && q.type === "match" && !q.done){
+    const side = ma ? "a" : "e", id = (ma || me).dataset[ma ? "ma" : "me"];
+    if (q.pairs[id] != null) return true;
+    if (!q.sel || q.sel.side === side){ q.sel = (q.sel && q.sel.id === id) ? null : { side: side, id: id }; drawQuiz(); return true; }
+    const aId = side === "a" ? id : q.sel.id, eId = side === "e" ? id : q.sel.id;
+    q.sel = null;
+    if (aId === eId){
+      q.pairs[aId] = q.nextColor++;
+      if (Object.keys(q.pairs).length === q.words.length){
+        settle(q, q.slips === 0);
+        drawQuiz();
+        const nx = $("#quizNext"); if (nx) nx.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        return true;
+      }
+    } else {
+      q.slips++;
+      const wa = byId(aId);
+      toBasket(wa);
+      if (quiz.misses.indexOf(aId) < 0) quiz.misses.push(aId);
+      q.flash = ["a" + aId, "e" + eId];
+      setTimeout(() => { if (quiz && quiz.qs[quiz.i] === q){ q.flash = null; drawQuiz(); } }, 520);
+    }
+    drawQuiz(); return true;
+  }
+
+  /* arrange: tap a tile to place it, tap a placed tile to send it back */
+  const aq = t.closest("[data-aq]");
+  if (aq && q.type === "arrange" && !q.done){
+    const i = +aq.dataset.aq;
+    if (q.placed.indexOf(i) < 0) q.placed.push(i);
+    drawQuiz(); return true;
+  }
+  const ap = t.closest("[data-ap]");
+  if (ap && q.type === "arrange" && !q.done){
+    q.placed.splice(+ap.dataset.ap, 1); drawQuiz(); return true;
+  }
+  if (t.closest("#arrClear") && q.type === "arrange"){ q.placed = []; drawQuiz(); return true; }
+  if (t.closest("#arrCheck") && q.type === "arrange" && !q.done){
+    const got = q.placed.map(i => q.words[i].ar).join(" ");
+    settle(q, got === q.words.map(x => x.ar).join(" "));
+    drawQuiz();
+    const nx = $("#quizNext"); if (nx) nx.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    return true;
+  }
+  return false;
+}
+
+/* ===================== play & learn: Word Rain =====================
+   The meaning sits at the top. Words fall. Catch the one that carries it
+   before it lands. Three catches in a row raise the multiplier (up to ×5);
+   every six catches the rain gets faster and thicker. Gold words score
+   double and give back a heart. A word you miss — or tap by mistake — goes
+   into the quiz's mistakes basket, so the game feeds your practice. The
+   targets walk the whole pool before any word repeats.                    */
+const GAME = { scope: "surah", run: null };
+const HEART = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.3l-1.3-1.2C5.6 14.5 2.5 11.7 2.5 8.2 2.5 5.4 4.7 3.3 7.4 3.3c1.8 0 3.5.9 4.6 2.2 1.1-1.3 2.8-2.2 4.6-2.2 2.7 0 4.9 2.1 4.9 4.9 0 3.5-3.1 6.3-8.2 10.9z"/></svg>';
+const SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg>';
+const SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
+const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+/* the guides quote their glosses ("…a small band [of jinn].") — drop the
+   quote marks and trailing dots so the prompt reads as a plain meaning */
+function plainMean(s, cap){
+  return brief(s, cap).replace(/^[\s"“”'‘’…\.]+/, "").replace(/[\s"“”'‘’]+$/, "").replace(/([^.])\.$/, "$1")
+    .replace(/[\s"“”'‘’]+$/, "") || brief(s, cap);
+}
+function gameKey(){ return GAME.scope === "all" ? "all" : "s" + cur.num; }
+function gameBest(){ return (QM.best && QM.best[gameKey()]) || 0; }
+function gamePool(scope){
+  const src = (scope || GAME.scope) === "all" ? ALL : cur.words;
+  const tidy = src.filter(w => w.ar && w.meaning && w.ar.indexOf("/") < 0 &&
+                               w.ar.split(/\s+/).length <= 4 && w.ar.length <= 30);
+  return tidy.length >= 4 ? tidy : src.filter(w => w.ar && w.meaning);
+}
+
+/* tiny synthesised sounds — no files to load */
+let AC = null;
+function sfx(kind, n){
+  if (QM.mute) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === "suspended") AC.resume();
+    const now = AC.currentTime, up = Math.pow(1.059, Math.min(n || 0, 14));
+    const notes = {
+      good:  [523 * up, 784 * up],
+      gold:  [880, 1175, 1568],
+      bad:   [196, 147],
+      land:  [262, 175],
+      level: [523, 659, 784, 1047],
+      over:  [392, 330, 262, 196],
+      tick:  [660],
+      go:    [988]
+    }[kind] || [440];
+    notes.forEach((f, i) => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = kind === "bad" || kind === "land" ? "triangle" : "sine";
+      o.frequency.value = f;
+      const t = now + i * (kind === "over" ? 0.13 : 0.075);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(kind === "bad" ? 0.16 : 0.11, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + (kind === "over" ? 0.32 : 0.2));
+      o.connect(g); g.connect(AC.destination);
+      o.start(t); o.stop(t + 0.36);
+    });
+  } catch (e) {}
+}
+
+function playView(){
+  gameStop();
+  const nS = gamePool("surah").length, nA = gamePool("all").length;
+  if (nS < 4 && GAME.scope === "surah") GAME.scope = "all";
+  return '<div class="game-intro">' +
+    '<div class="gi-art" aria-hidden="true">' + gamePool().slice().sort((a, b) => a.ar.length - b.ar.length).slice(0, 3)
+      .map(w => '<span class="ar">' + esc(w.ar) + '</span>').join('') + '</div>' +
+    '<div class="gi-kicker">Play &amp; Learn</div>' +
+    '<h2 class="gi-title">Word Rain</h2>' +
+    '<p class="gi-sub">A meaning appears at the top. Words start to fall. Tap the one that carries it before it lands.</p>' +
+    '<div class="segmented gi-scope" role="tablist">' +
+      '<button role="tab" data-scope="surah" aria-selected="' + (GAME.scope === "surah") + '"' + (nS < 4 ? ' disabled' : '') + '>This surah &middot; ' + nS + '</button>' +
+      '<button role="tab" data-scope="all" aria-selected="' + (GAME.scope === "all") + '">All surahs &middot; ' + nA + '</button>' +
+    '</div>' +
+    '<button class="cta gi-play" id="gameStart">Play</button>' +
+    '<div class="gi-rules">' +
+      '<span><b class="gi-h">' + HEART + '</b>3 lives</span>' +
+      '<span><b>&times;5</b>combo</span>' +
+      '<span><b class="gi-gold">&#9733;</b>gold = double</span>' +
+    '</div>' +
+    '<p class="gi-best">' + (gameBest() ? 'Your best here: <b>' + gameBest() + '</b>' : 'No score yet. Set one.') + '</p>' +
+    '<p class="gi-foot">Anything you miss lands in the quiz’s mistakes basket. On a keyboard, keys 1–4 catch the words left to right.</p>' +
+  '</div>';
+}
+
+function gameHUD(r){
+  const mult = Math.min(5, 1 + Math.floor(r.combo / 3));
+  return '<div class="g-score"><b id="gScore">' + r.score + '</b><span>Level ' + r.level + '</span></div>' +
+    '<div class="g-combo' + (r.combo >= 3 ? ' hot' : '') + '" id="gCombo">' + (r.combo ? '&times;' + mult + ' <small>' + r.combo + ' in a row</small>' : '') + '</div>' +
+    '<div class="g-lives">' + Array.from({ length: Math.max(r.lives, 0) }, () => '<i class="g-heart">' + HEART + '</i>').join('') + '</div>';
+}
+
+function gameStart(){
+  gameStop();
+  const pool = gamePool();
+  GAME.run = { score: 0, lives: 3, combo: 0, maxCombo: 0, caught: 0, taps: 0, level: 1,
+               drops: [], queue: [], missed: [], pool: pool, over: false, paused: true,
+               last: 0, raf: 0, timers: [], key: gameKey(), waves: 0 };
+  $("#modeBody").innerHTML =
+    '<div class="game" id="game">' +
+      '<div class="g-top"><div class="g-hud" id="gHud">' + gameHUD(GAME.run) + '</div>' +
+        '<button class="g-icon" id="gMute" aria-label="Sound on or off">' + (QM.mute ? SOUND_OFF : SOUND_ON) + '</button>' +
+        '<button class="g-icon" id="gQuit" aria-label="End game">' + CROSS + '</button></div>' +
+      '<div class="g-prompt" id="gPrompt"><span class="dlabel">Catch the word that means</span><div class="g-mean" id="gMean">&nbsp;</div></div>' +
+      '<div class="g-arena" id="gArena"><div class="g-ground"></div><div class="g-over" id="gOverlay"></div></div>' +
+    '</div>';
+  $("#gArena").addEventListener("pointerdown", gamePointer);
+  const top = $("#game").getBoundingClientRect().top + window.scrollY - 62;
+  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  gameCountdown();
+}
+
+function later(fn, ms){
+  const r = GAME.run;
+  if (!r) return;
+  r.timers.push(setTimeout(() => { if (GAME.run === r && !r.over) fn(); }, ms));
+}
+
+function gameCountdown(){
+  const ov = $("#gOverlay"), r = GAME.run;
+  r.paused = true;
+  let n = 3;
+  const step = () => {
+    if (n === 0){
+      ov.className = "g-over"; ov.innerHTML = "";
+      sfx("go"); r.paused = false; r.last = 0;
+      gameWave();
+      r.raf = requestAnimationFrame(gameTick);
+      return;
+    }
+    ov.className = "g-over show count"; ov.innerHTML = '<div class="g-count">' + n + '</div>';
+    sfx("tick"); n--;
+    later(step, 650);
+  };
+  step();
+}
+
+function gameStop(){
+  const r = GAME.run;
+  if (!r) return;
+  r.over = true;
+  cancelAnimationFrame(r.raf);
+  r.timers.forEach(clearTimeout);
+  GAME.run = null;
+}
+
+function nextTarget(r){
+  if (!r.queue.length) r.queue = shuffle(r.pool.slice());
+  return r.queue.pop();
+}
+
+function gameWave(){
+  const r = GAME.run;
+  if (!r || r.over) return;
+  const arena = $("#gArena");
+  r.drops.forEach(d => d.el.remove());
+  r.drops = [];
+  r.waves++;
+  const target = nextTarget(r);
+  const k = Math.min(4, 2 + Math.floor(r.level / 2));          // 2, 3, 3, 4 …
+  const arSeen = { [skeleton(target.ar)]: 1 }, enSeen = { [brief(target.meaning, 70)]: 1 };
+  const decoys = [];
+  const src = r.pool.length >= k + 2 ? r.pool : ALL;
+  shuffle(src.slice()).forEach(x => {
+    if (decoys.length >= k - 1 || x === target) return;
+    const a = skeleton(x.ar), m = brief(x.meaning, 70);
+    if (!a || arSeen[a] || enSeen[m] || x.ar.length > 30) return;
+    arSeen[a] = 1; enSeen[m] = 1; decoys.push(x);
+  });
+  const gold = r.level >= 2 && Math.random() < 0.14;
+  const words = shuffle([{ w: target, ok: true }].concat(decoys.map(w => ({ w: w, ok: false }))));
+  const W = arena.clientWidth, H = arena.clientHeight;
+  const slot = W / words.length;
+  const fall = Math.max(2.9, 8.4 - (r.level - 1) * 0.7);      // seconds to reach the ground
+  words.forEach((o, i) => {
+    const el = document.createElement("button");
+    el.className = "g-drop" + (o.ok && gold ? " gold" : "");
+    el.innerHTML = '<span class="ar">' + esc(o.w.ar) + '</span>';
+    el.style.maxWidth = Math.max(70, slot - 10) + "px";
+    arena.appendChild(el);
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const jitter = (slot - w) > 8 ? (Math.random() - 0.5) * (slot - w - 8) : 0;
+    const d = { el: el, w: o.w, ok: o.ok, gold: o.ok && gold, h: h,
+                x: Math.max(4, Math.min(W - w - 4, slot * i + (slot - w) / 2 + jitter)),
+                y: -h - 10 - Math.random() * 70, vy: (H + h) / fall * (0.92 + Math.random() * 0.16), dead: false };
+    el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
+    el._drop = d;
+    r.drops.push(d);
+  });
+  r.target = target;
+  const mean = $("#gMean");
+  mean.textContent = plainMean(target.meaning, 80);
+  mean.classList.remove("pop"); void mean.offsetWidth; mean.classList.add("pop");
+}
+
+function gameTick(ts){
+  const r = GAME.run;
+  if (!r || r.over) return;
+  const arena = $("#gArena");
+  if (!arena){ gameStop(); return; }
+  const visible = !document.hidden && $("#scr-surah").classList.contains("active") && !$("#sheet").classList.contains("open");
+  if (!visible && !r.paused && !r.ending){ gamePause(); }
+  if (r.paused){ r.last = 0; r.raf = requestAnimationFrame(gameTick); return; }
+  const dt = r.last ? Math.min(0.05, (ts - r.last) / 1000) : 0;
+  r.last = ts;
+  const H = arena.clientHeight;
+  let danger = false;
+  r.drops.forEach(d => {
+    if (d.dead) return;
+    d.y += d.vy * dt;
+    d.el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
+    if (d.ok && d.y > H * 0.66) danger = true;
+    if (d.y >= H - d.h - 4){
+      d.dead = true;
+      if (d.ok) gameLanded(d);
+      else d.el.classList.add("fade");
+    }
+  });
+  arena.classList.toggle("danger", danger);
+  r.raf = requestAnimationFrame(gameTick);
+}
+
+function gamePointer(e){
+  const el = e.target.closest(".g-drop");
+  if (!el || !el._drop) return;
+  e.preventDefault();
+  gameHit(el._drop);
+}
+
+function gameHit(d){
+  const r = GAME.run;
+  if (!r || r.over || r.paused || d.dead || d.wrongDone || r.ending) return;
+  r.taps++;
+  const arena = $("#gArena");
+  if (d.ok){
+    d.dead = true;
+    r.combo++; r.maxCombo = Math.max(r.maxCombo, r.combo); r.caught++;
+    const mult = Math.min(5, 1 + Math.floor((r.combo - 1) / 3));
+    const early = Math.max(0, Math.round(10 * (1 - d.y / arena.clientHeight)));
+    const pts = (10 + early) * mult * (d.gold ? 2 : 1);
+    r.score += pts;
+    if (d.gold && r.lives < 5) r.lives++;
+    outOfBasket(d.w);
+    sfx(d.gold ? "gold" : "good", r.combo);
+    burst(d, d.gold ? "gold" : "good");
+    floatText(d, "+" + pts + (d.gold ? " ★" : ""), d.gold ? "gold" : "good");
+    d.el.classList.add("caught");
+    r.drops.forEach(o => { if (!o.dead){ o.dead = true; o.el.classList.add("fade"); } });
+    let lvl = false;
+    if (r.caught % 6 === 0){ r.level++; lvl = true; }
+    $("#gHud").innerHTML = gameHUD(r);
+    const sc = $("#gScore"); if (sc){ sc.classList.add("bump"); }
+    if (lvl){ banner("Level " + r.level, "Faster rain"); sfx("level"); later(gameWave, 1050); }
+    else later(gameWave, 380);
+  } else {
+    d.el.classList.add("wrongtap");
+    d.el.innerHTML += '<small class="g-gloss">' + esc(plainMean(d.w.meaning, 40)) + '</small>';
+    reclamp(d);
+    d.vy *= 0.4; d.wrongDone = true;   // keep it falling, slowly, so you can read what it means
+    loseLife("tap", d);
+  }
+}
+
+function loseLife(why, d){
+  const r = GAME.run;
+  r.combo = 0;
+  r.lives--;
+  if (r.target){ toBasket(r.target); if (r.missed.indexOf(r.target.id) < 0) r.missed.push(r.target.id); }
+  sfx(why === "land" ? "land" : "bad");
+  try { if (navigator.vibrate) navigator.vibrate(why === "land" ? 90 : 50); } catch (e) {}
+  const g = $("#game"); if (g){ g.classList.remove("shake"); void g.offsetWidth; g.classList.add("shake"); }
+  $("#gHud").innerHTML = gameHUD(r);
+  if (r.lives <= 0){ r.ending = true; later(gameOver, 900); }
+}
+
+function gameLanded(d){
+  const r = GAME.run;
+  d.el.classList.add("landed");
+  d.el.innerHTML += '<small class="g-gloss">' + esc(plainMean(d.w.meaning, 40)) + '</small>';
+  reclamp(d);
+  d.y = Math.min(d.y, $("#gArena").clientHeight - d.el.offsetHeight - 4);
+  d.el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
+  r.drops.forEach(o => { if (!o.dead){ o.dead = true; o.el.classList.add("fade"); } });
+  loseLife("land", d);
+  if (r.lives > 0) later(gameWave, 1150);
+}
+
+function reclamp(d){
+  const W = $("#gArena").clientWidth;
+  d.x = Math.max(4, Math.min(d.x, W - d.el.offsetWidth - 4));
+  d.h = d.el.offsetHeight;
+  d.el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
+}
+function burst(d, kind){
+  const arena = $("#gArena");
+  const cx = d.x + d.el.offsetWidth / 2, cy = d.y + d.h / 2;
+  for (let i = 0; i < 14; i++){
+    const p = document.createElement("i");
+    p.className = "g-spark " + kind;
+    const a = Math.PI * 2 * i / 14 + Math.random() * 0.4, dist = 40 + Math.random() * 46;
+    p.style.left = cx + "px"; p.style.top = cy + "px";
+    p.style.setProperty("--dx", Math.cos(a) * dist + "px");
+    p.style.setProperty("--dy", Math.sin(a) * dist + "px");
+    arena.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+}
+function floatText(d, text, kind){
+  const arena = $("#gArena");
+  const f = document.createElement("span");
+  f.className = "g-float " + kind;
+  f.textContent = text;
+  f.style.left = (d.x + d.el.offsetWidth / 2) + "px"; f.style.top = d.y + "px";
+  arena.appendChild(f);
+  setTimeout(() => f.remove(), 900);
+}
+function banner(big, small){
+  const ov = $("#gOverlay");
+  if (!ov) return;
+  ov.className = "g-over show banner";
+  ov.innerHTML = '<div class="g-banner"><b>' + esc(big) + '</b><span>' + esc(small) + '</span></div>';
+  later(() => { if (ov.classList.contains("banner")){ ov.className = "g-over"; ov.innerHTML = ""; } }, 1000);
+}
+
+function gamePause(){
+  const r = GAME.run;
+  if (!r || r.paused) return;
+  r.paused = true;
+  const ov = $("#gOverlay");
+  ov.className = "g-over show";
+  ov.innerHTML = '<div class="g-card"><div class="go-title">Paused</div>' +
+    '<button class="cta" id="gResume">Resume</button>' +
+    '<button class="abtn wide" id="gQuit2">End game</button></div>';
+}
+function gameResume(){
+  const r = GAME.run;
+  if (!r) return;
+  const ov = $("#gOverlay"); ov.className = "g-over"; ov.innerHTML = "";
+  r.paused = false; r.last = 0;
+}
+
+function gameOver(){
+  const r = GAME.run;
+  if (!r) return;
+  r.paused = true;
+  const prev = (QM.best && QM.best[r.key]) || 0;
+  const best = Math.max(prev, r.score);
+  QM.best = QM.best || {}; QM.best[r.key] = best; qmSave();
+  sfx("over");
+  const acc = r.taps ? Math.round(r.caught / r.taps * 100) : 0;
+  const missed = r.missed.map(byId).filter(Boolean);
+  const inBasket = cur ? basketIds(cur.num).length : 0;
+  const ov = $("#gOverlay");
+  ov.className = "g-over show final";
+  ov.innerHTML = '<div class="g-card">' +
+    (r.score > prev && r.score > 0 ? '<div class="g-new">New best</div>' : '<div class="go-title">Game over</div>') +
+    '<div class="go-score">' + r.score + '</div>' +
+    '<div class="go-best">Best ' + best + '</div>' +
+    '<div class="go-stats"><span><b>' + r.caught + '</b>caught</span><span><b>' + acc + '%</b>accuracy</span>' +
+      '<span><b>&times;' + Math.min(5, 1 + Math.floor((Math.max(r.maxCombo, 1) - 1) / 3)) + '</b>top combo</span><span><b>' + r.level + '</b>level</span></div>' +
+    (missed.length ? '<p class="grouplabel">Revise these &middot; now in your mistakes basket</p>' + wordGroup(missed, false) : '') +
+    '<button class="cta" id="gameAgain">Play again</button>' +
+    (inBasket ? '<button class="abtn wide" id="gamePractice">' + BASKET + '<span>Practise ' + inBasket + ' in the quiz</span></button>' : '') +
+  '</div>';
+  ov.scrollTop = 0;
+  r.over = true;
+  cancelAnimationFrame(r.raf);
+}
+
+function gameClick(t){
+  if (mode !== "play") return false;
+  const sc = t.closest("[data-scope]");
+  if (sc && !sc.disabled){ GAME.scope = sc.dataset.scope; $("#modeBody").innerHTML = playView(); return true; }
+  if (t.closest("#gameStart") || t.closest("#gameAgain")){ gameStart(); return true; }
+  if (t.closest("#gResume")){ gameResume(); return true; }
+  if (t.closest("#gQuit") || t.closest("#gQuit2")){
+    const r = GAME.run;
+    if (r && !r.over && r.caught + r.missed.length > 0){ r.ending = true; gameOver(); }
+    else { gameStop(); $("#modeBody").innerHTML = playView(); }
+    return true;
+  }
+  if (t.closest("#gMute")){
+    QM.mute = !QM.mute; qmSave();
+    t.closest("#gMute").innerHTML = QM.mute ? SOUND_OFF : SOUND_ON;
+    return true;
+  }
+  if (t.closest("#gamePractice")){
+    gameStop(); mode = "quiz";
+    $$("[data-mode]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === mode)));
+    startQuiz(true); return true;
+  }
+  return false;
+}
+
+function gameKeys(e){
+  const r = GAME.run;
+  if (!r || r.over || mode !== "play") return;
+  if (e.key === "Escape" || e.key === "p"){ r.paused ? gameResume() : gamePause(); return; }
+  if (!/^[1-4]$/.test(e.key)) return;
+  const live = r.drops.filter(d => !d.dead).sort((a, b) => a.x - b.x);
+  const d = live[+e.key - 1];
+  if (d){ e.preventDefault(); gameHit(d); }
 }
 
 /* ===================== threads ===================== */
@@ -1589,46 +2505,9 @@ document.addEventListener("click", e => {
   if (t.closest("#shuffleCards")){ deck.order = shuffle(deck.order); deck.i = 0; deck.flipped = false; drawCards(); return; }
   if (t.closest("#saveCard")){ toggleSaved(cur.words[deck.order[deck.i]].id); drawCards(); return; }
 
-  /* quiz */
-  const opt = t.closest(".opt");
-  if (opt && quiz && !quiz.answered){
-    quiz.answered = true;
-    const q = quiz.qs[quiz.i];
-    const right = q.options[+opt.dataset.opt].ok;
-    if (right) quiz.score++;
-    $$(".opt").forEach(b => {
-      b.disabled = true;
-      if (q.options[+b.dataset.opt].ok) b.classList.add("correct");
-      else if (b === opt) b.classList.add("wrong");
-    });
-    const on = saved.has(q.w.id);
-    $("#quizNext").innerHTML =
-      '<div class="keepsake" style="margin-top:4px">' +
-        '<div class="dlabel">' + (right ? "Correct" :
-          (q.kind === "hook" ? "The answer" : "The hook")) + '</div>' +
-        '<p class="ar" style="font-size:26px;margin-bottom:4px">' + esc(q.w.ar) + '</p>' +
-        '<p style="font-size:15px;color:var(--ink-2);margin-bottom:8px">' +
-          esc(q.w.tr) + ' \u2014 ' + esc(brief(q.w.meaning)) + '</p>' +
-        '<p>' + esc(q.kind === "hook" ? firstSentence(q.w.root) : q.w.note) + '</p></div>' +
-      '<div class="quiz-actions">' +
-        '<button class="abtn' + (on ? ' saved' : '') + '" id="quizSave">' + STARBTN(on) +
-          '<span>' + (on ? 'Saved' : 'Save word') + '</span></button>' +
-        '<button class="cta" id="nextQ">' + (quiz.i === quiz.qs.length - 1 ? "See score" : "Next question") + '</button>' +
-      '</div>';
-    $("#quizNext").scrollIntoView({ block: "nearest", behavior: "smooth" });
-    return;
-  }
-  const qs = t.closest("#quizSave");
-  if (qs){
-    const w = quiz.qs[quiz.i].w;
-    const on = toggleSaved(w.id);
-    qs.classList.toggle("saved", on);
-    qs.querySelector("span").textContent = on ? "Saved" : "Save word";
-    qs.querySelector("svg").setAttribute("fill", on ? "currentColor" : "none");
-    return;
-  }
-  if (t.closest("#nextQ")){ quiz.i++; quiz.answered = false; drawQuiz(); return; }
-  if (t.closest("#againQuiz")){ startQuiz(); return; }
+  /* quiz and play */
+  if (quizClick(t)) return;
+  if (gameClick(t)) return;
 
   /* roots accordion */
   const rh = t.closest(".roothead");
@@ -1636,7 +2515,8 @@ document.addEventListener("click", e => {
 });
 
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && $("#sheet").classList.contains("open")) closeSheet();
+  if (e.key === "Escape" && $("#sheet").classList.contains("open")){ closeSheet(); return; }
+  gameKeys(e);
   if (e.key === "Enter" && document.activeElement && document.activeElement.id === "flashCard"){
     deck.flipped = !deck.flipped; $("#flashCard").classList.toggle("flipped", deck.flipped);
   }
