@@ -15,7 +15,11 @@ past tense, passive, "she/it"), and the little pieces stuck to its front and
 back — the *wa-*, the *al-*, the attached pronoun. If the root turns up anywhere
 else on the site, it says where.
 
-Currently **20 surahs, 480 words, 492 verses, 2,078 words of Qur'an text**.
+Currently **44 surahs, 916 words, 831 verses, 4,030 words of Qur'an text**.
+
+The quiz walks each surah ten words at a time, and no word comes back until every word in the surah has had its turn. Each round mixes multiple choice on every field of the card with two hands-on kinds: **Match** (pair four words with their meanings) and **Arrange** (rebuild a verse from its words, guided by the word-by-word English). Any question can open its word's card for revision. Every slip goes into a **mistakes basket**, which you can practise on its own when a round ends; getting a word right later takes it out.
+
+**Play & Learn** is the fifth section of every surah: *Word Rain*, a game where a meaning appears and words fall, and you catch the one that carries it before it lands. Combos, levels, gold words and a best score per surah keep it moving; anything you miss lands in the same mistakes basket. Progress, the basket and best scores are kept in the browser, like saved words.
 
 English is set in Source Serif 4 — the surah names, the meanings, the notes and
 the translations all read like a printed book, while the sans-serif stays on the
