@@ -816,6 +816,7 @@ body{font-size:17.5px;line-height:1.55}
   box-shadow:inset 0 1px 0 var(--glass-edge),0 12px 26px -14px var(--glass-drop);cursor:pointer;
   display:flex;flex-direction:column;align-items:center}
 .g-drop .ar{font-size:26px;line-height:1.5;white-space:normal;text-align:center;max-width:100%}
+.g-drop.long .ar{font-size:20px;line-height:1.55}
 .g-drop.gold{background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 34%,var(--surface)),color-mix(in srgb,var(--gold) 14%,var(--surface)));
   border-color:color-mix(in srgb,var(--gold) 70%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent),0 0 26px color-mix(in srgb,var(--gold) 45%,transparent)}
 .g-drop.caught{animation:catch .3s forwards;pointer-events:none}
@@ -858,6 +859,115 @@ body{font-size:17.5px;line-height:1.55}
 .go-stats span{display:flex;flex-direction:column;font-size:11.5px;color:var(--muted);padding:8px 2px;border-radius:12px;background:var(--glass-quiet)}
 .go-stats b{font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
 
+/* ================= the verse once, word by word ================= */
+.wbw.solo{border-top:0;margin-top:0;padding-top:0}
+
+/* ================= words: the surah verse by verse ================= */
+.vlist{margin-bottom:30px}
+.vblock{background:var(--surface);border:1px solid var(--hair);border-radius:16px;box-shadow:var(--shadow);
+  padding:13px 16px 14px;margin-bottom:10px;position:relative}
+.vblock.quiet{background:transparent;box-shadow:none;border-style:dashed;padding:10px 16px 11px}
+.vb-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.vb-no{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;border-radius:13px;
+  font-size:12.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);
+  border:1px solid color-mix(in srgb,var(--accent) 26%,transparent);font-variant-numeric:tabular-nums}
+.vblock.quiet .vb-no{color:var(--faint);background:transparent;border-color:var(--hair)}
+.vb-count{font-size:11.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.vb-ar{font-size:26px;line-height:2.05;color:var(--ink);text-align:right;direction:rtl}
+.vblock.quiet .vb-ar{color:var(--ink-2);font-size:24px}
+.vb-hit{color:var(--gold);cursor:pointer;border-radius:4px;
+  box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--gold) 50%,transparent);transition:background .15s}
+@media (hover:hover){.vb-hit:hover{background:color-mix(in srgb,var(--gold) 16%,transparent)}}
+.vb-hit:active{background:color-mix(in srgb,var(--gold) 24%,transparent)}
+.vb-end{display:inline-flex;align-items:center;justify-content:center;min-width:1.5em;height:1.5em;border-radius:50%;
+  border:1.5px solid color-mix(in srgb,var(--gold) 55%,transparent);color:var(--gold);font-size:.6em;line-height:1;
+  vertical-align:middle;margin-right:4px}
+.vb-en{font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.55;color:var(--ink-2);margin-top:6px}
+.vblock.quiet .vb-en{color:var(--muted);font-size:15px}
+.vb-words{margin:12px -16px -14px;border-top:1px solid var(--hair)}
+.vb-words .wordrow{border-bottom:1px solid var(--hair)}
+.vb-words .wordrow:last-child{border-bottom:0;border-radius:0 0 16px 16px}
+
+/* ================= ṣarf ṣaghīr ================= */
+.sarf{margin-top:12px;border-top:1px solid color-mix(in srgb,var(--accent) 20%,transparent);padding-top:10px}
+.sarf summary{list-style:none;display:flex;align-items:baseline;gap:9px;cursor:pointer;padding:2px 0;user-select:none}
+.sarf summary::-webkit-details-marker{display:none}
+.sarf summary .caret{width:10px;height:6px;margin-left:auto;align-self:center;color:var(--muted);transition:transform .2s}
+.sarf[open] summary .caret{transform:rotate(180deg)}
+.sf-k{font-size:11.5px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.sf-kar{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;font-size:16px;color:var(--gold);direction:rtl;unicode-bidi:isolate}
+.sf-sum{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;font-size:18px;color:var(--ink-2);direction:rtl;unicode-bidi:isolate;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sarf[open] .sf-sum{visibility:hidden}
+.sf-meta{display:flex;flex-wrap:wrap;gap:5px 8px;margin:8px 0 4px}
+.sf-meta > span{font-size:12.5px;line-height:1.35;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--hair);color:var(--ink-2)}
+.sf-en{font-weight:640;color:var(--ink)!important}
+.sf-babar{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;font-size:15px;direction:rtl;unicode-bidi:isolate;color:var(--gold);margin-left:3px}
+.sf-block{margin-top:10px}
+.sf-title{font-size:10.5px;font-weight:750;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.sf-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;direction:rtl}
+.sf-cell{direction:ltr;position:relative;background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:7px 6px 7px;text-align:center;min-width:0}
+.sf-cell.here{border-color:color-mix(in srgb,var(--gold) 70%,transparent);background:var(--gold-soft);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 22%,transparent)}
+.sf-ar{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;direction:rtl;font-size:20px;line-height:1.55;color:var(--ink);overflow-wrap:anywhere}
+.sf-cell.here .sf-ar{color:var(--gold)}
+.sf-lab{display:flex;flex-direction:column;gap:0;margin-top:1px}
+.sf-lab span:first-child{font-size:11.5px;font-weight:620;color:var(--ink-2);line-height:1.25}
+.sf-term{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;font-size:13px;color:var(--faint);direction:rtl;line-height:1.4}
+.sf-here{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--on-accent,#fff);background:var(--gold);border-radius:999px;padding:1px 7px;white-space:nowrap}
+.sf-line{margin-top:12px}
+.sf-line p{margin:0;font-size:19px;line-height:2;color:var(--ink-2);text-align:right;direction:rtl;
+  background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:6px 12px}
+.sf-note{font-size:13px;line-height:1.5;color:var(--muted);margin:9px 0 0}
+@media (max-width:560px){
+  .sf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sf-ar{font-size:21px}
+}
+
+/* ================= word rain: speed, passes, mistakes ================= */
+.gi-speed{max-width:420px;margin:0 auto 14px}
+.gi-speed .dlabel{margin-bottom:6px}
+.g-speeds{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.g-speeds button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px 7px;border-radius:12px;
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge);color:var(--muted);transition:.15s}
+.g-speeds button span{font-size:12px;font-weight:620}
+.g-speeds i{display:flex;gap:2px;align-items:flex-end;height:12px}
+.g-speeds i b{width:4px;border-radius:2px;background:currentColor;opacity:.55}
+.g-speeds i b:nth-child(1){height:4px}.g-speeds i b:nth-child(2){height:6px}.g-speeds i b:nth-child(3){height:8px}
+.g-speeds i b:nth-child(4){height:10px}.g-speeds i b:nth-child(5){height:12px}
+.g-speeds button[aria-checked="true"]{color:var(--accent);background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.g-speeds button[aria-checked="true"] i b{opacity:1}
+.g-pass{max-width:420px;margin:0 auto 12px;text-align:left;padding:12px 14px;border-radius:16px;
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.g-pass .progress{display:block;height:7px;margin:7px 0 2px}
+.g-pass .progress i{background:linear-gradient(90deg,var(--accent),var(--gold))}
+.g-pass p{margin:6px 0 0;font-size:14px;color:var(--ink-2)}
+.g-pass b{color:var(--ink)}
+.g-pass.mist{background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 30%,transparent)}
+.g-pass.mist .dlabel{color:var(--bad)}
+.g-pass.done{background:var(--good-soft);border-color:color-mix(in srgb,var(--good) 28%,transparent)}
+.g-pass.done .dlabel{color:var(--good)}
+.cta.mist,.gi-play.mist{background:linear-gradient(135deg,var(--bad),color-mix(in srgb,var(--bad) 55%,var(--gold)))}
+.linkbtn{display:block;margin:10px auto 0;font-size:14px;font-weight:600;color:var(--accent);padding:6px 10px}
+.g-spd{flex:none;height:38px;display:inline-flex;align-items:center;gap:6px;padding:0 11px;border-radius:19px;color:var(--ink-2);
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.g-spd-dots{display:flex;gap:2px;align-items:flex-end;height:12px}
+.g-spd-dots b{width:3.5px;border-radius:2px;background:currentColor;opacity:.25}
+.g-spd-dots b:nth-child(1){height:4px}.g-spd-dots b:nth-child(2){height:6px}.g-spd-dots b:nth-child(3){height:8px}
+.g-spd-dots b:nth-child(4){height:10px}.g-spd-dots b:nth-child(5){height:12px}
+.g-spd-dots b.on{opacity:1;color:var(--accent)}
+.g-spd-name{font-size:12.5px;font-weight:650}
+.g-prog{display:flex;align-items:center;gap:10px;margin-top:8px}
+.g-prog .progress{height:5px}
+.g-prog .progress i{background:linear-gradient(90deg,var(--accent),var(--gold))}
+.g-prog span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.game.mist .g-prompt{border-color:color-mix(in srgb,var(--bad) 35%,transparent)}
+.game.mist .g-prompt .dlabel{color:var(--bad)}
+.go-line{font-family:"Source Serif 4",Georgia,serif;font-size:16.5px;line-height:1.45;color:var(--ink-2)}
+.go-line b{color:var(--ink)}
+@media (max-width:420px){ .g-spd-name{display:none} .g-spd{padding:0 10px} }
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
@@ -886,9 +996,9 @@ body{font-size:17.5px;line-height:1.55}
         <div id="surahList"></div>
         <p class="grouplabel" style="margin-top:26px">How to use this</p>
         <div class="group">
-          <div class="row" style="display:block"><div class="dlabel">Tap a word</div><div class="dval">Every entry opens a card with its root, what it means here, the grammar, and why this exact word was chosen.</div></div>
+          <div class="row" style="display:block"><div class="dlabel">Tap a word</div><div class="dval">The Words tab walks the surah verse by verse, with the taught words lit in gold. Every entry opens a card with its root, what it means here, the grammar, and why this exact word was chosen &mdash; and every verb comes with its full &#7779;arf &#7779;agh&#299;r, from past tense to the noun of instrument.</div></div>
           <div class="row" style="display:block"><div class="dlabel">Star what you want back</div><div class="dval">Saved words gather in the Saved tab and stay in this browser.</div></div>
-          <div class="row" style="display:block"><div class="dlabel">Then test it</div><div class="dval">Each surah has flashcards, a quiz that walks through every word ten at a time and keeps a basket of your mistakes, and Play &amp; Learn &mdash; a game that drills the same words.</div></div>
+          <div class="row" style="display:block"><div class="dlabel">Then test it</div><div class="dval">Each surah has flashcards, a quiz that walks through every word ten at a time and keeps a basket of your mistakes, and Play &amp; Learn &mdash; a game that drops every word once at the speed you choose, then replays only the ones you missed.</div></div>
         </div>
         <p class="footnote">Transliteration follows a light academic scheme. Meanings are study glosses, not a translation of the Qur&rsquo;an.</p>
       </div>
@@ -960,9 +1070,10 @@ body{font-size:17.5px;line-height:1.55}
 </div>
 
 
-<script src="data/verses.js?v=25"></script>
-<script src="data/morph.js?v=25"></script>
-<script src="data/surahs.js?v=25"></script>
+<script src="data/verses.js?v=26"></script>
+<script src="data/morph.js?v=26"></script>
+<script src="data/surahs.js?v=26"></script>
+<script src="data/sarf.js?v=26"></script>
 <script>
 
 /* ===================== helpers ===================== */
@@ -1098,6 +1209,66 @@ function linkRow(l, from){
     (from ? '<div class="link-src">' + esc(from) + '</div>' : '') + '</div>';
 }
 
+/* ---------- the surah, verse by verse, with its words ----------
+   Every verse appears in order — even one with nothing to teach — so the
+   list reads as the surah itself. The words taught in a verse are lit up
+   in gold inside it, and their cards follow right underneath.          */
+function versesInOrder(s){
+  const book = HAVE_VERSES ? VERSES[s.num] : null;
+  if (!book) return null;
+  return Object.keys(book).map(Number).sort((a, b) => a - b);
+}
+function verseWordsHTML(s){
+  const nums = versesInOrder(s);
+  if (!nums || !nums.length) return '<p class="grouplabel">' + s.words.length + ' words</p>' + wordGroup(s.words, false);
+  const home = {}, lit = {};          // verse -> words listed there; verse -> words lit there
+  const stray = [];
+  s.words.forEach(w => {
+    const vs = verseNums(w.v).filter(n => VERSES[s.num][n]);
+    if (!vs.length){ stray.push(w); return; }
+    (home[vs[0]] = home[vs[0]] || []).push(w);
+    vs.forEach(n => (lit[n] = lit[n] || []).push(w));
+  });
+  let html = '<p class="grouplabel">' + s.words.length + ' words &middot; ' + nums.length + ' verses, in order</p>' +
+    '<p class="wbw-hint" style="margin:-6px 0 14px">The gold words in each verse are the ones taught here. Tap one to open it.</p>';
+  html += '<div class="vlist">' + nums.map(n => {
+    const v = VERSES[s.num][n];
+    const ws = home[n] || [];
+    const marks = {};                 // token index -> word id
+    /* exact matches first, then single words before the longer phrases that
+       contain them — so مَنِيٍّ doesn't take the يُمْنَىٰ next to it */
+    const entries = (lit[n] || []).slice().sort((a, b) => a.ar.split(/\s+/).length - b.ar.split(/\s+/).length);
+    const exactDone = {};
+    entries.forEach(w => {
+      const tokens = matchTokens(w.ar);
+      v.w.forEach((t, i) => {
+        const k = skeleton(t[0]);
+        if (marks[i] === undefined && tokens.some(x => x === k || squeeze(x) === squeeze(k))){ marks[i] = w.id; exactDone[w.id] = 1; }
+      });
+    });
+    entries.forEach(w => {
+      if (exactDone[w.id] && w.ar.split(/\s+/).length === 1) return;
+      const tokens = matchTokens(w.ar);
+      if (!tokens.length) return;
+      v.w.forEach((t, i) => { if (marks[i] === undefined && sameWord(t[0], tokens)) marks[i] = w.id; });
+    });
+    const ar = v.w.map((t, i) => marks[i] !== undefined
+      ? '<span class="vb-hit" data-word="' + marks[i] + '" role="button" tabindex="0">' + esc(t[0]) + '</span>'
+      : '<span>' + esc(t[0]) + '</span>').join(' ');
+    return '<section class="vblock' + (ws.length ? '' : ' quiet') + '" id="vb-' + n + '">' +
+      '<div class="vb-head"><span class="vb-no">' + n + '</span>' +
+        '<span class="vb-count">' + (ws.length ? ws.length + (ws.length === 1 ? ' word' : ' words') : 'no new word') + '</span></div>' +
+      '<div class="ar vb-ar">' + ar + ' <span class="vb-end">۝' + toArabicDigits(n) + '</span></div>' +
+      (v.e ? '<div class="vb-en">' + esc(v.e) + '</div>' : '') +
+      (ws.length ? '<div class="vb-words">' + ws.map(w => wordRow(w, false)).join('') + '</div>' : '') +
+    '</section>';
+  }).join('') + '</div>';
+  if (stray.length)
+    html += '<p class="grouplabel">More words</p>' + wordGroup(stray, false);
+  return html;
+}
+function toArabicDigits(n){ return String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]); }
+
 function wordsView(){
   const s = cur;
   let html = '';
@@ -1116,7 +1287,7 @@ function wordsView(){
       '<div class="group"><ol class="steps">' +
       s.big.map(b => '<li>' + esc(b) + '</li>').join('') + '</ol></div>';
   }
-  html += '<p class="grouplabel">' + s.words.length + ' words</p>' + wordGroup(s.words, false);
+  html += verseWordsHTML(s);
   if (s.traps && s.traps.length){
     html += '<p class="grouplabel">Never-forget traps</p><div class="group">' +
       s.traps.map(t => '<div class="trap"><span class="warn">!</span><span>' + esc(t) + '</span></div>').join('') +
@@ -1641,6 +1812,18 @@ const SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
 const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
+/* You choose how fast the words fall — and it stays that speed. Seconds for a
+   word to fall from the top of the arena to the ground. */
+const SPEEDS = [
+  { name: "Gentle", t: 16 },
+  { name: "Slow",   t: 12 },
+  { name: "Steady", t: 9 },
+  { name: "Quick",  t: 6.5 },
+  { name: "Fast",   t: 4.6 }
+];
+function speedIx(){ const s = QM.speed; return (s >= 0 && s < SPEEDS.length) ? s : 1; }
+function fallTime(){ return SPEEDS[speedIx()].t; }
+
 /* the guides quote their glosses ("…a small band [of jinn].") — drop the
    quote marks and trailing dots so the prompt reads as a plain meaning */
 function plainMean(s, cap){
@@ -1649,11 +1832,37 @@ function plainMean(s, cap){
 }
 function gameKey(){ return GAME.scope === "all" ? "all" : "s" + cur.num; }
 function gameBest(){ return (QM.best && QM.best[gameKey()]) || 0; }
+/* every word of the surah is in the pass — phrases too */
 function gamePool(scope){
   const src = (scope || GAME.scope) === "all" ? ALL : cur.words;
-  const tidy = src.filter(w => w.ar && w.meaning && w.ar.indexOf("/") < 0 &&
-                               w.ar.split(/\s+/).length <= 4 && w.ar.length <= 30);
-  return tidy.length >= 4 ? tidy : src.filter(w => w.ar && w.meaning);
+  return src.filter(w => w.ar && w.meaning);
+}
+/* what a drop shows: the first spelling when a guide gives alternatives */
+function dropText(w){ return String(w.ar).split(/\s*\/\s*/)[0].trim(); }
+const isLong = w => dropText(w).length > 24;
+
+/* ---------- the pass: every word once, then your mistakes ----------
+   QM.game[key] = { left: [ids still to come], miss: [ids you missed],
+                    total: n, done: true once every word has fallen }
+   It is saved after every word, so you can stop and carry on later.     */
+function gState(key){
+  QM.game = QM.game || {};
+  const k = key || gameKey();
+  const pool = gamePool();
+  const valid = {}; pool.forEach(w => valid[w.id] = 1);
+  let st = QM.game[k];
+  if (st){
+    st.left = (st.left || []).filter(id => valid[id]);
+    st.miss = (st.miss || []).filter(id => valid[id]);
+  }
+  return st || null;
+}
+function newPass(){
+  const ids = shuffle(gamePool().map(w => w.id));
+  QM.game = QM.game || {};
+  QM.game[gameKey()] = { left: ids, miss: [], total: ids.length, done: false };
+  qmSave();
+  return QM.game[gameKey()];
 }
 
 /* tiny synthesised sounds — no files to load */
@@ -1671,6 +1880,7 @@ function sfx(kind, n){
       land:  [262, 175],
       level: [523, 659, 784, 1047],
       over:  [392, 330, 262, 196],
+      win:   [523, 659, 784, 1047, 1319],
       tick:  [660],
       go:    [988]
     }[kind] || [440];
@@ -1678,23 +1888,51 @@ function sfx(kind, n){
       const o = AC.createOscillator(), g = AC.createGain();
       o.type = kind === "bad" || kind === "land" ? "triangle" : "sine";
       o.frequency.value = f;
-      const t = now + i * (kind === "over" ? 0.13 : 0.075);
+      const t = now + i * (kind === "over" || kind === "win" ? 0.12 : 0.075);
       g.gain.setValueAtTime(0.0001, t);
       g.gain.exponentialRampToValueAtTime(kind === "bad" ? 0.16 : 0.11, t + 0.015);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + (kind === "over" ? 0.32 : 0.2));
+      g.gain.exponentialRampToValueAtTime(0.0001, t + (kind === "over" || kind === "win" ? 0.32 : 0.2));
       o.connect(g); g.connect(AC.destination);
       o.start(t); o.stop(t + 0.36);
     });
   } catch (e) {}
 }
 
+function speedPicker(){
+  return '<div class="g-speeds" role="radiogroup" aria-label="How fast the words fall">' +
+    SPEEDS.map((s, i) => '<button role="radio" data-speed="' + i + '" aria-checked="' + (i === speedIx()) + '">' +
+      '<i>' + '<b></b>'.repeat(i + 1) + '</i><span>' + s.name + '</span></button>').join('') + '</div>';
+}
+
 function playView(){
   gameStop();
   const nS = gamePool("surah").length, nA = gamePool("all").length;
   if (nS < 4 && GAME.scope === "surah") GAME.scope = "all";
+  const st = gState();
+  const pool = gamePool();
+  let stage, buttons;
+  if (st && !st.done && st.left.length){
+    const doneN = st.total - st.left.length;
+    stage = '<div class="g-pass"><div class="dlabel">Pass in progress</div>' +
+      '<div class="progress"><i style="width:' + Math.round(doneN / Math.max(1, st.total) * 100) + '%"></i></div>' +
+      '<p><b>' + st.left.length + '</b> of ' + st.total + ' words still to fall' +
+      (st.miss.length ? ' &middot; <b>' + st.miss.length + '</b> missed so far' : '') + '</p></div>';
+    buttons = '<button class="cta gi-play" id="gameStart" data-run="main">Continue</button>' +
+      '<button class="linkbtn" id="gameNew">Start the pass again</button>';
+  } else if (st && st.done && st.miss.length){
+    stage = '<div class="g-pass mist"><div class="dlabel">Every word has fallen once</div>' +
+      '<p>Now the ones that got away: <b>' + st.miss.length + '</b> ' + (st.miss.length === 1 ? 'mistake' : 'mistakes') + ' to clear.</p></div>';
+    buttons = '<button class="cta gi-play mist" id="gameStart" data-run="mist">Play my ' + st.miss.length + ' mistake' + (st.miss.length === 1 ? '' : 's') + '</button>' +
+      '<button class="linkbtn" id="gameNew">Start a fresh pass instead</button>';
+  } else {
+    stage = (st && st.done
+      ? '<div class="g-pass done"><div class="dlabel">All clear</div><p>You caught every word, mistakes included. Go again?</p></div>'
+      : '');
+    buttons = '<button class="cta gi-play" id="gameStart" data-run="new">Play &middot; ' + pool.length + ' words</button>';
+  }
   return '<div class="game-intro">' +
-    '<div class="gi-art" aria-hidden="true">' + gamePool().slice().sort((a, b) => a.ar.length - b.ar.length).slice(0, 3)
-      .map(w => '<span class="ar">' + esc(w.ar) + '</span>').join('') + '</div>' +
+    '<div class="gi-art" aria-hidden="true">' + pool.slice().sort((a, b) => dropText(a).length - dropText(b).length).slice(0, 3)
+      .map(w => '<span class="ar">' + esc(dropText(w)) + '</span>').join('') + '</div>' +
     '<div class="gi-kicker">Play &amp; Learn</div>' +
     '<h2 class="gi-title">Word Rain</h2>' +
     '<p class="gi-sub">A meaning appears at the top. Words start to fall. Tap the one that carries it before it lands.</p>' +
@@ -1702,40 +1940,57 @@ function playView(){
       '<button role="tab" data-scope="surah" aria-selected="' + (GAME.scope === "surah") + '"' + (nS < 4 ? ' disabled' : '') + '>This surah &middot; ' + nS + '</button>' +
       '<button role="tab" data-scope="all" aria-selected="' + (GAME.scope === "all") + '">All surahs &middot; ' + nA + '</button>' +
     '</div>' +
-    '<button class="cta gi-play" id="gameStart">Play</button>' +
+    '<div class="gi-speed"><div class="dlabel">Falling speed</div>' + speedPicker() + '</div>' +
+    stage + buttons +
     '<div class="gi-rules">' +
-      '<span><b class="gi-h">' + HEART + '</b>3 lives</span>' +
+      '<span><b>1</b>every word falls once</span>' +
+      '<span><b>2</b>then only your mistakes</span>' +
       '<span><b>&times;5</b>combo</span>' +
       '<span><b class="gi-gold">&#9733;</b>gold = double</span>' +
     '</div>' +
     '<p class="gi-best">' + (gameBest() ? 'Your best here: <b>' + gameBest() + '</b>' : 'No score yet. Set one.') + '</p>' +
-    '<p class="gi-foot">Anything you miss lands in the quiz’s mistakes basket. On a keyboard, keys 1–4 catch the words left to right.</p>' +
+    '<p class="gi-foot">Your place is saved after every word, so you can stop and carry on later. Misses also go into the quiz’s mistakes basket. On a keyboard: keys 1–4 catch the words left to right, [ and ] change the speed, P pauses.</p>' +
   '</div>';
 }
 
 function gameHUD(r){
   const mult = Math.min(5, 1 + Math.floor(r.combo / 3));
-  return '<div class="g-score"><b id="gScore">' + r.score + '</b><span>Level ' + r.level + '</span></div>' +
-    '<div class="g-combo' + (r.combo >= 3 ? ' hot' : '') + '" id="gCombo">' + (r.combo ? '&times;' + mult + ' <small>' + r.combo + ' in a row</small>' : '') + '</div>' +
-    '<div class="g-lives">' + Array.from({ length: Math.max(r.lives, 0) }, () => '<i class="g-heart">' + HEART + '</i>').join('') + '</div>';
+  return '<div class="g-score"><b id="gScore">' + r.score + '</b><span>' + (r.kind === "mist" ? 'Mistakes' : 'Level ' + r.level) + '</span></div>' +
+    '<div class="g-combo' + (r.combo >= 3 ? ' hot' : '') + '" id="gCombo">' + (r.combo ? '&times;' + mult + ' <small>' + r.combo + ' in a row</small>' : '') + '</div>';
+}
+function gameProgress(r){
+  const done = r.total - r.list.length;
+  return '<div class="g-prog"><div class="progress"><i style="width:' + Math.round(done / Math.max(1, r.total) * 100) + '%"></i></div>' +
+    '<span>' + (r.kind === "mist" ? 'Mistake ' : 'Word ') + Math.min(r.total, done + 1) + ' of ' + r.total + '</span></div>';
+}
+function speedChip(){
+  return '<span class="g-spd-dots">' + SPEEDS.map((s, i) => '<b' + (i <= speedIx() ? ' class="on"' : '') + '></b>').join('') + '</span>' +
+    '<span class="g-spd-name">' + SPEEDS[speedIx()].name + '</span>';
 }
 
-function gameStart(){
+/* kind: "new" starts a fresh pass, "main" carries on the pass, "mist" plays the mistakes */
+function gameStart(kind){
   gameStop();
-  const pool = gamePool();
-  GAME.run = { score: 0, lives: 3, combo: 0, maxCombo: 0, caught: 0, taps: 0, level: 1,
-               drops: [], queue: [], missed: [], pool: pool, over: false, paused: true,
+  let st = gState();
+  if (kind === "new" || !st || (kind === "main" && (st.done || !st.left.length))) { st = newPass(); kind = "main"; }
+  if (kind === "mist" && !st.miss.length) kind = "main";
+  const list = kind === "mist" ? shuffle(st.miss.slice()) : st.left;
+  GAME.run = { kind: kind, st: st, list: list, total: kind === "mist" ? list.length : st.total,
+               score: 0, combo: 0, maxCombo: 0, caught: 0, taps: 0, level: 1, flubbed: false,
+               drops: [], missed: [], cleared: [], pool: gamePool(), over: false, paused: true,
                last: 0, raf: 0, timers: [], key: gameKey(), waves: 0 };
   $("#modeBody").innerHTML =
-    '<div class="game" id="game">' +
+    '<div class="game' + (kind === "mist" ? ' mist' : '') + '" id="game">' +
       '<div class="g-top"><div class="g-hud" id="gHud">' + gameHUD(GAME.run) + '</div>' +
+        '<button class="g-spd" id="gSpeed" aria-label="Falling speed — tap to change">' + speedChip() + '</button>' +
         '<button class="g-icon" id="gMute" aria-label="Sound on or off">' + (QM.mute ? SOUND_OFF : SOUND_ON) + '</button>' +
-        '<button class="g-icon" id="gQuit" aria-label="End game">' + CROSS + '</button></div>' +
-      '<div class="g-prompt" id="gPrompt"><span class="dlabel">Catch the word that means</span><div class="g-mean" id="gMean">&nbsp;</div></div>' +
+        '<button class="g-icon" id="gQuit" aria-label="Stop">' + CROSS + '</button></div>' +
+      '<div class="g-prompt" id="gPrompt"><span class="dlabel">' + (kind === "mist" ? 'Second chance &middot; catch the word that means' : 'Catch the word that means') + '</span>' +
+        '<div class="g-mean" id="gMean">&nbsp;</div><div id="gProg">' + gameProgress(GAME.run) + '</div></div>' +
       '<div class="g-arena" id="gArena"><div class="g-ground"></div><div class="g-over" id="gOverlay"></div></div>' +
     '</div>';
   $("#gArena").addEventListener("pointerdown", gamePointer);
-  const top = $("#game").getBoundingClientRect().top + window.scrollY - 62;
+  const top = $("#game").getBoundingClientRect().top + window.scrollY - 100;
   window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
   gameCountdown();
 }
@@ -1774,9 +2029,25 @@ function gameStop(){
   GAME.run = null;
 }
 
-function nextTarget(r){
-  if (!r.queue.length) r.queue = shuffle(r.pool.slice());
-  return r.queue.pop();
+/* the word now falling is always the last id in the list; it only leaves
+   the list once it has been caught or has landed */
+function settleTarget(ok){
+  const r = GAME.run, w = r.target;
+  if (!w) return;
+  const at = r.list.lastIndexOf(w.id);
+  if (at >= 0) r.list.splice(at, 1);
+  const miss = r.st.miss;
+  if (r.kind === "main"){
+    if (!ok && miss.indexOf(w.id) < 0) miss.push(w.id);
+  } else {
+    const i = miss.indexOf(w.id);
+    if (ok && i >= 0) miss.splice(i, 1);
+  }
+  (ok ? r.cleared : r.missed).push(w.id);
+  if (r.kind === "main" && !r.list.length) r.st.done = true;
+  qmSave();
+  r.target = null;
+  const p = $("#gProg"); if (p) p.innerHTML = gameProgress(r);
 }
 
 function gameWave(){
@@ -1785,34 +2056,43 @@ function gameWave(){
   const arena = $("#gArena");
   r.drops.forEach(d => d.el.remove());
   r.drops = [];
+  let target = null;
+  while (r.list.length && !(target = byId(r.list[r.list.length - 1]))) r.list.pop();
+  if (!target){ passEnd(); return; }
   r.waves++;
-  const target = nextTarget(r);
-  const k = Math.min(4, 2 + Math.floor(r.level / 2));          // 2, 3, 3, 4 …
+  r.flubbed = false;
+  let k = Math.min(4, 2 + Math.floor(r.level / 2));            // 2, 3, 3, 4 …
+  if (isLong(target)) k = Math.min(k, dropText(target).length > 40 ? 2 : 3);   // long phrases need room
   const arSeen = { [skeleton(target.ar)]: 1 }, enSeen = { [brief(target.meaning, 70)]: 1 };
   const decoys = [];
   const src = r.pool.length >= k + 2 ? r.pool : ALL;
-  shuffle(src.slice()).forEach(x => {
-    if (decoys.length >= k - 1 || x === target) return;
+  const tl = dropText(target).length;
+  /* decoys of a similar length, so the size of a drop never gives the answer away */
+  const near = shuffle(src.slice()).filter(x => x !== target)
+    .sort((a, b) => Math.abs(dropText(a).length - tl) - Math.abs(dropText(b).length - tl))
+    .slice(0, Math.max(10, k * 4));
+  shuffle(near).forEach(x => {
+    if (decoys.length >= k - 1) return;
     const a = skeleton(x.ar), m = brief(x.meaning, 70);
-    if (!a || arSeen[a] || enSeen[m] || x.ar.length > 30) return;
+    if (!a || arSeen[a] || enSeen[m]) return;
     arSeen[a] = 1; enSeen[m] = 1; decoys.push(x);
   });
-  const gold = r.level >= 2 && Math.random() < 0.14;
+  const gold = r.waves > 3 && Math.random() < 0.14;
   const words = shuffle([{ w: target, ok: true }].concat(decoys.map(w => ({ w: w, ok: false }))));
   const W = arena.clientWidth, H = arena.clientHeight;
   const slot = W / words.length;
-  const fall = Math.max(2.9, 8.4 - (r.level - 1) * 0.7);      // seconds to reach the ground
+  const fall = fallTime();
   words.forEach((o, i) => {
     const el = document.createElement("button");
-    el.className = "g-drop" + (o.ok && gold ? " gold" : "");
-    el.innerHTML = '<span class="ar">' + esc(o.w.ar) + '</span>';
+    el.className = "g-drop" + (o.ok && gold ? " gold" : "") + (isLong(o.w) ? " long" : "");
+    el.innerHTML = '<span class="ar">' + esc(dropText(o.w)) + '</span>';
     el.style.maxWidth = Math.max(70, slot - 10) + "px";
     arena.appendChild(el);
     const w = el.offsetWidth, h = el.offsetHeight;
     const jitter = (slot - w) > 8 ? (Math.random() - 0.5) * (slot - w - 8) : 0;
     const d = { el: el, w: o.w, ok: o.ok, gold: o.ok && gold, h: h,
                 x: Math.max(4, Math.min(W - w - 4, slot * i + (slot - w) / 2 + jitter)),
-                y: -h - 10 - Math.random() * 70, vy: (H + h) / fall * (0.92 + Math.random() * 0.16), dead: false };
+                y: -h - 10 - Math.random() * 50, vy: (H + h) / fall * (0.94 + Math.random() * 0.12), dead: false };
     el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
     el._drop = d;
     r.drops.push(d);
@@ -1864,43 +2144,45 @@ function gameHit(d){
   const arena = $("#gArena");
   if (d.ok){
     d.dead = true;
-    r.combo++; r.maxCombo = Math.max(r.maxCombo, r.combo); r.caught++;
-    const mult = Math.min(5, 1 + Math.floor((r.combo - 1) / 3));
+    const clean = !r.flubbed;
+    if (clean){ r.combo++; r.maxCombo = Math.max(r.maxCombo, r.combo); }
+    r.caught++;
+    const mult = Math.min(5, 1 + Math.floor((Math.max(r.combo, 1) - 1) / 3));
     const early = Math.max(0, Math.round(10 * (1 - d.y / arena.clientHeight)));
-    const pts = (10 + early) * mult * (d.gold ? 2 : 1);
+    const pts = clean ? (10 + early) * mult * (d.gold ? 2 : 1) : 2;
     r.score += pts;
-    if (d.gold && r.lives < 5) r.lives++;
-    outOfBasket(d.w);
-    sfx(d.gold ? "gold" : "good", r.combo);
+    if (clean) outOfBasket(d.w);
+    sfx(d.gold && clean ? "gold" : "good", r.combo);
     burst(d, d.gold ? "gold" : "good");
-    floatText(d, "+" + pts + (d.gold ? " ★" : ""), d.gold ? "gold" : "good");
+    floatText(d, "+" + pts + (d.gold && clean ? " ★" : ""), d.gold && clean ? "gold" : "good");
     d.el.classList.add("caught");
     r.drops.forEach(o => { if (!o.dead){ o.dead = true; o.el.classList.add("fade"); } });
+    settleTarget(clean);
     let lvl = false;
-    if (r.caught % 6 === 0){ r.level++; lvl = true; }
+    if (r.kind === "main" && clean && r.caught % 6 === 0 && r.level < 5){ r.level++; lvl = r.level <= 5; }
     $("#gHud").innerHTML = gameHUD(r);
     const sc = $("#gScore"); if (sc){ sc.classList.add("bump"); }
-    if (lvl){ banner("Level " + r.level, "Faster rain"); sfx("level"); later(gameWave, 1050); }
-    else later(gameWave, 380);
+    if (lvl && r.list.length){ banner("Level " + r.level, "One more word in the rain"); sfx("level"); later(gameWave, 1050); }
+    else later(gameWave, 420);
   } else {
     d.el.classList.add("wrongtap");
     d.el.innerHTML += '<small class="g-gloss">' + esc(plainMean(d.w.meaning, 40)) + '</small>';
     reclamp(d);
     d.vy *= 0.4; d.wrongDone = true;   // keep it falling, slowly, so you can read what it means
-    loseLife("tap", d);
+    flub("tap");
   }
 }
 
-function loseLife(why, d){
+/* a wrong tap: the right word can still be caught, but it now counts as a mistake */
+function flub(why){
   const r = GAME.run;
   r.combo = 0;
-  r.lives--;
-  if (r.target){ toBasket(r.target); if (r.missed.indexOf(r.target.id) < 0) r.missed.push(r.target.id); }
+  r.flubbed = true;
+  if (r.target) toBasket(r.target);
   sfx(why === "land" ? "land" : "bad");
   try { if (navigator.vibrate) navigator.vibrate(why === "land" ? 90 : 50); } catch (e) {}
   const g = $("#game"); if (g){ g.classList.remove("shake"); void g.offsetWidth; g.classList.add("shake"); }
   $("#gHud").innerHTML = gameHUD(r);
-  if (r.lives <= 0){ r.ending = true; later(gameOver, 900); }
 }
 
 function gameLanded(d){
@@ -1911,8 +2193,9 @@ function gameLanded(d){
   d.y = Math.min(d.y, $("#gArena").clientHeight - d.el.offsetHeight - 4);
   d.el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
   r.drops.forEach(o => { if (!o.dead){ o.dead = true; o.el.classList.add("fade"); } });
-  loseLife("land", d);
-  if (r.lives > 0) later(gameWave, 1150);
+  flub("land");
+  settleTarget(false);
+  later(gameWave, 1500);       // a beat to read the word you missed
 }
 
 function reclamp(d){
@@ -1952,6 +2235,16 @@ function banner(big, small){
   later(() => { if (ov.classList.contains("banner")){ ov.className = "g-over"; ov.innerHTML = ""; } }, 1000);
 }
 
+/* change speed — words already falling change pace too */
+function setSpeed(i){
+  const old = fallTime();
+  QM.speed = Math.max(0, Math.min(SPEEDS.length - 1, i)); qmSave();
+  const r = GAME.run;
+  if (r) r.drops.forEach(d => { d.vy *= old / fallTime(); });
+  const chip = $("#gSpeed"); if (chip) chip.innerHTML = speedChip();
+  $$("[data-speed]").forEach(b => b.setAttribute("aria-checked", String(+b.dataset.speed === speedIx())));
+}
+
 function gamePause(){
   const r = GAME.run;
   if (!r || r.paused) return;
@@ -1959,8 +2252,9 @@ function gamePause(){
   const ov = $("#gOverlay");
   ov.className = "g-over show";
   ov.innerHTML = '<div class="g-card"><div class="go-title">Paused</div>' +
+    '<div class="gi-speed"><div class="dlabel">Falling speed</div>' + speedPicker() + '</div>' +
     '<button class="cta" id="gResume">Resume</button>' +
-    '<button class="abtn wide" id="gQuit2">End game</button></div>';
+    '<button class="abtn wide" id="gQuit2">Stop here &middot; your place is saved</button></div>';
 }
 function gameResume(){
   const r = GAME.run;
@@ -1969,28 +2263,41 @@ function gameResume(){
   r.paused = false; r.last = 0;
 }
 
-function gameOver(){
+function keepBest(r){
+  const prev = (QM.best && QM.best[r.key]) || 0;
+  QM.best = QM.best || {}; QM.best[r.key] = Math.max(prev, r.score); qmSave();
+  return prev;
+}
+
+/* the list ran out: the main pass is complete, or a mistakes round is */
+function passEnd(){
   const r = GAME.run;
   if (!r) return;
-  r.paused = true;
-  const prev = (QM.best && QM.best[r.key]) || 0;
-  const best = Math.max(prev, r.score);
-  QM.best = QM.best || {}; QM.best[r.key] = best; qmSave();
-  sfx("over");
+  r.paused = true; r.ending = true;
+  const prev = keepBest(r);
+  const st = r.st;
+  const left = st.miss.length;
+  sfx(left ? "over" : "win");
   const acc = r.taps ? Math.round(r.caught / r.taps * 100) : 0;
-  const missed = r.missed.map(byId).filter(Boolean);
-  const inBasket = cur ? basketIds(cur.num).length : 0;
+  const missedWords = (r.kind === "main" ? st.miss : r.missed).map(byId).filter(Boolean);
+  const head = r.kind === "main"
+    ? '<div class="go-title">Pass complete</div><div class="go-line">Every word fell once. You caught <b>' + r.cleared.length + '</b> of ' + r.total + ' clean.</div>'
+    : (left ? '<div class="go-title">Mistakes round done</div><div class="go-line">Cleared <b>' + r.cleared.length + '</b>. Still to clear: <b>' + left + '</b>.</div>'
+            : '<div class="g-new">All clear</div><div class="go-line">Every mistake caught. These words are yours now.</div>');
   const ov = $("#gOverlay");
   ov.className = "g-over show final";
-  ov.innerHTML = '<div class="g-card">' +
-    (r.score > prev && r.score > 0 ? '<div class="g-new">New best</div>' : '<div class="go-title">Game over</div>') +
+  ov.innerHTML = '<div class="g-card">' + head +
+    (r.score > prev && r.score > 0 ? '<div class="g-new">New best</div>' : '') +
     '<div class="go-score">' + r.score + '</div>' +
-    '<div class="go-best">Best ' + best + '</div>' +
-    '<div class="go-stats"><span><b>' + r.caught + '</b>caught</span><span><b>' + acc + '%</b>accuracy</span>' +
-      '<span><b>&times;' + Math.min(5, 1 + Math.floor((Math.max(r.maxCombo, 1) - 1) / 3)) + '</b>top combo</span><span><b>' + r.level + '</b>level</span></div>' +
-    (missed.length ? '<p class="grouplabel">Revise these &middot; now in your mistakes basket</p>' + wordGroup(missed, false) : '') +
-    '<button class="cta" id="gameAgain">Play again</button>' +
-    (inBasket ? '<button class="abtn wide" id="gamePractice">' + BASKET + '<span>Practise ' + inBasket + ' in the quiz</span></button>' : '') +
+    '<div class="go-best">Best ' + Math.max(prev, r.score) + '</div>' +
+    '<div class="go-stats"><span><b>' + r.cleared.length + '</b>clean</span><span><b>' + r.missed.length + '</b>missed</span>' +
+      '<span><b>' + acc + '%</b>accuracy</span><span><b>&times;' + Math.min(5, 1 + Math.floor((Math.max(r.maxCombo, 1) - 1) / 3)) + '</b>top combo</span></div>' +
+    (left ? '<button class="cta mist" id="gameStart" data-run="mist">Play my ' + left + ' mistake' + (left === 1 ? '' : 's') + '</button>'
+          : '<button class="cta" id="gameStart" data-run="new">Start a fresh pass</button>') +
+    (missedWords.length ? '<p class="grouplabel">' + (r.kind === "main" ? 'Your mistakes pool' : 'Still slipping') + ' &middot; tap one to revise it</p>' +
+      wordGroup(missedWords.slice(0, 40), GAME.scope === "all") : '') +
+    (left && cur && basketIds(cur.num).length ? '<button class="abtn wide" id="gamePractice">' + BASKET + '<span>Practise them in the quiz instead</span></button>' : '') +
+    '<button class="linkbtn" id="gameHome">Back to Word Rain</button>' +
   '</div>';
   ov.scrollTop = 0;
   r.over = true;
@@ -2001,12 +2308,18 @@ function gameClick(t){
   if (mode !== "play") return false;
   const sc = t.closest("[data-scope]");
   if (sc && !sc.disabled){ GAME.scope = sc.dataset.scope; $("#modeBody").innerHTML = playView(); return true; }
-  if (t.closest("#gameStart") || t.closest("#gameAgain")){ gameStart(); return true; }
+  const sp = t.closest("[data-speed]");
+  if (sp){ setSpeed(+sp.dataset.speed); return true; }
+  if (t.closest("#gSpeed")){ setSpeed((speedIx() + 1) % SPEEDS.length); return true; }
+  const go = t.closest("#gameStart");
+  if (go){ gameStart(go.dataset.run || "main"); return true; }
+  if (t.closest("#gameNew")){ gameStart("new"); return true; }
   if (t.closest("#gResume")){ gameResume(); return true; }
+  if (t.closest("#gameHome")){ gameStop(); $("#modeBody").innerHTML = playView(); return true; }
   if (t.closest("#gQuit") || t.closest("#gQuit2")){
     const r = GAME.run;
-    if (r && !r.over && r.caught + r.missed.length > 0){ r.ending = true; gameOver(); }
-    else { gameStop(); $("#modeBody").innerHTML = playView(); }
+    if (r && !r.over) keepBest(r);
+    gameStop(); $("#modeBody").innerHTML = playView();
     return true;
   }
   if (t.closest("#gMute")){
@@ -2025,7 +2338,9 @@ function gameClick(t){
 function gameKeys(e){
   const r = GAME.run;
   if (!r || r.over || mode !== "play") return;
-  if (e.key === "Escape" || e.key === "p"){ r.paused ? gameResume() : gamePause(); return; }
+  if (e.key === "Escape" || e.key === "p" || e.key === "P"){ r.paused ? gameResume() : gamePause(); return; }
+  if (e.key === "[" || e.key === "-"){ setSpeed(speedIx() - 1); return; }
+  if (e.key === "]" || e.key === "=" || e.key === "+"){ setSpeed(speedIx() + 1); return; }
   if (!/^[1-4]$/.test(e.key)) return;
   const live = r.drops.filter(d => !d.dead).sort((a, b) => a.x - b.x);
   const d = live[+e.key - 1];
@@ -2171,13 +2486,14 @@ function sameWord(verseWord, entryTokens){
            (b2.length >= 3 && (a2.indexOf(b2) >= 0 || b2.indexOf(a2) >= 0));
   });
 }
+/* The verse is shown ONCE: as its words, each with its meaning underneath.
+   Tap a word for its root, grammar and ṣarf. */
 function oneVerseHTML(surahNum, n, tokens, showSrc){
   const v = (VERSES[surahNum] || {})[n];
   if (!v) return "";
   return '<div class="verse" data-verse="' + surahNum + ':' + n + '">' +
     '<div class="verse-no">Verse ' + surahNum + ':' + n + '</div>' +
-    '<div class="ar verse-ar">' + esc(v.t) + '</div>' +
-    '<div class="wbw">' + v.w.map((w, i) =>
+    '<div class="wbw solo">' + v.w.map((w, i) =>
       '<span class="wbw-w' + (tokens && sameWord(w[0], tokens) ? ' hit' : '') + '" role="button" tabindex="0"' +
         ' data-s="' + surahNum + '" data-v="' + n + '" data-i="' + i + '">' +
         '<span class="wa">' + esc(w[0]) + '</span>' +
@@ -2209,7 +2525,7 @@ function readView(){
     return '<div class="empty"><p>The text of this surah isn’t loaded.</p></div>';
   const nums = Object.keys(VERSES[s.num]).map(Number).sort((a, b) => a - b);
   return '<p class="grouplabel">' + esc(s.name) + ' · ' + nums.length + ' verses</p>' +
-    '<p class="wbw-hint" style="margin:-6px 0 14px">Tap any word in a verse to see its root and how it is working in the sentence.</p>' +
+    '<p class="wbw-hint" style="margin:-6px 0 14px">Each verse is written once, word by word. Tap any word for its root, its grammar and — for verbs — its full ṣarf.</p>' +
     '<div class="versebox">' + nums.map((n, i) => oneVerseHTML(s.num, n, null, i === nums.length - 1)).join('') + '</div>';
 }
 
@@ -2274,8 +2590,105 @@ function morphHTML(s, v, i){
         '<div class="wcard-en">' + esc(word[1]) + '</div></div></div>' +
     '<dl class="wcard-rows wgrid">' +
       rows.map(r => '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>').join('') +
-    '</dl>' + also + '</div>';
+    '</dl>' + sarfHTML(m) + also + '</div>';
 }
+
+/* ---------- ṣarf ṣaghīr: the whole family of a verb ----------
+   data/sarf.js holds, for every verb on the site (and the verb behind each
+   participle and maṣdar), the classic madrasa recitation:
+   past · present · maṣdar · doer · passive past · passive present · maṣdar ·
+   done-to · command · prohibition · place/time · instrument.             */
+const HAVE_SARF = typeof SARF !== "undefined" && SARF;
+const ROMAN = { I:1, II:2, III:3, IV:4, V:5, VI:6, VII:7, VIII:8, IX:9, X:10 };
+const BAB_NAME = {
+  "فَتَحَ": "fataḥa · a–a", "نَصَرَ": "naṣara · a–u", "ضَرَبَ": "ḍaraba · a–i",
+  "سَمِعَ": "samiʿa · i–a", "كَرُمَ": "karuma · u–u", "حَسِبَ": "ḥasiba · i–i"
+};
+function sarfFor(m){
+  if (!HAVE_SARF || !m || !m.r) return null;
+  const d = m.d || [];
+  const derived = /participle|maṣdar/i.test(m.k) || d.some(x => /participle|verbal noun/.test(x));
+  if (m.k !== "Verb" && !derived) return null;
+  let form = 1;
+  d.forEach(x => { const f = x.match(/Form ([IVX]+)\b/); if (f) form = ROMAN[f[1]] || form; });
+  const row = SARF[m.r.replace(/\s+/g, "") + "|" + form];
+  if (!row) return null;
+  const o = {};
+  SARF_FIELDS.forEach((k, i) => o[k] = row[i]);
+  return o;
+}
+/* which cell of the table is the word you tapped? */
+function sarfSpot(m){
+  const d = (m.d || []).join(" | "), k = m.k;
+  const pass = /passive \(it is done/.test(d);
+  if (k === "Verb"){
+    if (/command/.test(d)) return "amr";
+    if (/past tense/.test(d)) return pass ? "pastPassive" : "past";
+    if (/present/.test(d)) return pass ? "presentPassive" : "present";
+    return "";
+  }
+  if (/Active participle/.test(k) || /active participle/.test(d)) return "fail";
+  if (/Passive participle/.test(k) || /passive participle/.test(d)) return "maful";
+  if (/maṣdar/.test(k) || /verbal noun/.test(d)) return "masdar";
+  return "";
+}
+function sarfHTML(m){
+  const x = sarfFor(m);
+  if (!x) return "";
+  const ok = v => v && v !== "—";
+  const spot = sarfSpot(m);
+  const cell = (key, en, ar, val) => ok(val)
+    ? '<div class="sf-cell' + (key === spot ? ' here' : '') + '">' +
+        '<div class="sf-ar">' + esc(val) + '</div>' +
+        '<div class="sf-lab"><span>' + en + '</span><span class="sf-term">' + ar + '</span></div>' +
+        (key === spot ? '<div class="sf-here">this word</div>' : '') + '</div>'
+    : '';
+  const block = (title, cells) => {
+    const c = cells.join("");
+    return c ? '<div class="sf-block"><div class="sf-title">' + title + '</div><div class="sf-grid">' + c + '</div></div>' : '';
+  };
+  const firstMasdar = String(x.masdar || "").split("،")[0].trim();
+  /* "فَعَّلَ يُفَعِّلُ (تَفْعِيل)" -> "فَعَّلَ يُفَعِّلُ · تَفْعِيل" — brackets flip about in mixed-direction text */
+  const bab = String(x.bab || "").replace(/\s*\(([^)]*)\)\s*/g, " · $1").trim();
+  const babKey = bab.split(" ")[0];
+  const babLine = BAB_NAME[babKey]
+    ? 'Bāb ' + BAB_NAME[babKey] + ' <span class="sf-babar">' + esc(bab) + '</span>'
+    : (bab ? 'Pattern <span class="sf-babar">' + esc(bab) + '</span>' : '');
+  /* the recitation, as it is chanted in the madrasa */
+  const line = ok(x.present)
+    ? [x.past, x.present, firstMasdar, 'فَهُوَ', x.fail, 'وَ' + x.pastPassive, x.presentPassive, firstMasdar, 'فَهُوَ', x.maful,
+       'الْأَمْرُ مِنْهُ', x.amr, 'وَالنَّهْيُ عَنْهُ', x.nahy, 'الظَّرْفُ مِنْهُ', x.zarf]
+        .concat(ok(x.ala) ? ['وَالْآلَةُ مِنْهُ', x.ala] : []).filter(ok).join(' ')
+    : '';
+  return '<details class="sarf"' + (sarfOpen ? ' open' : '') + '>' +
+    '<summary><span class="sf-k">Ṣarf</span><span class="sf-kar">صرفِ صغیر</span>' +
+      '<span class="sf-sum">' + esc(x.past) + (ok(x.present) ? ' · ' + esc(x.present) : '') + '</span>' +
+      '<svg class="caret" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l4 4 4-4"/></svg></summary>' +
+    '<div class="sf-meta">' +
+      (x.en ? '<span class="sf-en">' + esc(x.en) + '</span>' : '') +
+      (babLine ? '<span class="sf-bab">' + babLine + '</span>' : '') +
+      '<span class="sf-tr">' + (x.trans ? 'transitive · mutaʿaddī' : 'intransitive · lāzim — its passive needs a preposition') + '</span>' +
+    '</div>' +
+    block('Active · maʿrūf', [
+      cell('past', 'Past', 'الماضي', x.past),
+      cell('present', 'Present', 'المضارع', x.present),
+      cell('masdar', 'Maṣdar', 'المصدر', x.masdar),
+      cell('fail', 'Doer', 'اسم الفاعل', x.fail)]) +
+    block('Passive · majhūl', [
+      cell('pastPassive', 'Past passive', 'الماضي المجهول', x.pastPassive),
+      cell('presentPassive', 'Present passive', 'المضارع المجهول', x.presentPassive),
+      cell('masdar2', 'Maṣdar', 'المصدر', x.masdar),
+      cell('maful', 'Done-to', 'اسم المفعول', x.maful)]) +
+    block('Command, place &amp; tool', [
+      cell('amr', 'Command', 'الأمر', x.amr),
+      cell('nahy', 'Prohibition', 'النهي', x.nahy),
+      cell('zarf', 'Place / time', 'الظرف', x.zarf),
+      cell('ala', 'Instrument', 'الآلة', x.ala)]) +
+    (line ? '<div class="sf-line"><div class="sf-title">Recite it in one breath</div><p class="ar">' + esc(line) + '</p></div>' : '') +
+    (x.note ? '<p class="sf-note">' + esc(x.note) + '</p>' : '') +
+  '</details>';
+}
+let sarfOpen = true;
 
 /* open, close, or swap the little grammar card under a verse */
 function tapVerseWord(el){
@@ -2513,6 +2926,10 @@ document.addEventListener("click", e => {
   const rh = t.closest(".roothead");
   if (rh){ rh.parentElement.classList.toggle("open"); return; }
 });
+
+document.addEventListener("toggle", e => {
+  if (e.target && e.target.classList && e.target.classList.contains("sarf")) sarfOpen = e.target.open;
+}, true);
 
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && $("#sheet").classList.contains("open")){ closeSheet(); return; }
