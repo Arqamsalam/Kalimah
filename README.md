@@ -18,7 +18,10 @@ else on the site, it says where. A verb's card also carries its full **ṣarf
 prohibition, place/time and instrument — with the form you tapped marked
 "this word".
 
-Currently **44 surahs, 916 words, 831 verses, 4,030 words of Qur'an text**.
+Currently **46 surahs, 1,010 words, 913 verses, 4,336 words of Qur'an text** —
+every surah from Al-Ḥāqqah (69) to An-Nās (114). An-Nabaʾ (78) and ʿAbasa (80)
+are the newest; their Qur'an text and grammar are fetched by the publish workflow
+the first time it runs with them.
 
 **The word being taught.** Most entries in the guides are a phrase, often the
 whole verse, but each one is really about one or two of its words. The site works

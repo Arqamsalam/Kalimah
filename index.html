@@ -975,6 +975,8 @@ body{font-size:17.5px;line-height:1.55}
 }
 
 /* ================= home: carry on, totals, the two juz ================= */
+.home-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.home-title .ar{font-size:34px;font-weight:400;color:var(--gold);line-height:1.2}
 .resume{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:20px;margin:0 0 12px;
   background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 15%,var(--glass)),color-mix(in srgb,var(--gold) 12%,var(--glass)));
   border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),0 18px 40px -22px var(--glass-drop);
@@ -1076,7 +1078,7 @@ button.stat b{color:var(--gold)}
       <span class="nav-slot right"><button class="iconbtn" id="themeBtn" aria-label="Switch light or dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M18.4 5.6l-1.1 1.1M6.7 17.3l-1.1 1.1"/><circle cx="12" cy="12" r="4"/></svg></button></span>
     </div>
     <div class="wrap">
-      <h1 class="large-title">Kalimah</h1>
+      <h1 class="large-title home-title">Kalimah <span class="ar" lang="ar">كَلِمَة</span></h1>
       <p class="deck" id="homeDeck"></p>
       <div class="searchbar" id="homeSearchWrap">
         <svg class="mag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
