@@ -205,7 +205,8 @@ def parse_words(lines):
                 buf.append(ln)
             i += 1
         if cur: fields[cur] = buf
-        w = {"ar": ar, "tr": tr, "v": verse}
+        w = {"ar": ar, "tr": tr, "v": verse,
+             "italic": italic_phrases("\n".join(ln for k, b in fields.items() if k != "_skip" for ln in b))}
         extra = []
         for k in ("root", "meaning", "magic", "grammar", "why", "note"):
             ps = para_clean(fields.get(k, []))
@@ -257,6 +258,31 @@ def links_table(lines):
         rows.append({"w": clean(cells[0]), "e": clean(cells[1]), "t": clean(cells[2])})
     return rows
 
+def italic_phrases(raw):
+    """every phrase the guide writes in *italics* — mostly its Arabic in
+    English letters — for arabize.py to read as a hint"""
+    import arabize
+    def as_written(x):
+        c = clean(x)                   # clean() capitalises a first letter; undo that
+        t = re.sub(r"^[^\w]+", "", x)
+        return c[0].lower() + c[1:] if c and t[:1].islower() else c
+    out = set()
+    for line in raw.split("\n"):
+        line = line.replace("⭐", "")
+        on, buf = False, []
+        for piece in re.split(r"(\*+)", line):
+            if piece.startswith("*"):
+                if len(piece) % 2:                  # * or *** opens or closes italics
+                    if on and buf:
+                        out |= arabize.ngrams(as_written("".join(buf))); buf = []
+                    on = not on
+                continue
+            if on:
+                buf.append(piece)
+        if on and buf:
+            out |= arabize.ngrams(as_written("".join(buf)))
+    return out
+
 def parse_file(path):
     raw = open(path, encoding="utf-8").read()
     lines = raw.split("\n")
@@ -282,6 +308,8 @@ def parse_file(path):
         "traps": numbered_list(section(lines, "Never-Forget Traps")),
         "links": links_table(section(lines, "Connect It")),
         "words": parse_words(lines),
+        "italic": italic_phrases("\n".join(one + section(lines, "The Big Picture") +
+                                           section(lines, "Never-Forget Traps") + section(lines, "Connect It"))),
     }
 
 # ------------------------------------------------------------------ write out
@@ -316,6 +344,74 @@ const SURAHS = ["""]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, "w", encoding="utf-8").write("\n".join(out) + "\n")
 
+# ----------------------------------------------------- Arabic in the notes
+# The guides write the Qur'an's words in English letters inside their notes
+# ("mā gharraka bi-rabbika'l-Karīm"). arabize.py finds each one in the Qur'an
+# and marks it ⟦arabic|letters⟧, so the site can show it in Arabic script.
+WORD_FIELDS  = ["root", "meaning", "magic", "grammar", "why", "note"]
+SURAH_FIELDS = ["blurb", "special", "big", "traps"]
+
+def arabic_script(surahs):
+    import arabize, build_morph
+    try:
+        corpus = build_morph.fetch_source()
+    except Exception as e:
+        print(f"\n  (Arabic script skipped — no Qur'an corpus: {e})")
+        return
+    verses = None
+    vjs = os.path.join(HERE, "data", "verses.js")
+    if os.path.exists(vjs):
+        m = re.search(r"const VERSES\s*=\s*(\{.*\});?\s*$", open(vjs, encoding="utf-8").read(), re.S)
+        verses = json.loads(m.group(1)) if m else None
+    lex = arabize.Lexicon(corpus, verses)
+    conv = arabize.Converter(lex, keep=arabize.KEEP, names=surah_names(), english=english_words(surahs))
+    for s in surahs:
+        ital = s.pop("italic", set())
+        base = {"surah": s["num"], "verses": [], "italic": ital}
+        for k in SURAH_FIELDS:
+            if isinstance(s.get(k), list):
+                s[k] = [conv.convert(x, base) for x in s[k]]
+            elif s.get(k):
+                s[k] = conv.convert(s[k], base)
+        for r in s.get("links") or []:
+            r["t"] = conv.convert(r["t"], base)
+        for w in s["words"]:
+            ctx = dict(base, verses=[int(x) for x in re.findall(r"\d+", w.get("v", ""))][:12],
+                       italic=w.pop("italic", set()))
+            for k in WORD_FIELDS:
+                if w.get(k):
+                    w[k] = conv.convert(w[k], ctx)
+            if w.get("more"):
+                w["more"] = [conv.convert(x, ctx) for x in w["more"]]
+        if os.environ.get("ARABIZE_PROGRESS"):
+            print(f"    arabic script: surah {s['num']}  ({len(conv.log)} so far)", flush=True)
+    print(f"\n  {len(conv.log)} Arabic phrases written in Arabic script")
+
+def surah_names():
+    out = []
+    for name, *_ in SURAH_META.values():
+        out.append(name)
+        out.append(re.sub(r"^(?:A[lnrsdtzṣḍṭẓ]|Ash|Adh|Ath)-", "", name))
+    return out
+
+def english_words(surahs):
+    """plain words the notes use far more often outside italics than inside —
+    English, even when they spell an Arabic particle too (in, man, an)"""
+    import arabize
+    from collections import Counter
+    total, ital = Counter(), Counter()
+    for s in surahs:
+        texts = [s.get("blurb", "")] + s.get("special", []) + s.get("big", []) + s.get("traps", [])
+        for w in s["words"]:
+            texts += [w.get(k, "") for k in WORD_FIELDS] + w.get("more", [])
+        for t in texts:
+            for m in arabize.TOKEN.finditer(t or ""):
+                total[m.group(0).lower()] += 1
+        for phrase in set().union(s.get("italic", set()), *(w.get("italic", set()) for w in s["words"])):
+            if " " not in phrase:
+                ital[phrase.lower()] += 1
+    return {w for w, n in total.items() if w.isascii() and n >= 4 and ital[w] * 6 < n}
+
 def main():
     by_num, problems = {}, []
 
@@ -335,6 +431,7 @@ def main():
             problems.append(f"  !!  {os.path.basename(path)}: {e}")
 
     surahs = [by_num[k] for k in sorted(by_num)]
+    arabic_script(surahs)
     emit(surahs)
     print(f"\n  {len(surahs)} surahs, {sum(len(s['words']) for s in surahs)} words  ->  data/surahs.js")
     if problems:
