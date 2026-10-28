@@ -87,8 +87,14 @@ def get(url, tries=4):
             time.sleep(2 + attempt * 3)
 
 
-# bump when clean_en() changes, so the next run fetches the verses again
-CLEANER = 2
+# bump when clean_en() or SOURCE_TYPOS changes, so the next run fetches the
+# verses again
+CLEANER = 3
+
+# typos in the API's own text, put right on the way in: (translation, verse)
+SOURCE_TYPOS = {
+    (85, "96:2"): [("manfrom", "man from")],
+}
 
 
 def clean_en(s):
@@ -116,6 +122,12 @@ def list_english():
             print("     %4s  %s" % (t.get("id"), t.get("name") or t.get("author_name")))
 
 
+def fix_typos(tid, key, s):
+    for wrong, right in SOURCE_TYPOS.get((tid, key), []):
+        s = s.replace(wrong, right)
+    return s
+
+
 def has_english(num, tid):
     data = get(API.format(n=num, t=tid))
     return bool((data["verses"][0].get("translations") or [{}])[0].get("text"))
@@ -140,7 +152,7 @@ def fetch(num, tid):
             ])
         out[key] = {
             "t": ar(v.get("text_uthmani")),
-            "e": clean_en(tr[0].get("text")),
+            "e": fix_typos(tid, v["verse_key"], clean_en(tr[0].get("text"))),
             "w": words,
         }
     return out
