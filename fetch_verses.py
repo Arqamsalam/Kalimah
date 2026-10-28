@@ -67,8 +67,11 @@ def existing():
         return {}, None
     src = open(VERSES_JS, encoding="utf-8").read()
     m = re.search(r"const VERSES\s*=\s*(\{.*\});?\s*$", src, re.S)
-    t = re.search(r"const VERSES_TRANSLATION\s*=\s*\{\s*\"id\"\s*:\s*(\d+)", src)
-    return (json.loads(m.group(1)) if m else {}), (int(t.group(1)) if t else 20)
+    t = re.search(r"const VERSES_TRANSLATION\s*=\s*(\{.*?\});", src)
+    meta = json.loads(t.group(1)) if t else {"id": 20}
+    if meta.get("clean", 1) != CLEANER:
+        meta["id"] = None                      # cleaned the old way: fetch again
+    return (json.loads(m.group(1)) if m else {}), meta.get("id")
 
 
 def get(url, tries=4):
@@ -84,11 +87,21 @@ def get(url, tries=4):
             time.sleep(2 + attempt * 3)
 
 
+# bump when clean_en() changes, so the next run fetches the verses again
+CLEANER = 2
+
+
 def clean_en(s):
-    s = SUP_RE.sub("", s or "")
-    s = TAG_RE.sub("", s)
+    """the translation as plain text. A footnote or tag between two words
+    leaves a space behind ("man<sup>a</sup>from"), and the spaces that
+    leaves next to punctuation and quote marks are taken out again."""
+    s = SUP_RE.sub(" ", s or "")
+    s = TAG_RE.sub(" ", s)
     s = re.sub(r"\s+", " ", s)
-    return re.sub(r"\s+([,.;:!?])", r"\1", s).strip()
+    s = re.sub(r"\s+([,.;:!?])", r"\1", s)
+    s = re.sub(r"([‘“(\[])\s+", r"\1", s)
+    s = re.sub(r"\s+([’”)\]])(?=[\s,.;:!?’”)\]]|$)", r"\1", s)
+    return s.strip()
 
 
 def list_english():
@@ -145,7 +158,8 @@ def main():
     if "--all" in sys.argv:
         store = {}
     elif had != tid:
-        print("  the translation is now %s — fetching every surah again" % NAMES.get(tid, tid))
+        print("  the translation is now %s, or its text is cleaned differently — fetching every surah again"
+              % NAMES.get(tid, tid))
         store = {}
 
     for n in nums:
@@ -167,7 +181,8 @@ def main():
                 "   Qur'an text and word-by-word data from the Quran.com API.\n"
                 "   Translation: %s.  */\n" % NAMES.get(tid, tid))
         f.write("const VERSES_TRANSLATION = " +
-                json.dumps({"id": tid, "name": NAMES.get(tid, "translation %d" % tid)}, ensure_ascii=False) + ";\n")
+                json.dumps({"id": tid, "name": NAMES.get(tid, "translation %d" % tid), "clean": CLEANER},
+                           ensure_ascii=False) + ";\n")
         f.write("const VERSES = " + body + ";\n")
 
     v = sum(len(s) for s in store.values())
