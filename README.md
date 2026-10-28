@@ -125,6 +125,7 @@ python3 build.py         # rebuilds data/surahs.js from guides/
 python3 fetch_verses.py  # pulls the Qur'an text for any surah not yet fetched
 python3 build_morph.py   # rebuilds data/morph.js — root and grammar per word
 python3 build_sarf.py    # rebuilds data/sarf.js from sarf.json — the verb tables
+python3 stamp.py         # fingerprints the data files in index.html
 python3 -m http.server   # then open http://localhost:8000
 ```
 
@@ -149,6 +150,7 @@ fetch_verses.py         pulls data/verses.js from the Quran.com API
 build_morph.py          builds data/morph.js from the Quranic Arabic Corpus
 build_sarf.py           builds data/sarf.js from sarf.json
 sarf.json               the verb tables, hand-checked — edit this, not sarf.js
+stamp.py                fingerprints the data files' script tags in index.html
 guides/*.md             the source guides
 guides/_manual.json     Al-Qiyāmah (75) and Al-Mursalāt (77), typed in by hand
                         rather than parsed — they came from image sheets
@@ -160,10 +162,16 @@ guides/_manual.json     Al-Qiyāmah (75) and Al-Mursalāt (77), typed in by hand
 `sarf.json` holds one row per verb (root and form): its past, present, maṣdar,
 doer, both passives, done-to, command, prohibition, place/time and instrument,
 its bāb, and an English gloss. Each row was written out in full and the verbal
-forms cross-checked against an independent conjugator. `build_sarf.py` turns it
-into `data/sarf.js`, which the site loads; a verb with no row simply shows no
-table. The script tags in `index.html` end in `?v=dev`; each publish stamps
-them with the commit, so browsers never mix a new page with old cached data.
+forms cross-checked against an independent conjugator — except the eight added
+with An-Nabaʾ and ʿAbasa (fataḥa, dhāqa, takallama, taṣaddā, amāta, aqbara,
+ansharah, shaqqa), which were written by hand and are worth a second look.
+`build_sarf.py` turns it into `data/sarf.js`, which the site loads; a verb with
+no row simply shows no table.
+
+`stamp.py` stamps each data file's script tag in `index.html` with a
+fingerprint of its contents (`data/verses.js?v=89c91d12`). The workflow runs it
+on every publish, so the fingerprint changes exactly when the data does and a
+browser never pairs a new page with old cached data.
 
 ### Where the Qur'an text comes from
 
