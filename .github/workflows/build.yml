@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Rebuild data/surahs.js from guides/
+      - name: Rebuild data/surahs.js from guides/, with the notes' Arabic in Arabic script
         run: python3 build.py
 
       - name: Fetch the Qur'an text for any new surah

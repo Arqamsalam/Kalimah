@@ -254,10 +254,22 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .keepsake .dlabel{color:var(--gold)}
 .keepsake p{margin:0;font-family:"Source Serif 4",Georgia,serif;font-size:18px;line-height:1.5;color:var(--ink)}
 
-.morebtn{width:100%;background:var(--surface);border:1px solid var(--hair);border-radius:13px;padding:11px;
-  font-size:15px;font-weight:600;color:var(--accent);box-shadow:var(--shadow);margin-bottom:14px}
+.morebtn{width:100%;background:var(--surface);border:1px solid var(--hair);border-radius:13px;padding:11px 14px;
+  font-size:15px;font-weight:600;color:var(--accent);box-shadow:var(--shadow);margin-bottom:14px;
+  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;scroll-margin-top:70px}
+.morebtn .mb-n{font-weight:500;font-size:13px;color:var(--faint)}
+.morebtn .caret{width:11px;height:7px;transition:transform .2s}
+.morebtn[aria-expanded="true"] .caret{transform:rotate(180deg)}
+.morebtn[aria-expanded="true"] .mb-n{display:none}
 .morebox{margin-bottom:14px}
 .morebox .dval{font-size:15px}
+
+/* the Qur'an's own words inside an English note: Arabic script, a touch larger
+   so its vowel marks read, kept as one right-to-left run */
+.ar-in{font-family:"Amiri",'Segoe UI Historic','Geeza Pro',serif;font-size:1.18em;line-height:1.55;
+  font-style:normal;font-weight:400;color:var(--ink);unicode-bidi:isolate;white-space:normal;padding:0 .08em}
+.ar-in.loud{color:var(--gold);font-weight:700}
+.keepsake .ar-in{color:var(--gold)}
 
 .sheet-actions{display:flex;gap:10px;padding-bottom:6px}
 .abtn{flex:1;background:var(--surface);border:1px solid var(--hair);border-radius:13px;padding:11px;
@@ -1169,7 +1181,7 @@ button.stat b{color:var(--gold)}
 
 <script src="data/verses.js?v=1f2e9b65"></script>
 <script src="data/morph.js?v=b2dd1547"></script>
-<script src="data/surahs.js?v=8d0b85df"></script>
+<script src="data/surahs.js?v=89fa7fe8"></script>
 <script src="data/sarf.js?v=e31718f7"></script>
 <script>
 
@@ -1177,6 +1189,21 @@ button.stat b{color:var(--gold)}
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* The notes carry the Qur'an's words twice: ⟦بِسْمِ رَبِّكَ|bi'smi rabbika⟧ —
+   the Arabic to show, and the guide's own letters, which everything that
+   matches or tests words keeps reading (arabize.py writes them).          */
+const MARKED = /⟦([^|⟧]*)\|([^⟧]*)⟧/g;
+const latin = t => String(t == null ? "" : t).replace(MARKED, "$2");
+const arOnly = t => String(t == null ? "" : t).replace(MARKED, "$1");
+function rich(t){
+  return String(t == null ? "" : t).split(/(⟦[^⟧]*⟧)/).map(p => {
+    const m = /^⟦([^|⟧]*)\|([^⟧]*)⟧$/.exec(p);
+    if (!m) return esc(p);
+    const loud = m[2].replace(/[^A-Za-zÀ-ɏḀ-ỿ]/g, "");
+    return '<bdi class="ar-in' + (loud.length >= 3 && loud === loud.toUpperCase() ? ' loud' : '') +
+      '" lang="ar" title="' + esc(m[2]) + '">' + esc(m[1]) + '</bdi>';
+  }).join("");
+}
 const CHEV = '<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>';
 const STAR = '<svg class="wr-star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>';
 function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -1444,11 +1471,12 @@ function focusOf(w){
     });
   }
 
-  const root = String(w.root || ""), heads = [];
+  const root = latin(w.root), heads = [];
   root.replace(/(?:^|[.;]\s+)([^—–.;(=:]{1,40}?)\s+[—–]/g, (_, h) => { heads.push(h); return _; });
   if (!spans && et.length > 1){
-    const fields = { head: heads.join(" "), root: root, note: w.note, why: w.why, magic: w.magic, grammar: w.grammar };
-    const noted = notedRoots(root + " " + (w.rk || "") + " " + w.note + " " + w.why + " " + w.grammar);
+    const note = latin(w.note), why = latin(w.why), grammar = latin(w.grammar);
+    const fields = { head: heads.join(" "), root: root, note: note, why: why, magic: latin(w.magic), grammar: grammar };
+    const noted = notedRoots(root + " " + (w.rk || "") + " " + note + " " + why + " " + grammar);
     rows.forEach(r => {
       if (!r.content || !r.tr) return;
       for (const f in fields) wordsOf(fields[f]).forEach(fw => {
@@ -1645,7 +1673,7 @@ function wordRow(w, showSurah){
       (isLearned(w) ? '<span class="wr-ok" title="Learned">&#10003;</span>' : '') +
       STAR.replace('wr-star', 'wr-star' + (saved.has(w.id) ? ' on' : '')) +
       '<span class="wr-badge">' + (showSurah ? w.surah + ':' + esc(w.v) : 'v. ' + esc(w.v)) + '</span></span>' +
-    '<span class="wr-mean">' + esc(w.meaning) + '</span></button>';
+    '<span class="wr-mean">' + rich(w.meaning) + '</span></button>';
 }
 function wordGroup(list, showSurah){
   return '<div class="group">' + list.map(w => wordRow(w, showSurah)).join('') + '</div>';
@@ -1706,7 +1734,7 @@ function renderHome(){
    English is matched without its accents (qariah finds qāriʿah); Arabic is
    matched by its letters, so you can type it with or without the vowel
    marks; "96:3" jumps to a verse. Best matches first.                     */
-const plain = t => String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[ʿʾ'’]/g, "");
+const plain = t => latin(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[ʿʾ'’]/g, "");
 function search(q){
   q = q.trim();
   if (!q) return null;
@@ -1771,7 +1799,7 @@ function renderSurah(){
       '<div class="hero-en">Surah ' + s.num + ' &middot; ' + esc(s.en) + '<br>' +
       esc(s.place) + ' &middot; ' + s.verses + ' verses &middot; ' + n + ' words</div></div>' +
       '<div class="ar hero-ar">' + esc(s.ar) + '</div></div>' +
-      (s.blurb ? '<p class="hero-blurb">' + esc(s.blurb) + '</p>' : '') +
+      (s.blurb ? '<p class="hero-blurb">' + rich(s.blurb) + '</p>' : '') +
       '<div class="hero-prog" id="heroProg">' + heroProg(s) + '</div>' +
     '</div>' +
     '<div class="segmented five" role="tablist" id="modeSeg" aria-label="Study mode">' +
@@ -1793,7 +1821,7 @@ function refreshProgress(){ const p = $("#heroProg"); if (p && cur) p.innerHTML 
 function linkRow(l, from){
   return '<div class="link"><div class="link-pair"><span class="ar">' + esc(l.w) + '</span>' +
     '<span class="arrow">&rarr;</span><span class="ar">' + esc(l.e) + '</span></div>' +
-    '<div class="link-t">' + esc(l.t) + '</div>' +
+    '<div class="link-t">' + rich(l.t) + '</div>' +
     (from ? '<div class="link-src">' + esc(from) + '</div>' : '') + '</div>';
 }
 
@@ -1870,9 +1898,9 @@ function wordsView(){
   if (s.special && s.special.length){
     html += '<div class="callout' + (s.special.length > 1 ? '' : ' open') + '" id="oneThing" style="margin:0 0 30px">' +
         '<div class="dlabel">What makes this surah</div>' +
-        '<p>' + esc(s.special[0]) + '</p>' +
+        '<p>' + rich(s.special[0]) + '</p>' +
         (s.special.length > 1
-          ? '<div class="rest">' + s.special.slice(1).filter(p => p !== "--").map(p => '<p>' + esc(p) + '</p>').join('') + '</div>' +
+          ? '<div class="rest">' + s.special.slice(1).filter(p => p !== "--").map(p => '<p>' + rich(p) + '</p>').join('') + '</div>' +
             '<button class="more" id="moreOne">Read the rest</button>'
           : '') +
       '</div>';
@@ -1880,12 +1908,12 @@ function wordsView(){
   if (s.big && s.big.length){
     html += '<p class="grouplabel">The surah in ' + s.big.length + ' moves</p>' +
       '<div class="group"><ol class="steps">' +
-      s.big.map(b => '<li>' + esc(b) + '</li>').join('') + '</ol></div>';
+      s.big.map(b => '<li>' + rich(b) + '</li>').join('') + '</ol></div>';
   }
   html += verseWordsHTML(s);
   if (s.traps && s.traps.length){
     html += '<p class="grouplabel">Never-forget traps</p><div class="group">' +
-      s.traps.map(t => '<div class="trap"><span class="warn">!</span><span>' + esc(t) + '</span></div>').join('') +
+      s.traps.map(t => '<div class="trap"><span class="warn">!</span><span>' + rich(t) + '</span></div>').join('') +
       '</div>';
   }
   if (s.links && s.links.length){
@@ -1944,9 +1972,9 @@ function drawCards(){
         '<div class="hint">' + (f.whole ? 'What does it mean? Tap to reveal' : 'What does the gold word mean? Tap to reveal') + '</div></div>' +
       '<div class="face back"' + (deck.flipped ? '' : ' aria-hidden="true"') + '>' +
         (glosses ? '<div class="fc-gs">' + glosses + '</div>' : '') +
-        '<div class="mean">' + esc(w.meaning) + '</div>' +
-        (w.root ? '<div class="root">' + esc(brief(w.root, 140)) + '</div>' : '') +
-        '<div class="note">' + esc(w.note) + '</div>' +
+        '<div class="mean">' + rich(w.meaning) + '</div>' +
+        (w.root ? '<div class="root">' + rich(brief(w.root, 140)) + '</div>' : '') +
+        '<div class="note">' + rich(w.note) + '</div>' +
         '<div class="hint">Tap to flip back</div></div>' +
     '</div></div>' +
     '<div class="fc-grade"' + (deck.flipped ? '' : ' hidden') + '>' +
@@ -2006,8 +2034,15 @@ function firstSentence(s){
 function brief(s, cap){
   let t = firstSentence(s).replace(/\s+/g, " ");
   cap = cap || 105;
-  if (t.length > cap){
-    t = t.slice(0, cap);
+  if (latin(t).length > cap){
+    /* count what reads, and never cut through an Arabic span */
+    let at = 0, seen = 0;
+    for (const p of t.split(/(⟦[^⟧]*⟧)/)){
+      const n = latin(p).length;
+      if (seen + n > cap){ at += p[0] === "⟦" ? 0 : cap - seen; break; }
+      seen += n; at += p.length;
+    }
+    t = t.slice(0, at);
     const sp = t.lastIndexOf(" ");
     if (sp > 45) t = t.slice(0, sp);
     t += "…";
@@ -2017,6 +2052,7 @@ function brief(s, cap){
 /* the guides quote their glosses ("…a small band [of jinn].") — drop the
    quote marks and trailing dots so it reads as a plain meaning */
 function plainMean(s, cap){
+  s = latin(s);
   return brief(s, cap).replace(/^[\s"“”'‘’…\.]+/, "").replace(/[\s"“”'‘’]+$/, "").replace(/([^.])\.$/, "$1")
     .replace(/[\s"“”'‘’]+$/, "") || brief(s, cap);
 }
@@ -2028,6 +2064,12 @@ function maskWord(text, w){
   let out = String(text || "");
   const ars = new Set(String(w.ar || "").split(/\s+/));
   focusOf(w).items.forEach(it => it.ar.split(/\s+/).forEach(a => ars.add(a)));
+  /* a hook's Arabic span gives the word away as surely as its letters do */
+  const said = [...ars].map(a => skeleton(a)).filter(k => k.length >= 3);
+  const trs = [w.tr].concat(focusOf(w).items.map(it => it.tr)).map(x => lat(x)).filter(x => x.length >= 3);
+  out = out.replace(MARKED, (all, ar, la) =>
+    said.some(k => skeleton(ar).indexOf(k) >= 0 || k.indexOf(skeleton(ar)) >= 0 && skeleton(ar).length >= 3) ||
+    trs.some(x => sameLat(la, x)) ? "——" : all);
   ars.forEach(a => { if (skeleton(a).length >= 3) out = out.split(a).join("——"); });
   const stems = new Set();
   const addStem = t => {
@@ -2044,7 +2086,7 @@ function maskWord(text, w){
     const re = p.split("").map(c => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[\\u0300-\\u036f]*").join("[ʿʾ'’]?");
     out = out.replace(new RegExp(re, "gi"), "——");
   });
-  return out.normalize("NFC").replace(/(——)([A-Za-zÀ-ɏḀ-ỿ]*)/g, "$1");
+  return out.normalize("NFC").replace(/⟦[^⟧]*——[^⟧]*⟧/g, "——").replace(/(——)([A-Za-zÀ-ɏḀ-ỿ]*)/g, "$1");
 }
 /* the three letters of the taught word, from the morphology of the verse */
 function rootLetters(w){
@@ -2241,7 +2283,7 @@ function quizStrip(){
 }
 
 function promptHTML(q){
-  if (q.text) return '<p class="qtext">' + esc(q.text) + '</p>';
+  if (q.text) return '<p class="qtext">' + rich(q.text) + '</p>';
   const w = q.w, f = focusOf(w), it = f.primary;
   if (q.show === "item" && !f.whole)
     return '<div class="ar q-word">' + esc(it.ar) + '</div>' +
@@ -2256,7 +2298,7 @@ function choiceHTML(q){
       const cls = !q.done ? '' : o.ok ? ' correct' : (k === q.picked ? ' wrong' : '');
       return '<button class="opt' + (q.arOptions ? ' opt-ar' : '') + cls + '" data-opt="' + k + '"' + (q.done ? ' disabled' : '') + '>' +
         '<span class="kbd">' + (k + 1) + '</span>' +
-        (q.arOptions ? '<span class="ar">' + esc(o.text) + '</span>' : '<span>' + esc(o.text) + '</span>') + '</button>';
+        (q.arOptions ? '<span class="ar">' + esc(o.text) + '</span>' : '<span>' + rich(o.text) + '</span>') + '</button>';
     }).join('') + '</div>';
 }
 
@@ -2327,8 +2369,8 @@ function feedbackHTML(q){
       '<div class="dlabel">' + (q.right ? "Correct" : (q.kind === "hook" ? "The answer" : "The hook")) + '</div>' +
       '<p class="ar fb-ar">' + phraseHTML(q.w) + '</p>' +
       '<p class="fb-line">' + (it.gloss && !focusOf(q.w).whole ? '<b class="ar">' + esc(it.ar) + '</b> ' + esc(it.gloss) + ' &middot; ' : '') +
-        esc(q.w.tr) + ' — ' + esc(brief(q.w.meaning)) + '</p>' +
-      '<p>' + esc(q.kind === "hook" ? firstSentence(q.w.root) : q.w.note) + '</p></div>' + peek + actions;
+        esc(q.w.tr) + ' — ' + rich(brief(q.w.meaning)) + '</p>' +
+      '<p>' + rich(q.kind === "hook" ? firstSentence(q.w.root) : q.w.note) + '</p></div>' + peek + actions;
 }
 
 function drawQuiz(){
@@ -2989,7 +3031,7 @@ function rootsView(q){
     const cross = new Set(r.words.map(w => w.surah)).size > 1;
     return '<div class="rootcard" data-root="' + esc(r.key) + '">' +
       '<button class="roothead" aria-expanded="false"><span class="rootkey">√' + esc(r.key) + '</span>' +
-      '<span class="rootgloss">' + esc(r.gloss) + '</span>' +
+      '<span class="rootgloss">' + rich(r.gloss) + '</span>' +
       '<span class="rootcount' + (cross ? ' linked' : '') + '">' + r.words.length + '</span>' + CHEV + '</button>' +
       '<div class="rootbody">' + r.words.map(w => wordRow(w, true)).join('') + '</div></div>';
   };
@@ -3268,11 +3310,11 @@ function openSheet(id){
   if (!was) lastFocus = document.activeElement;
   const s = surahOf(w.surah), at = s.words.indexOf(w), f = focusOf(w);
   const rows = [
-    ["Root", w.root ? (w.root.length < 70 ? '<span class="rootmono">' + esc(w.root) + '</span>' : esc(w.root)) : null],
-    ["Here it means", esc(w.meaning)],
-    ["Word magic", w.magic ? w.magic.split("\n").map(p => '<p>' + esc(p) + '</p>').join('') : null],
-    ["Grammar bite", w.grammar ? esc(w.grammar) : null],
-    ["Why this exact word", w.why ? esc(w.why) : null]
+    ["Root", w.root ? (latin(w.root).length < 70 ? '<span class="rootmono">' + rich(w.root) + '</span>' : rich(w.root)) : null],
+    ["Here it means", rich(w.meaning)],
+    ["Word magic", w.magic ? w.magic.split("\n").map(p => '<p>' + rich(p) + '</p>').join('') : null],
+    ["Grammar bite", w.grammar ? rich(w.grammar) : null],
+    ["Why this exact word", w.why ? rich(w.why) : null]
   ].filter(r => r[1]);
   const ref    = esc(s.name) + ' ' + s.num + ':' + esc(w.v);
   const vHTML  = verseHTML(w.surah, verseNums(w.v), w.ar);
@@ -3308,7 +3350,7 @@ function openSheet(id){
       '</div>' +
       '<div class="tr">' + esc(w.tr) + '</div>' +
       glosses +
-      '<div class="mean">' + esc(w.meaning) + '</div>' +
+      '<div class="mean">' + rich(w.meaning) + '</div>' +
       '<div class="meta">' + verseLabel +
       (w.rk ? '<span class="pill">√' + esc(w.rk) + '</span>' : '') +
       (isLearned(w) ? '<span class="pill pill-ok">&#10003; learned</span>' : inBasket(w) ? '<span class="pill pill-warn">in your mistakes</span>' : '') +
@@ -3316,11 +3358,13 @@ function openSheet(id){
     vHTML +
     '<div class="detail">' + rows.map(r =>
       '<div class="drow"><div class="dlabel">' + r[0] + '</div><div class="dval">' + r[1] + '</div></div>').join('') + '</div>' +
-    '<div class="keepsake"><div class="dlabel">Never forget</div><p>' + esc(w.note) + '</p></div>' +
+    '<div class="keepsake"><div class="dlabel">Never forget</div><p>' + rich(w.note) + '</p></div>' +
     (w.more && w.more.length
-      ? '<button class="morebtn" id="moreBtn">Show the full note</button>' +
+      ? '<button class="morebtn" id="moreBtn" aria-expanded="false" aria-controls="moreBox">' +
+          '<span class="mb-t">Go deeper</span><span class="mb-n">' + w.more.length +
+          (w.more.length === 1 ? ' more note' : ' more notes') + ' on this word</span>' + CARET + '</button>' +
         '<div class="detail morebox" id="moreBox" hidden>' +
-        w.more.map(p => '<div class="drow"><div class="dval">' + esc(p) + '</div></div>').join('') +
+        w.more.map(p => '<div class="drow"><div class="dval">' + rich(p) + '</div></div>').join('') +
         '</div>'
       : '') +
     '<div class="sheet-actions">' +
@@ -3449,8 +3493,12 @@ document.addEventListener("click", e => {
   if (thr){ go(thr.dataset.thread === "roots" ? "/threads/roots" : "/threads", { replace: true }); return; }
 
   if (t.closest("#moreBtn")){
-    $("#moreBox").hidden = false;
-    t.closest("#moreBtn").remove(); return;
+    const b = t.closest("#moreBtn"), open = $("#moreBox").hidden;
+    $("#moreBox").hidden = !open;
+    b.setAttribute("aria-expanded", String(open));
+    b.querySelector(".mb-t").textContent = open ? "Show less" : "Go deeper";
+    if (open) setTimeout(() => b.scrollIntoView({ block: "start", behavior: "smooth" }), 30);
+    return;
   }
 
   if (t.closest("#moreOne")){

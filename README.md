@@ -23,6 +23,17 @@ every surah from Al-Ḥāqqah (69) to An-Nās (114). An-Nabaʾ (78) and ʿAbasa 
 are the newest; their Qur'an text and grammar are fetched by the publish workflow
 the first time it runs with them.
 
+**The Qur'an's words in Arabic script.** The guides write Arabic in English
+letters inside their notes — *mā gharraka bi-rabbika'l-Karīm*. On the site, every
+such word or phrase is shown in Arabic instead: مَا غَرَّكَ بِرَبِّكَ ٱلْكَرِيمِ. Nothing is
+spelled out letter by letter; each one is looked up — in the verse the note points
+at ("Infiṭār 82:6 —"), in the word's own verse, in its surah, anywhere in the
+Qur'an, among the dictionary forms of its words and in the verb tables — and the
+Arabic is copied from there. A phrase that can't be found stays in English letters,
+and so do surah names, people's names and grammar terms (*iḍāfah*, *maṣdar*,
+*sukūn*). Hover an Arabic word on a computer to see the guide's own spelling.
+This is `arabize.py`, run by `build.py`; the guides themselves don't change.
+
 **The word being taught.** Most entries in the guides are a phrase, often the
 whole verse, but each one is really about one or two of its words. The site works
 out which, by lining the phrase up against the verse and seeing which words the
@@ -76,9 +87,9 @@ list, the flashcards, the quiz, the traps and the threads, all built automatical
 You never touch the HTML.
 
 If you are building locally rather than letting GitHub do it, run the four
-scripts in order — `build.py` for the vocabulary, `fetch_verses.py` for that
-surah's Qur'an text, `build_morph.py` for its roots and grammar, then
-`build_sarf.py` for the verb tables.
+scripts in order — `build.py` for the vocabulary (and the Arabic script in its
+notes), `fetch_verses.py` for that surah's Qur'an text, `build_morph.py` for its
+roots and grammar, then `build_sarf.py` for the verb tables.
 
 ### What the file has to look like
 
@@ -112,7 +123,7 @@ automatically — write the guide however you normally would.
 
 **Length is handled for you.** The guides run several paragraphs per field; the
 site shows the opening claim only — one or two sentences per category — and puts
-everything else behind a "Show the full note" tap on the word's card. Nothing is
+everything else behind a **Go deeper** tap on the word's card. Nothing is
 lost, and no card is a wall of text. The limits are the `BUDGET` line near the top
 of `build.py` if you ever want them looser or tighter.
 
@@ -121,7 +132,7 @@ of `build.py` if you ever want them looser or tighter.
 ## Running it on your own machine (optional)
 
 ```bash
-python3 build.py         # rebuilds data/surahs.js from guides/
+python3 build.py         # rebuilds data/surahs.js from guides/ (about a minute and a half)
 python3 fetch_verses.py  # pulls the Qur'an text for any surah not yet fetched
 python3 build_morph.py   # rebuilds data/morph.js — root and grammar per word
 python3 build_sarf.py    # rebuilds data/sarf.js from sarf.json — the verb tables
@@ -133,7 +144,9 @@ No installs, no dependencies — just Python 3 and a browser. `fetch_verses.py` 
 `build_morph.py` are the parts that need the internet; add `--all` to
 `fetch_verses.py` to re-pull every surah, which is what you do after changing
 which translation it uses. `build_morph.py` keeps its 6 MB source file in
-`.morph-cache.txt` so it only downloads it once.
+`.morph-cache.txt` so it only downloads it once; `build.py` reads the same file to
+put the notes' Arabic into Arabic script, and if it can't be had, the notes simply
+stay in English letters.
 
 ---
 
@@ -146,6 +159,8 @@ data/verses.js          generated — the Qur'an text and word-by-word. Same.
 data/morph.js           generated — root, base form and grammar per word. Same.
 data/sarf.js            generated — the ṣarf ṣaghīr of every verb. Same.
 build.py                turns guides/*.md into data/surahs.js
+arabize.py              finds the Arabic the notes write in English letters and
+                        marks it ⟦arabic|letters⟧ for the site to show in Arabic
 fetch_verses.py         pulls data/verses.js from the Quran.com API
 build_morph.py          builds data/morph.js from the Quranic Arabic Corpus
 build_sarf.py           builds data/sarf.js from sarf.json
