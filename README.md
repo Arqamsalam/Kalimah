@@ -7,7 +7,7 @@ threads that run between surahs.
 
 Tap the verse pill on any word's card — or open a surah's **Read** tab — and the
 verse itself opens: the Arabic, every word glossed in English below it, and the
-translation. The word you are studying is picked out in gold.
+translation. The word you are studying is picked out in colour.
 
 Then tap any word inside a verse. A card opens under it with that word's
 three-letter root, its dictionary form, what it is grammatically (verb Form II,
@@ -40,8 +40,8 @@ This is `arabize.py`, run by `build.py`; the guides themselves don't change.
 whole verse, but each one is really about one or two of its words. The site works
 out which, by lining the phrase up against the verse and seeing which words the
 guide's notes keep naming (the headword of the root line, a root written out as
-√q-r-r, the CAPITALISED word in the hook). Those words are lit gold — in the
-verse, in the word list, on the card — and they are what the quiz and the game
+√q-r-r, the CAPITALISED word in the hook). Those words are picked out in colour
+inside the verse and on the card, and they are what the quiz and the game
 test, each with its own word-by-word meaning. A phrase the guide teaches as one
 unit (*kulū wa'shrabū*, *mā lakum*) stays whole. Nothing in the guides has to
 change for this; it is all in `focusOf()` in `index.html`.
@@ -68,11 +68,18 @@ the translations all read like a printed book, while the sans-serif stays on the
 controls. The whole type scheme is one block at the end of the stylesheet marked
 `the reading voice`.
 
-The surfaces are glass: every panel is translucent and blurs whatever is
-behind it, lit by a soft colour wash fixed to the page, with a bright hairline
-along its top edge. The whole effect lives in one block at the end of the
-stylesheet, marked `liquid glass`, and is driven by tokens — turn `--glass-blur`
-down or drop the block entirely and everything falls back to solid cards.
+**The Words tab** is the surah itself: every verse once, in order, numbered,
+with its English underneath and nothing else. The words it teaches are coloured
+inside the verse (blue; green once learned, red while in your mistakes) and open
+their card when tapped.
+
+The surfaces are thick, polished glass. A lapis and gold light washes the page,
+and every panel catches it the same way: a sheen across its top, a bright bevel
+along the top edge, and three layered shadows that make it float. Surah numbers
+are cut like gems, the Arabic headings are gold leaf, the tab bar floats as a
+glass capsule, and panes press down when tapped. The whole effect lives in one
+block of the stylesheet, marked `liquid glass`, and is driven by tokens. Drop the
+block and everything falls back to solid cards.
 
 ---
 
@@ -144,8 +151,8 @@ python3 -m http.server   # then open http://localhost:8000
 
 No installs, no dependencies — just Python 3 and a browser. `fetch_verses.py` and
 `build_morph.py` are the parts that need the internet; add `--all` to
-`fetch_verses.py` to re-pull every surah, which is what you do after changing
-which translation it uses. `build_morph.py` keeps its 6 MB source file in
+`fetch_verses.py` to re-pull every surah (it does this by itself when the
+translation changes). `build_morph.py` keeps its 6 MB source file in
 `.morph-cache.txt` so it only downloads it once; `build.py` reads the same file to
 put the notes' Arabic into Arabic script, and if it can't be had, the notes simply
 stay in English letters.
@@ -197,9 +204,11 @@ browser never pairs a new page with old cached data.
 
 `fetch_verses.py` reads the Quran.com API, which serves the Uthmani text and the
 word-by-word glosses of the Quranic Arabic Corpus. The verse translation is
-**Saheeh International**; the translation number is the `TRANSLATION` line near
-the top of the script, with the other options listed beside it. The Clear Quran
-(Khattab) is not among them — it isn't openly licensed, so no free API carries it.
+**The Clear Quran by Dr. Mustafa Khattab**, as the Quran.com API serves it. It
+is a copyrighted translation, so the site credits it under the verses. The translation number is the `TRANSLATION` line near the top of the
+script, with other options listed beside it. Change it and the next run fetches
+every surah again by itself. If the chosen translation ever comes back empty, the
+script uses Saheeh International instead, so the site never loses its English.
 
 One deliberate change is made to the text on the way in: the Qur'anic recitation
 marks (waqf signs and the small superscript letters, U+06D6–U+06ED) are removed.

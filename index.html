@@ -463,74 +463,129 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .tab[aria-selected="true"]{color:var(--accent)}
 
 /* ================= liquid glass =================
-   Surfaces stop being flat paint and start behaving like frosted glass held
-   over a soft coloured light. Three things do the work: a blurred,
-   semi-transparent fill; a bright hairline along the top edge, where the
-   light catches the bevel; and a wide soft shadow underneath, so a panel
-   floats above the page instead of sitting flat on it.
-   Everything here is expressed as tokens, so the whole effect can be dialled
-   up, dialled down, or removed from this one block.                         */
+   Panels behave like thick, polished glass resting on a lit table. A lapis
+   and gold light washes the page (the two pigments of an illuminated
+   muṣḥaf), and every pane catches it the same way:
+     · a sheen across its top third, as if lit from above
+     · a bright bevel along the top edge and a faint dark one along the bottom
+     · three shadows: one where it touches, one for its thickness, one wide
+       and soft for the distance it floats
+   Tapping presses a pane down; on a computer, hovering lifts it.
+   Everything is a token, so the whole effect lives in this one block.       */
 :root{
-  --glass:rgba(255,255,255,.58);
+  --glass:rgba(255,255,255,.62);
+  --glass-hi:rgba(255,255,255,.84);
   --glass-quiet:rgba(255,255,255,.40);
-  --glass-strong:rgba(255,255,255,.80);
-  --glass-border:rgba(255,255,255,.58);
-  --glass-edge:rgba(255,255,255,.95);
-  --glass-under:rgba(20,24,45,.05);
-  --glass-ring:rgba(20,24,45,.07);
-  --glass-drop:rgba(20,24,45,.26);
-  --glass-blur:saturate(180%) blur(20px);
-  --glass-blur-lg:saturate(200%) blur(40px);
-  --glass-chrome:rgba(255,255,255,.90);
-  --tint-a:rgba(124,156,255,.34);
-  --tint-b:rgba(246,196,122,.32);
-  --tint-c:rgba(160,192,255,.26);
+  --glass-strong:rgba(250,251,255,.86);
+  --glass-border:rgba(255,255,255,.78);
+  --glass-edge:rgba(255,255,255,1);
+  --glass-under:rgba(26,34,78,.07);
+  --glass-ring:rgba(26,34,78,.07);
+  --glass-drop:rgba(26,34,78,.36);
+  --glass-blur:saturate(170%) blur(22px);
+  --glass-blur-lg:saturate(190%) blur(40px);
+  --glass-chrome:rgba(246,247,252,.80);
+  --sheen:linear-gradient(180deg,rgba(255,255,255,.62) 0%,rgba(255,255,255,.16) 34%,rgba(255,255,255,0) 52%);
+  --lift:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 var(--glass-under),inset 0 0 0 1px rgba(255,255,255,.22),
+         0 0 0 1px var(--glass-ring),0 1px 2px rgba(26,34,78,.08),0 10px 20px -10px rgba(26,34,78,.20),0 34px 64px -30px var(--glass-drop);
+  --lift-hi:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 var(--glass-under),inset 0 0 0 1px rgba(255,255,255,.26),
+         0 0 0 1px var(--glass-ring),0 2px 4px rgba(26,34,78,.08),0 14px 26px -12px rgba(26,34,78,.22),0 40px 74px -34px var(--glass-drop);
+  --lift-lo:inset 0 1px 0 var(--glass-edge),inset 0 1px 6px rgba(26,34,78,.06),0 0 0 1px var(--glass-ring),0 1px 2px rgba(26,34,78,.08);
+  --gold-glass:linear-gradient(155deg,rgba(255,250,236,.94),rgba(248,236,206,.74));
+  --gold-border:rgba(196,154,64,.40);
+  --gem:linear-gradient(150deg,#4E6EDB 0%,#2E4BAE 52%,#21367F 100%);
+  --gem-glow:rgba(36,58,150,.50);
+  --foil:linear-gradient(180deg,#B88A28 0%,#97701A 50%,#6E4F0C 100%);
+  --hl:#2F55C8;
+  --hl-soft:rgba(47,85,200,.09);
+  --tint-a:rgba(92,122,238,.34);
+  --tint-b:rgba(236,194,116,.34);
+  --tint-c:rgba(132,160,255,.24);
+  --ground-top:#F0F2F8;
+  --ground-bottom:#E5E8F1;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --glass:rgba(34,38,52,.56);
-    --glass-quiet:rgba(34,38,52,.38);
-    --glass-strong:rgba(26,30,42,.74);
+    --glass:rgba(30,35,52,.58);
+    --glass-hi:rgba(46,52,74,.74);
+    --glass-quiet:rgba(30,35,52,.40);
+    --glass-strong:rgba(20,24,37,.86);
     --glass-border:rgba(255,255,255,.10);
     --glass-edge:rgba(255,255,255,.17);
-    --glass-under:rgba(0,0,0,.34);
-    --glass-ring:rgba(0,0,0,.45);
-    --glass-drop:rgba(0,0,0,.78);
-    --glass-chrome:rgba(14,17,25,.86);
-    --tint-a:color-mix(in srgb, var(--accent) 20%, transparent);
-    --tint-b:color-mix(in srgb, var(--gold) 15%, transparent);
-    --tint-c:color-mix(in srgb, var(--accent) 14%, transparent);
+    --glass-under:rgba(0,0,0,.45);
+    --glass-ring:rgba(0,0,0,.40);
+    --glass-drop:rgba(0,0,0,.80);
+    --glass-chrome:rgba(12,15,25,.78);
+    --sheen:linear-gradient(180deg,rgba(255,255,255,.09) 0%,rgba(255,255,255,.02) 36%,rgba(255,255,255,0) 52%);
+    --lift:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 var(--glass-under),0 0 0 1px var(--glass-ring),
+           0 1px 2px rgba(0,0,0,.5),0 10px 22px -12px rgba(0,0,0,.6),0 32px 64px -30px var(--glass-drop);
+    --lift-hi:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 var(--glass-under),0 0 0 1px var(--glass-ring),
+           0 2px 4px rgba(0,0,0,.5),0 16px 30px -14px rgba(0,0,0,.7),0 44px 80px -34px var(--glass-drop);
+    --lift-lo:inset 0 1px 0 var(--glass-edge),inset 0 1px 8px rgba(0,0,0,.35),0 0 0 1px var(--glass-ring);
+    --gold-glass:linear-gradient(155deg,rgba(62,50,24,.74),rgba(38,31,17,.62));
+    --gold-border:rgba(220,180,99,.30);
+    --gem:linear-gradient(150deg,#7B97F2 0%,#4E6CD0 52%,#3550A8 100%);
+    --gem-glow:rgba(90,120,230,.45);
+    --foil:linear-gradient(180deg,#F4D88E 0%,#DDB45E 50%,#B78A30 100%);
+    --hl:#A6BCFF;
+    --hl-soft:rgba(166,188,255,.12);
+    --tint-a:rgba(70,98,226,.30);
+    --tint-b:rgba(214,170,90,.16);
+    --tint-c:rgba(70,116,214,.22);
+    --ground-top:#0C101B;
+    --ground-bottom:#080A12;
   }
 }
 :root[data-theme="dark"]{
-  --glass:rgba(34,38,52,.56);
-  --glass-quiet:rgba(34,38,52,.38);
-  --glass-strong:rgba(26,30,42,.74);
+  --glass:rgba(30,35,52,.58);
+  --glass-hi:rgba(46,52,74,.74);
+  --glass-quiet:rgba(30,35,52,.40);
+  --glass-strong:rgba(20,24,37,.86);
   --glass-border:rgba(255,255,255,.10);
   --glass-edge:rgba(255,255,255,.17);
-  --glass-under:rgba(0,0,0,.34);
-  --glass-ring:rgba(0,0,0,.45);
-  --glass-drop:rgba(0,0,0,.78);
-  --glass-chrome:rgba(14,17,25,.86);
-  --tint-a:color-mix(in srgb, var(--accent) 20%, transparent);
-  --tint-b:color-mix(in srgb, var(--gold) 15%, transparent);
-  --tint-c:color-mix(in srgb, var(--accent) 14%, transparent);
+  --glass-under:rgba(0,0,0,.45);
+  --glass-ring:rgba(0,0,0,.40);
+  --glass-drop:rgba(0,0,0,.80);
+  --glass-chrome:rgba(12,15,25,.78);
+  --sheen:linear-gradient(180deg,rgba(255,255,255,.09) 0%,rgba(255,255,255,.02) 36%,rgba(255,255,255,0) 52%);
+  --lift:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 var(--glass-under),0 0 0 1px var(--glass-ring),
+         0 1px 2px rgba(0,0,0,.5),0 10px 22px -12px rgba(0,0,0,.6),0 32px 64px -30px var(--glass-drop);
+  --lift-hi:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 var(--glass-under),0 0 0 1px var(--glass-ring),
+         0 2px 4px rgba(0,0,0,.5),0 16px 30px -14px rgba(0,0,0,.7),0 44px 80px -34px var(--glass-drop);
+  --lift-lo:inset 0 1px 0 var(--glass-edge),inset 0 1px 8px rgba(0,0,0,.35),0 0 0 1px var(--glass-ring);
+  --gold-glass:linear-gradient(155deg,rgba(62,50,24,.74),rgba(38,31,17,.62));
+  --gold-border:rgba(220,180,99,.30);
+  --gem:linear-gradient(150deg,#7B97F2 0%,#4E6CD0 52%,#3550A8 100%);
+  --gem-glow:rgba(90,120,230,.45);
+  --foil:linear-gradient(180deg,#F4D88E 0%,#DDB45E 50%,#B78A30 100%);
+  --hl:#A6BCFF;
+  --hl-soft:rgba(166,188,255,.12);
+  --tint-a:rgba(70,98,226,.30);
+  --tint-b:rgba(214,170,90,.16);
+  --tint-c:rgba(70,116,214,.22);
+  --ground-top:#0C101B;
+  --ground-bottom:#080A12;
 }
 
-/* the light the glass sits on — fixed, so panels refract it as you scroll */
+/* the light the glass sits on — fixed, so panes refract it as you scroll —
+   with a fine grain over it, like the tooth of good paper */
 body{
   background:
-    radial-gradient(760px 480px at 2% -4%, var(--tint-a), transparent 62%),
-    radial-gradient(640px 430px at 102% 3%, var(--tint-b), transparent 60%),
-    radial-gradient(700px 580px at 40% 106%, var(--tint-c), transparent 64%),
-    var(--ground);
+    radial-gradient(820px 560px at -4% -8%, var(--tint-a), transparent 62%),
+    radial-gradient(680px 480px at 104% 2%, var(--tint-b), transparent 60%),
+    radial-gradient(760px 640px at 46% 108%, var(--tint-c), transparent 64%),
+    linear-gradient(180deg, var(--ground-top), var(--ground-bottom));
   background-attachment:fixed;
 }
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 /* the panes */
 .group,
 .surah-card,
 .verse,
+.vblock,
+.detail,
 .rootcard,
 .face,
 .quiz-q,
@@ -538,92 +593,148 @@ body{
 .score,
 .abtn,
 .morebtn,
+.stat,
 .searchbar input,
 .flash-controls .fbtn{
-  background:var(--glass);
+  background:var(--sheen),linear-gradient(155deg,var(--glass-hi),var(--glass));
   -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
   border:1px solid var(--glass-border);
-  box-shadow:
-    inset 0 1px 0 var(--glass-edge),
-    inset 0 -1px 0 var(--glass-under),
-    0 1px 2px var(--glass-ring),
-    0 18px 40px -22px var(--glass-drop);
+  box-shadow:var(--lift);
 }
-.group{border-radius:20px}
-.surah-card{border-radius:20px}
-.verse{border-radius:18px}
+.group{border-radius:22px}
+.surah-card{border-radius:22px}
+.verse,.vblock{border-radius:20px}
+.detail{border-radius:18px}
 .rootcard{border-radius:18px}
 .opt{border-radius:16px;border-width:1px}
-.searchbar input{border-radius:14px}
+.searchbar input{border-radius:16px;box-shadow:var(--lift-lo)}
+.stat{border-radius:18px}
+.vblock.quiet{background:var(--glass-quiet);box-shadow:var(--lift-lo);border-style:solid}
 
-/* chrome floats highest, so it is the clearest glass of all */
-.navbar,
-.tabbar{
+/* press and lift: panes you can tap move like something with weight */
+.surah-card,.resume,.abtn,.morebtn,.opt,.rootcard .roothead,.stat{transition:transform .18s cubic-bezier(.2,.8,.3,1),box-shadow .18s}
+.surah-card:active,.resume:active,.abtn:active,.morebtn:active,.opt:not([disabled]):active{transform:translateY(1px) scale(.992);box-shadow:var(--lift-lo)}
+@media (hover:hover){
+  .surah-card:hover,.resume:hover,.abtn:hover,.morebtn:hover,.opt:not([disabled]):hover{transform:translateY(-2px);box-shadow:var(--lift-hi)}
+}
+
+/* surah numbers are cut gems; verse numbers, small glass beads */
+.surah-num{background:radial-gradient(120% 90% at 30% 12%,rgba(255,255,255,.62),rgba(255,255,255,0) 46%),var(--gem);
+  color:#FFFFFF;border:1px solid rgba(255,255,255,.42);border-radius:15px;
+  text-shadow:0 1px 1px rgba(0,0,0,.28);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.62),inset 0 -3px 6px rgba(8,18,64,.38),0 6px 14px -6px var(--gem-glow)}
+.vb-no{background:var(--sheen),linear-gradient(155deg,var(--glass-hi),var(--glass));color:var(--accent);
+  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),0 2px 6px -2px var(--glass-drop)}
+.vblock.quiet .vb-no{box-shadow:none;background:transparent}
+
+/* gold leaf on the Arabic headings */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+.home-title .ar,.hero-ar,.surah-ar,.resume-ar{
+  background:var(--foil);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;
+  padding-block:.35em;margin-block:-.35em;  /* room for the vowel marks, which sit above the text box */
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.5))}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) :is(.home-title .ar,.hero-ar,.surah-ar,.resume-ar){filter:drop-shadow(0 1px 8px rgba(220,180,99,.18))}}
+:root[data-theme="dark"] :is(.home-title .ar,.hero-ar,.surah-ar,.resume-ar){filter:drop-shadow(0 1px 8px rgba(220,180,99,.18))}
+}
+.large-title,.hero-name{text-shadow:0 1px 0 rgba(255,255,255,.55)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) :is(.large-title,.hero-name){text-shadow:none}}
+:root[data-theme="dark"] :is(.large-title,.hero-name){text-shadow:none}
+
+/* chrome floats highest, so it is the clearest glass of all; the tab bar is
+   a floating capsule */
+.navbar{
   background:var(--glass-chrome);
   -webkit-backdrop-filter:var(--glass-blur-lg);backdrop-filter:var(--glass-blur-lg);
 }
-.tabbar{box-shadow:inset 0 1px 0 var(--glass-edge), 0 -10px 30px -20px var(--glass-drop)}
+.navbar.stuck{box-shadow:inset 0 -1px 0 var(--glass-border),0 10px 30px -24px var(--glass-drop)}
+.tabbar{
+  left:50%;right:auto;transform:translateX(-50%);width:min(520px,calc(100% - 24px));
+  bottom:calc(10px + env(safe-area-inset-bottom, 0px));padding:5px 6px;border-radius:26px;
+  background:var(--sheen),var(--glass-chrome);
+  -webkit-backdrop-filter:var(--glass-blur-lg);backdrop-filter:var(--glass-blur-lg);
+  border:1px solid var(--glass-border);box-shadow:var(--lift-hi)}
+.tab{border-radius:20px;padding:6px 0 5px;transition:background .18s,color .18s}
+.tab[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 11%,transparent);
+  box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 0 0 1px color-mix(in srgb,var(--accent) 14%,transparent)}
 
 .sheet{
-  background:var(--glass-strong);
+  background:var(--sheen),var(--glass-strong);
   -webkit-backdrop-filter:var(--glass-blur-lg);backdrop-filter:var(--glass-blur-lg);
-  border-radius:26px 26px 0 0;
+  border-radius:28px 28px 0 0;
   border:1px solid var(--glass-border);border-bottom:0;
   box-shadow:inset 0 1px 0 var(--glass-edge), var(--sheet-shadow);
 }
-@media (min-width:700px){.sheet{border-radius:24px;border-bottom:1px solid var(--glass-border)}}
-.scrim{background:rgba(8,10,18,.34);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+@media (min-width:700px){.sheet{border-radius:26px;border-bottom:1px solid var(--glass-border)}}
+.grabber{background:color-mix(in srgb,var(--ink) 18%,transparent);box-shadow:inset 0 1px 1px rgba(0,0,0,.12)}
+.closebtn{background:var(--sheen),linear-gradient(155deg,var(--glass-hi),var(--glass));border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 3px 8px -3px var(--glass-drop)}
+.scrim{background:rgba(8,10,22,.36);-webkit-backdrop-filter:blur(4px) saturate(120%);backdrop-filter:blur(4px) saturate(120%)}
 
-/* the segmented control: a glass trough with a glass lozenge sliding in it */
+/* the segmented control: a trough pressed into the glass, with a raised
+   lozenge sliding in it */
 .segmented{
-  background:var(--glass-quiet);
+  background:color-mix(in srgb,var(--ink) 6%,transparent);
   -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
-  border:1px solid var(--glass-border);border-radius:15px;padding:3px;
-  box-shadow:inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-under)
+  border:1px solid var(--glass-border);border-radius:16px;padding:3px;
+  box-shadow:inset 0 1px 3px rgba(26,34,78,.16),inset 0 -1px 0 var(--glass-edge)
 }
-.segmented button{border-radius:12px}
+.segmented button{border-radius:13px}
 .segmented button[aria-selected="true"]{
-  background:var(--glass-strong);
+  background:var(--sheen),linear-gradient(155deg,var(--glass-hi),var(--glass));color:var(--ink);
   border:1px solid var(--glass-border);
-  box-shadow:inset 0 1px 0 var(--glass-edge), 0 2px 8px -3px var(--glass-drop)
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 1px 2px rgba(26,34,78,.10),0 6px 14px -6px var(--glass-drop)
 }
 
 /* small chips */
 .pill,.wr-badge,.wbit,.rootcount{
-  background:var(--glass);
+  background:var(--sheen),var(--glass);
   -webkit-backdrop-filter:saturate(170%) blur(12px);backdrop-filter:saturate(170%) blur(12px);
   border:1px solid var(--glass-border);
-  box-shadow:inset 0 1px 0 var(--glass-edge)
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 2px 6px -3px var(--glass-drop)
 }
 .closebtn,.wbw-w.open{
   -webkit-backdrop-filter:saturate(170%) blur(12px);backdrop-filter:saturate(170%) blur(12px)
 }
 
-/* tinted panes keep their colour but gain the same bevel and float */
+/* gold panes: the same glass, tinted like gold leaf under it */
 .callout,.keepsake{
+  background:var(--sheen),var(--gold-glass);
   -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
-  border-radius:18px;
-  box-shadow:inset 0 1px 0 var(--glass-edge), 0 18px 40px -24px var(--glass-drop)
+  border:1px solid var(--gold-border);border-radius:20px;
+  box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 rgba(150,112,26,.10),
+    0 1px 2px rgba(120,90,20,.10),0 10px 20px -12px rgba(150,112,26,.22),0 30px 60px -32px rgba(150,112,26,.40)
 }
 .wcard{
   -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
   border-radius:16px;
   box-shadow:inset 0 1px 0 var(--glass-edge), 0 16px 34px -22px var(--glass-drop)
 }
-.cta{box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 12px 28px -14px var(--glass-drop)}
+.resume{background:var(--sheen),linear-gradient(135deg,color-mix(in srgb,var(--accent) 16%,var(--glass-hi)),color-mix(in srgb,var(--gold) 14%,var(--glass)));
+  box-shadow:var(--lift);border-radius:22px}
+
+/* the main buttons are cut from the same lapis as the gems */
+.cta{background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,0) 52%),var(--gem);color:#FFFFFF;
+  border:1px solid rgba(255,255,255,.28);text-shadow:0 1px 1px rgba(0,0,0,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.50),inset 0 -2px 4px rgba(8,18,64,.30),0 12px 26px -12px var(--gem-glow);
+  transition:transform .16s,box-shadow .16s}
+.cta:active{transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 2px 6px rgba(8,18,64,.35),0 4px 10px -6px var(--gem-glow)}
 
 /* rows inside a pane must not paint over the glass, so they tint instead */
-.row:active,.surah-card:active{background:color-mix(in srgb, var(--ink) 7%, transparent)}
+.row:active,.surah-card:active{background-color:color-mix(in srgb, var(--ink) 4%, transparent)}
 @media (hover:hover){
   .row:hover{background:color-mix(in srgb, var(--ink) 5%, transparent)}
   .wbw-w:hover{background:color-mix(in srgb, var(--ink) 6%, transparent)}
 }
 .wbw-w:active{background:color-mix(in srgb, var(--ink) 9%, transparent)}
 
+@media (prefers-reduced-motion: reduce){
+  .surah-card:hover,.resume:hover,.abtn:hover,.morebtn:hover,.opt:hover{transform:none}
+}
+
 /* if a browser can't blur behind an element, fall back to solid panels so
    nothing turns into unreadable grey-on-grey */
 @supports not ((backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px))){
-  :root{--glass:var(--surface);--glass-quiet:var(--surface-2);--glass-strong:var(--ground);
+  :root{--glass:var(--surface);--glass-hi:var(--surface);--glass-quiet:var(--surface-2);--glass-strong:var(--ground);
         --glass-chrome:var(--ground)}
   .navbar,.tabbar{background:var(--nav)}
 }
@@ -925,29 +1036,32 @@ body{font-size:17.5px;line-height:1.55}
 
 /* ================= words: the surah verse by verse ================= */
 .vlist{margin-bottom:30px}
-.vblock{background:var(--surface);border:1px solid var(--hair);border-radius:16px;box-shadow:var(--shadow);
-  padding:13px 16px 14px;margin-bottom:10px;position:relative}
-.vblock.quiet{background:transparent;box-shadow:none;border-style:dashed;padding:10px 16px 11px}
+/* the pane itself — fill, edge, depth — comes from the liquid glass block */
+.vblock{padding:14px 17px 15px;margin-bottom:12px;position:relative}
+.vblock.quiet{padding:11px 17px 12px}
 .vb-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .vb-no{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;border-radius:13px;
-  font-size:12.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);
-  border:1px solid color-mix(in srgb,var(--accent) 26%,transparent);font-variant-numeric:tabular-nums}
-.vblock.quiet .vb-no{color:var(--faint);background:transparent;border-color:var(--hair)}
+  font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.vblock.quiet .vb-no{color:var(--faint);border-color:var(--hair)}
 .vb-count{font-size:11.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .vb-ar{font-size:26px;line-height:2.05;color:var(--ink);text-align:right;direction:rtl}
 .vblock.quiet .vb-ar{color:var(--ink-2);font-size:24px}
-.vb-hit{color:var(--gold);cursor:pointer;border-radius:4px;
-  box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--gold) 50%,transparent);transition:background .15s}
-@media (hover:hover){.vb-hit:hover{background:color-mix(in srgb,var(--gold) 16%,transparent)}}
-.vb-hit:active{background:color-mix(in srgb,var(--gold) 24%,transparent)}
+.vb-hit{color:var(--hl);cursor:pointer;border-radius:9px;padding:0 .14em;margin:0 -.04em;
+  background:var(--hl-soft);box-shadow:inset 0 -1.5px 0 color-mix(in srgb,var(--hl) 45%,transparent);
+  transition:background .15s,box-shadow .15s,transform .15s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+@media (hover:hover){.vb-hit:hover{background:color-mix(in srgb,var(--hl) 20%,transparent);
+  box-shadow:inset 0 -2px 0 var(--hl),0 4px 12px -6px color-mix(in srgb,var(--hl) 60%,transparent)}}
+.vb-hit:active{transform:translateY(1px);background:color-mix(in srgb,var(--hl) 26%,transparent)}
+.vb-hit.learned{--hl:var(--good);--hl-soft:color-mix(in srgb,var(--good) 11%,transparent)}
+.vb-hit.review{--hl:var(--bad);--hl-soft:color-mix(in srgb,var(--bad) 10%,transparent)}
 .vb-end{display:inline-flex;align-items:center;justify-content:center;min-width:1.5em;height:1.5em;border-radius:50%;
   border:1.5px solid color-mix(in srgb,var(--gold) 55%,transparent);color:var(--gold);font-size:.6em;line-height:1;
   vertical-align:middle;margin-right:4px}
-.vb-en{font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.55;color:var(--ink-2);margin-top:6px}
-.vblock.quiet .vb-en{color:var(--muted);font-size:15px}
-.vb-words{margin:12px -16px -14px;border-top:1px solid var(--hair)}
-.vb-words .wordrow{border-bottom:1px solid var(--hair)}
-.vb-words .wordrow:last-child{border-bottom:0;border-radius:0 0 16px 16px}
+.vb-en{font-family:"Source Serif 4",Georgia,serif;font-size:16.5px;line-height:1.6;color:var(--ink-2);margin:8px 0 0;
+  padding-top:9px;border-top:1px solid var(--hair)}
+.vblock.quiet .vb-en{color:var(--muted);font-size:15.5px}
+.vb-hint{margin:-6px 0 14px}
+.vb-credit{font-size:12.5px;color:var(--faint);margin:-18px 4px 30px;letter-spacing:.01em}
 
 /* ================= ṣarf ṣaghīr ================= */
 .sarf{margin-top:12px;border-top:1px solid color-mix(in srgb,var(--accent) 20%,transparent);padding-top:10px}
@@ -988,21 +1102,16 @@ body{font-size:17.5px;line-height:1.55}
 
 /* ================= home: carry on, totals, the two juz ================= */
 .home-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.home-title .ar{font-size:34px;font-weight:400;color:var(--gold);line-height:1.2}
-.resume{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:20px;margin:0 0 12px;
-  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 15%,var(--glass)),color-mix(in srgb,var(--gold) 12%,var(--glass)));
-  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),0 18px 40px -22px var(--glass-drop);
-  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);transition:transform .16s cubic-bezier(.2,.8,.3,1)}
-.resume:active{transform:scale(.985)}
+.home-title .ar{font-size:34px;font-weight:400;line-height:1.2}
+.resume{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;margin:0 0 12px;
+  border:1px solid var(--glass-border);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
 .resume-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .resume-k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 .resume-name{font-family:"Source Serif 4",Georgia,serif;font-size:20px;font-weight:600}
 .resume-sub{font-size:13.5px;color:var(--muted)}
-.resume-ar{font-size:30px;color:var(--gold);flex:none}
+.resume-ar{font-size:30px;flex:none}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 26px}
-.stat{display:flex;flex-direction:column;align-items:center;padding:10px 4px;border-radius:16px;font-size:12px;color:var(--muted);letter-spacing:.03em;
-  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge);
-  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+.stat{display:flex;flex-direction:column;align-items:center;padding:10px 4px;font-size:12px;color:var(--muted);letter-spacing:.03em}
 .stat b{font-size:21px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 button.stat b{color:var(--gold)}
 .stat.warn b{color:var(--bad)}
@@ -1838,31 +1947,29 @@ function linkRow(l, from){
     (from ? '<div class="link-src">' + esc(from) + '</div>' : '') + '</div>';
 }
 
-/* ---------- the surah, verse by verse, with its words ----------
-   Every verse appears in order — even one with nothing to teach — so the
-   list reads as the surah itself. The words taught in a verse are lit up
-   in gold inside it, and their cards follow right underneath.          */
+/* ---------- the surah, verse by verse ----------
+   Every verse appears once, in order — even one with nothing to teach — so
+   the list reads as the surah itself. The words it teaches are picked out
+   in colour inside the verse and open their card when tapped; under the
+   verse is its English, and nothing else.                               */
 function versesInOrder(s){
   const book = HAVE_VERSES ? VERSES[s.num] : null;
   if (!book) return null;
   return Object.keys(book).map(Number).sort((a, b) => a - b);
 }
+const VERSES_EN = typeof VERSES_TRANSLATION !== "undefined" ? VERSES_TRANSLATION : null;
 function verseWordsHTML(s){
   const nums = versesInOrder(s);
   if (!nums || !nums.length) return '<p class="grouplabel">' + s.words.length + ' words</p>' + wordGroup(s.words, false);
-  const home = {}, lit = {};          // verse -> words listed there; verse -> words lit there
+  const lit = {}, shown = new Set();     // verse -> words lit there; words lit somewhere
   const stray = [];
   s.words.forEach(w => {
     const vs = verseNums(w.v).filter(n => VERSES[s.num][n]);
     if (!vs.length){ stray.push(w); return; }
-    (home[vs[0]] = home[vs[0]] || []).push(w);
     vs.forEach(n => (lit[n] = lit[n] || []).push(w));
   });
-  let html = '<p class="grouplabel">' + s.words.length + ' words &middot; ' + nums.length + ' verses, in order</p>' +
-    '<p class="wbw-hint" style="margin:-6px 0 14px">The gold words in each verse are the ones taught here. Tap one to open it.</p>';
-  html += '<div class="vlist">' + nums.map(n => {
+  const blocks = nums.map(n => {
     const v = VERSES[s.num][n];
-    const ws = home[n] || [];
     const marks = {};                 // token index -> word id
     /* an entry lights only the words it teaches — when an entry is the whole
        verse, lighting all of it would point at nothing */
@@ -1888,17 +1995,28 @@ function verseWordsHTML(s){
       if (!tokens.length) return;
       v.w.forEach((t, i) => { if (marks[i] === undefined && sameWord(t[0], tokens)) marks[i] = w.id; });
     });
-    const ar = v.w.map((t, i) => marks[i] !== undefined
-      ? '<span class="vb-hit" data-word="' + esc(marks[i]) + '" role="button" tabindex="0">' + esc(t[0]) + '</span>'
-      : '<span>' + esc(t[0]) + '</span>').join(' ');
-    return '<section class="vblock' + (ws.length ? '' : ' quiet') + '" id="vb-' + n + '">' +
+    const here = new Set(Object.values(marks));
+    here.forEach(id => shown.add(id));
+    const ar = v.w.map((t, i) => {
+      if (marks[i] === undefined) return '<span>' + esc(t[0]) + '</span>';
+      const w = byId(marks[i]), g = primaryOf(w).gloss || plainMean(w.meaning, 60);
+      return '<span class="vb-hit' + (isLearned(w) ? ' learned' : inBasket(w) ? ' review' : '') + '" data-word="' + esc(w.id) +
+        '" role="button" tabindex="0" title="' + esc(g) + '" aria-label="' + esc(t[0] + ' — ' + g) + '">' + esc(t[0]) + '</span>';
+    }).join(' ');
+    return '<section class="vblock' + (here.size ? '' : ' quiet') + '" id="vb-' + n + '">' +
       '<div class="vb-head"><span class="vb-no">' + n + '</span>' +
-        '<span class="vb-count">' + (ws.length ? ws.length + (ws.length === 1 ? ' word' : ' words') : 'no new word') + '</span></div>' +
-      '<div class="ar vb-ar">' + ar + ' <span class="vb-end">' + toArabicDigits(n) + '</span></div>' +
-      (v.e ? '<div class="vb-en">' + esc(v.e) + '</div>' : '') +
-      (ws.length ? '<div class="vb-words">' + ws.map(w => wordRow(w, false)).join('') + '</div>' : '') +
+        (here.size ? '<span class="vb-count">' + here.size + (here.size === 1 ? ' word' : ' words') + '</span>' : '') + '</div>' +
+      '<div class="ar vb-ar" lang="ar">' + ar + ' <span class="vb-end">' + toArabicDigits(n) + '</span></div>' +
+      (v.e ? '<p class="vb-en">' + esc(v.e) + '</p>' : '') +
     '</section>';
-  }).join('') + '</div>';
+  });
+  /* a word whose verse is missing, or that couldn't be found inside it,
+     still gets a way in */
+  s.words.forEach(w => { if (!shown.has(w.id) && stray.indexOf(w) < 0) stray.push(w); });
+  let html = '<p class="grouplabel">' + s.words.length + ' words &middot; ' + nums.length + ' verses, in order</p>' +
+    '<p class="wbw-hint vb-hint">The coloured words are the ones taught here. Tap one to open it.</p>' +
+    '<div class="vlist">' + blocks.join('') + '</div>' +
+    (VERSES_EN && VERSES_EN.name ? '<p class="vb-credit">English: ' + esc(VERSES_EN.name) + '</p>' : '');
   if (stray.length)
     html += '<p class="grouplabel">More words</p>' + wordGroup(stray, false);
   return html;
