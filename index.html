@@ -1181,7 +1181,7 @@ button.stat b{color:var(--gold)}
 
 <script src="data/verses.js?v=1f2e9b65"></script>
 <script src="data/morph.js?v=b2dd1547"></script>
-<script src="data/surahs.js?v=89fa7fe8"></script>
+<script src="data/surahs.js?v=d3aac7bc"></script>
 <script src="data/sarf.js?v=e31718f7"></script>
 <script>
 
@@ -1680,10 +1680,21 @@ function wordGroup(list, showSurah){
 }
 
 /* ===================== home ===================== */
+/* the thirty juz — where each begins and the words it is named by. A surah
+   is listed under the juz it begins in, so a new guide finds its own place. */
 const JUZ = [
-  { from: 67, to: 77,  label: "Juz 29", name: "Tabārak", ar: "تبارك" },
-  { from: 78, to: 114, label: "Juz 30", name: "ʿAmma",   ar: "عمّ" }
-];
+  [1, 1, "Alif Lām Mīm", "الم"], [2, 142, "Sayaqūl", "سيقول"], [2, 253, "Tilka'r-rusul", "تلك الرسل"],
+  [3, 93, "Lan tanālū", "لن تنالوا"], [4, 24, "Wa'l-muḥṣanāt", "والمحصنات"], [4, 148, "Lā yuḥibbu'llāh", "لا يحب الله"],
+  [5, 82, "Wa idhā samiʿū", "وإذا سمعوا"], [6, 111, "Wa law annanā", "ولو أننا"], [7, 88, "Qāla'l-malaʾ", "قال الملأ"],
+  [8, 41, "Wa'ʿlamū", "واعلموا"], [9, 93, "Yaʿtadhirūn", "يعتذرون"], [11, 6, "Wa mā min dābbah", "وما من دابة"],
+  [12, 53, "Wa mā ubarriʾu", "وما أبرئ"], [15, 1, "Rubamā", "ربما"], [17, 1, "Subḥāna'lladhī", "سبحان الذي"],
+  [18, 75, "Qāla a-lam", "قال ألم"], [21, 1, "Iqtaraba", "اقترب"], [23, 1, "Qad aflaḥa", "قد أفلح"],
+  [25, 21, "Wa qāla'lladhīna", "وقال الذين"], [27, 56, "Amman khalaqa", "أمن خلق"], [29, 46, "Utlu mā ūḥiya", "اتل ما أوحي"],
+  [33, 31, "Wa man yaqnut", "ومن يقنت"], [36, 28, "Wa mā liya", "وما لي"], [39, 32, "Fa-man aẓlamu", "فمن أظلم"],
+  [41, 47, "Ilayhi yuraddu", "إليه يرد"], [46, 1, "Ḥā Mīm", "حم"], [51, 31, "Qāla fa-mā khaṭbukum", "قال فما خطبكم"],
+  [58, 1, "Qad samiʿa", "قد سمع"], [67, 1, "Tabārak", "تبارك"], [78, 1, "ʿAmma", "عمّ"]
+].map(([s, v, name, ar], i) => ({ n: i + 1, s: s, v: v, label: "Juz " + (i + 1), name: name, ar: ar }));
+const juzOf = num => JUZ.filter(j => j.s < num || (j.s === num && j.v === 1)).pop();
 const MODE_NAME = { words: "Words", read: "Read", cards: "Cards", quiz: "Quiz", play: "Word Rush" };
 
 function surahCard(s){
@@ -1721,10 +1732,12 @@ function renderHome(){
   $("#homeTop").innerHTML = top;
 
   const desc = QM.order === "desc";
-  const groups = JUZ.map(j => ({ j: j, list: SURAHS.filter(s => s.num >= j.from && s.num <= j.to) })).filter(g => g.list.length);
+  const groups = JUZ.map(j => ({ j: j, list: SURAHS.filter(s => juzOf(s.num) === j) })).filter(g => g.list.length);
   if (desc){ groups.reverse(); groups.forEach(g => g.list.reverse()); }
-  $("#orderBtn").innerHTML = (desc ? '114 &rarr; 69' : '69 &rarr; 114');
-  $("#orderBtn").setAttribute("aria-label", desc ? "Showing An-Nās first — tap to show Al-Ḥāqqah first" : "Showing Al-Ḥāqqah first — tap to show An-Nās first");
+  const lo = SURAHS[0], hi = SURAHS[SURAHS.length - 1];
+  $("#orderBtn").innerHTML = desc ? hi.num + ' &rarr; ' + lo.num : lo.num + ' &rarr; ' + hi.num;
+  $("#orderBtn").setAttribute("aria-label", desc ? "Showing " + hi.name + " first — tap to show " + lo.name + " first"
+                                                 : "Showing " + lo.name + " first — tap to show " + hi.name + " first");
   $("#surahList").innerHTML = groups.map(g =>
     '<div class="juz-head"><span class="grouplabel">' + g.j.label + ' &middot; ' + g.j.name + '</span>' +
     '<span class="ar juz-ar">' + g.j.ar + '</span></div>' + g.list.map(surahCard).join('')).join('');
