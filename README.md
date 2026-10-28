@@ -13,13 +13,42 @@ Then tap any word inside a verse. A card opens under it with that word's
 three-letter root, its dictionary form, what it is grammatically (verb Form II,
 past tense, passive, "she/it"), and the little pieces stuck to its front and
 back — the *wa-*, the *al-*, the attached pronoun. If the root turns up anywhere
-else on the site, it says where.
+else on the site, it says where. A verb's card also carries its full **ṣarf
+ṣaghīr** — past, present, maṣdar, doer, both passives, done-to, command,
+prohibition, place/time and instrument — with the form you tapped marked
+"this word".
 
-Currently **44 surahs, 916 words, 831 verses, 4,030 words of Qur'an text**.
+Currently **46 surahs, 1,010 words, 913 verses, 4,336 words of Qur'an text** —
+every surah from Al-Ḥāqqah (69) to An-Nās (114). An-Nabaʾ (78) and ʿAbasa (80)
+are the newest; their Qur'an text and grammar are fetched by the publish workflow
+the first time it runs with them.
 
-The quiz walks each surah ten words at a time, and no word comes back until every word in the surah has had its turn. Each round mixes multiple choice on every field of the card with two hands-on kinds: **Match** (pair four words with their meanings) and **Arrange** (rebuild a verse from its words, guided by the word-by-word English). Any question can open its word's card for revision. Every slip goes into a **mistakes basket**, which you can practise on its own when a round ends; getting a word right later takes it out.
+**The word being taught.** Most entries in the guides are a phrase, often the
+whole verse, but each one is really about one or two of its words. The site works
+out which, by lining the phrase up against the verse and seeing which words the
+guide's notes keep naming (the headword of the root line, a root written out as
+√q-r-r, the CAPITALISED word in the hook). Those words are lit gold — in the
+verse, in the word list, on the card — and they are what the quiz and the game
+test, each with its own word-by-word meaning. A phrase the guide teaches as one
+unit (*kulū wa'shrabū*, *mā lakum*) stays whole. Nothing in the guides has to
+change for this; it is all in `focusOf()` in `index.html`.
 
-**Play & Learn** is the fifth section of every surah: *Word Rain*, a game where a meaning appears and words fall, and you catch the one that carries it before it lands. Combos, levels, gold words and a best score per surah keep it moving; anything you miss lands in the same mistakes basket. Progress, the basket and best scores are kept in the browser, like saved words.
+The quiz walks each surah ten words at a time, and no word comes back until every word in the surah has had its turn. Each round mixes multiple choice on every field of the card with two hands-on kinds: **Match** (pair four words with their meanings) and **Arrange** (rebuild a verse from its words, guided by the word-by-word English). Any question can open its word's card for revision. Every slip goes into a **mistakes basket**, which you can practise on its own when a round ends; getting a word right later takes it out. On a keyboard, 1–4 answer and Enter moves on.
+
+**Cards** are flashcards you grade yourself: *Got it* counts the word as learned, *Still learning* puts it in the mistakes basket. Swipe or use the arrow keys to move through the deck.
+
+**Play & Learn** is the fifth section of every surah: *Word Rush*. Meanings on the left, Arabic on the right — tap a word and the meaning it carries before the clock runs out. Every pair buys back a little time, a streak raises the multiplier (up to ×5), every twelve pairs the clock runs faster, and ten in a row sets off a **Frenzy**: the clock stops and pairs score double. Pick *Relaxed*, *Classic* or *Blitz*, this surah or all of them. Unseen words and your mistakes come first; a mix-up goes into the mistakes basket and a clean pair takes it out.
+
+Every word you get right — in the quiz, the cards or the game — counts toward the surah's **learned** bar, shown on the surah list and at the top of each surah. The home screen picks up where you left off. Progress, the basket, best scores and saved words are kept in the browser.
+
+**Links and the Back button.** Every screen has its own address after the `#` —
+`#/surah/96`, `#/surah/96/quiz`, `#/threads/roots`, and `?w=…` for a word's card
+on top of any of them — so the phone's Back button steps back through the app
+instead of leaving it, and any surah, mode or word can be shared as a link.
+
+Saved words, mistakes and quiz progress are remembered by each word's surah,
+verse and letters, not its position in the guide, so editing a guide never moves
+them onto the wrong word.
 
 English is set in Source Serif 4 — the surah names, the meanings, the notes and
 the translations all read like a printed book, while the sans-serif stays on the
@@ -46,9 +75,10 @@ list, the flashcards, the quiz, the traps and the threads, all built automatical
 
 You never touch the HTML.
 
-If you are building locally rather than letting GitHub do it, run the three
+If you are building locally rather than letting GitHub do it, run the four
 scripts in order — `build.py` for the vocabulary, `fetch_verses.py` for that
-surah's Qur'an text, then `build_morph.py` for its roots and grammar.
+surah's Qur'an text, `build_morph.py` for its roots and grammar, then
+`build_sarf.py` for the verb tables.
 
 ### What the file has to look like
 
@@ -94,6 +124,8 @@ of `build.py` if you ever want them looser or tighter.
 python3 build.py         # rebuilds data/surahs.js from guides/
 python3 fetch_verses.py  # pulls the Qur'an text for any surah not yet fetched
 python3 build_morph.py   # rebuilds data/morph.js — root and grammar per word
+python3 build_sarf.py    # rebuilds data/sarf.js from sarf.json — the verb tables
+python3 stamp.py         # fingerprints the data files in index.html
 python3 -m http.server   # then open http://localhost:8000
 ```
 
@@ -112,14 +144,34 @@ index.html              the whole website (HTML, CSS and JavaScript in one file)
 data/surahs.js          generated — every surah's vocabulary. Don't edit by hand.
 data/verses.js          generated — the Qur'an text and word-by-word. Same.
 data/morph.js           generated — root, base form and grammar per word. Same.
+data/sarf.js            generated — the ṣarf ṣaghīr of every verb. Same.
 build.py                turns guides/*.md into data/surahs.js
 fetch_verses.py         pulls data/verses.js from the Quran.com API
 build_morph.py          builds data/morph.js from the Quranic Arabic Corpus
+build_sarf.py           builds data/sarf.js from sarf.json
+sarf.json               the verb tables, hand-checked — edit this, not sarf.js
+stamp.py                fingerprints the data files' script tags in index.html
 guides/*.md             the source guides
 guides/_manual.json     Al-Qiyāmah (75) and Al-Mursalāt (77), typed in by hand
                         rather than parsed — they came from image sheets
 .github/workflows/      rebuilds and republishes on every push
 ```
+
+### The verb tables
+
+`sarf.json` holds one row per verb (root and form): its past, present, maṣdar,
+doer, both passives, done-to, command, prohibition, place/time and instrument,
+its bāb, and an English gloss. Each row was written out in full and the verbal
+forms cross-checked against an independent conjugator — except the eight added
+with An-Nabaʾ and ʿAbasa (fataḥa, dhāqa, takallama, taṣaddā, amāta, aqbara,
+ansharah, shaqqa), which were written by hand and are worth a second look.
+`build_sarf.py` turns it into `data/sarf.js`, which the site loads; a verb with
+no row simply shows no table.
+
+`stamp.py` stamps each data file's script tag in `index.html` with a
+fingerprint of its contents (`data/verses.js?v=89c91d12`). The workflow runs it
+on every publish, so the fingerprint changes exactly when the data does and a
+browser never pairs a new page with old cached data.
 
 ### Where the Qur'an text comes from
 

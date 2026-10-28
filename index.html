@@ -140,8 +140,10 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   padding:11px 36px 11px 36px;box-shadow:var(--shadow);
 }
 .searchbar input::placeholder{color:var(--faint)}
-.searchbar .mag{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--faint);width:16px;height:16px}
-.searchbar .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--faint);padding:6px;display:none}
+.searchbar input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none}
+/* the icons sit above the input: a frosted input is its own layer and would paint over them */
+.searchbar .mag{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--faint);width:16px;height:16px;z-index:1;pointer-events:none}
+.searchbar .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--faint);padding:6px;display:none;z-index:1}
 .searchbar.has .clr{display:block}
 
 /* ---------- grouped lists ---------- */
@@ -219,17 +221,20 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .scrim{position:fixed;inset:0;background:rgba(8,10,18,.42);opacity:0;pointer-events:none;transition:opacity .28s;z-index:60;
   -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
 .scrim.open{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:92vh;
+/* a closed sheet is hidden once it has slid away, so Tab and screen readers
+   can't wander into it; while it is open, the page behind it is inert */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:92vh;max-height:92dvh;
   background:var(--ground);border-radius:20px 20px 0 0;box-shadow:var(--sheet-shadow);
-  transform:translateY(calc(101% + 40px));transition:transform .36s cubic-bezier(.22,.9,.28,1);
+  transform:translateY(calc(101% + 40px));visibility:hidden;
+  transition:transform .36s cubic-bezier(.22,.9,.28,1),visibility 0s linear .36s;
   display:flex;flex-direction:column;overflow:hidden}
-.sheet.open{transform:none}
+.sheet.open{transform:none;visibility:visible;transition:transform .36s cubic-bezier(.22,.9,.28,1),visibility 0s}
 @media (min-width:700px){.sheet{max-width:600px;margin:0 auto;border-radius:20px;bottom:24px;left:16px;right:16px}}
 .grabber{width:38px;height:5px;border-radius:3px;background:var(--sep);margin:8px auto 0;flex:none}
 .sheet-head{display:flex;align-items:center;justify-content:flex-end;padding:6px 12px 0;flex:none}
 .closebtn{width:30px;height:30px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:grid;place-items:center}
 .closebtn svg{width:13px;height:13px}
-.sheet-scroll{overflow-y:auto;padding:0 16px 32px;-webkit-overflow-scrolling:touch}
+.sheet-scroll{overflow-y:auto;padding:0 16px 32px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 
 .word-hero{text-align:center;padding:2px 0 20px}
 .word-hero .ar{font-size:54px;line-height:1.5;color:var(--ink)}
@@ -261,20 +266,35 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .abtn svg{width:16px;height:16px}
 
 /* ---------- flashcards ---------- */
-.flash-stage{perspective:1400px;margin-bottom:16px}
-.flash-card{position:relative;width:100%;min-height:330px;transform-style:preserve-3d;
-  transition:transform .55s cubic-bezier(.3,.9,.3,1);cursor:pointer}
+/* Both faces sit in the same grid cell, so the card is always as tall as its
+   longer side — a long note can never spill out of it. */
+.flash-stage{perspective:1400px;margin-bottom:14px}
+.flash-card{display:grid;width:100%;transform-style:preserve-3d;border-radius:20px;
+  transition:transform .55s cubic-bezier(.3,.9,.3,1);cursor:pointer;touch-action:pan-y}
 .flash-card.flipped{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+.face{grid-area:1/1;min-height:340px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   background:var(--surface);border:1px solid var(--hair);border-radius:20px;box-shadow:var(--shadow);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:26px;text-align:center}
-.face.back{transform:rotateY(180deg);justify-content:flex-start;padding-top:30px}
-.face .ar{font-size:56px;color:var(--ink)}
-.face .tr{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:21px;color:var(--accent)}
-.face .hint{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600;position:absolute;bottom:18px}
-.face.back .mean{font-size:21px;font-weight:640;text-wrap:balance}
-.face.back .note{font-family:"Source Serif 4",Georgia,serif;font-size:17px;color:var(--ink-2);line-height:1.5;text-wrap:balance}
-.face.back .root{font-family:"Source Serif 4",Georgia,serif;color:var(--gold);font-size:16px}
+  display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 22px 16px;text-align:center}
+.face.back{transform:rotateY(180deg);padding-top:24px}
+.fc-top{align-self:stretch;display:flex;justify-content:space-between;font-size:11.5px;font-weight:650;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.fc-mid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px;width:100%}
+.face .ar{font-size:52px;color:var(--ink);line-height:1.6}
+.face .fc-ar.m{font-size:40px}
+.face .fc-ar.s{font-size:31px;line-height:1.85}
+.face .fc-ar.xs{font-size:25px;line-height:1.9}
+.face .tr{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:20px;color:var(--accent)}
+.face .hint{margin-top:auto;padding-top:6px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.fc-gs{display:flex;flex-direction:column;gap:4px;width:100%}
+.fc-g{display:flex;align-items:baseline;justify-content:center;gap:10px;flex-wrap:wrap}
+.face .fc-g .ar{font-size:30px;color:var(--gold);line-height:1.5}
+.fc-gt{font-family:"Source Serif 4",Georgia,serif;font-size:19px;font-weight:600;color:var(--ink)}
+.face.back .mean{font-size:17px;color:var(--ink-2);text-wrap:balance}
+.face.back .note{font-family:"Source Serif 4",Georgia,serif;font-size:16.5px;color:var(--ink-2);line-height:1.5;text-wrap:balance}
+.face.back .root{font-family:"Source Serif 4",Georgia,serif;color:var(--gold);font-size:15px;line-height:1.45}
+.fc-grade{display:flex;gap:10px;margin-bottom:14px}
+.fc-grade .abtn,.fc-grade .cta{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px}
+.fc-grade .fc-again{color:var(--bad)}
 .flash-controls{display:flex;align-items:center;gap:10px}
 .fbtn{flex:none;width:46px;height:46px;border-radius:50%;background:var(--surface);border:1px solid var(--hair);
   box-shadow:var(--shadow);color:var(--accent);display:grid;place-items:center}
@@ -748,109 +768,125 @@ body{font-size:17.5px;line-height:1.55}
 
 @keyframes wob{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 
-/* ================= play & learn: Word Rain ================= */
+/* ================= play & learn: Word Rush ================= */
 .game-intro{text-align:center;padding:6px 4px 8px}
-.gi-art{display:flex;justify-content:center;align-items:flex-start;gap:12px;height:104px;margin:0 auto 8px;overflow:hidden}
-.gi-art .ar{font-size:28px;padding:2px 14px;border-radius:16px;background:var(--glass);
-  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),0 14px 30px -18px var(--glass-drop);
-  animation:drift 3.2s ease-in-out infinite;white-space:nowrap}
-.gi-art .ar:nth-child(1){margin-top:6px}
-.gi-art .ar:nth-child(2){margin-top:38px;animation-delay:-1.1s;color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,transparent)}
-.gi-art .ar:nth-child(3){margin-top:14px;animation-delay:-2s}
-.gi-art .ar:empty{display:none}
-@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(9px)}}
+.ri-art{display:flex;flex-direction:column;align-items:center;gap:8px;margin:4px auto 14px;min-height:40px}
+.ri-pair{display:inline-flex;align-items:center;gap:8px;animation:pairUp 3.3s ease-in-out infinite}
+.ri-en,.ri-ar{border-radius:13px;background:var(--glass);border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 12px 26px -18px var(--glass-drop)}
+.ri-en{font-family:"Source Serif 4",Georgia,serif;font-size:15px;padding:6px 12px;color:var(--ink-2)}
+.ri-ar{font-size:24px;line-height:1.5;padding:0 13px;color:var(--gold);border-color:color-mix(in srgb,var(--gold) 38%,transparent)}
+.ri-link{width:24px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--gold))}
+@keyframes pairUp{0%,100%{transform:translateX(-5px);opacity:.75}50%{transform:translateX(5px);opacity:1}}
 .gi-kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent)}
 .gi-title{font-family:"Source Serif 4",Georgia,serif;font-size:38px;font-weight:600;margin:2px 0 6px;letter-spacing:-.01em}
 .gi-sub{font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.5;color:var(--ink-2);margin:0 auto 16px;max-width:30em;text-wrap:balance}
-.gi-rules{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:16px 0 4px}
+.gi-gold{color:var(--gold)!important}
+.gi-scope{max-width:420px;margin:0 auto 12px}
+.gi-scope button{font-size:13.5px}
+.gi-scope button:disabled{opacity:.4}
+.r-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:420px;margin:0 auto 12px}
+.r-modes button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px 8px;border-radius:14px;color:var(--muted);
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge);transition:.15s}
+.r-modes b{font-size:14.5px;color:var(--ink-2)}
+.r-modes span{font-size:11.5px}
+.r-modes button[aria-checked="true"]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent)}
+.r-modes button[aria-checked="true"] b{color:var(--accent)}
+.g-pass{max-width:420px;margin:0 auto 12px;text-align:left;padding:12px 14px;border-radius:16px;
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
+.g-pass .progress{display:block;height:7px;margin:7px 0 2px}
+.g-pass .progress i{background:linear-gradient(90deg,var(--accent),var(--gold))}
+.g-pass p{margin:6px 0 0;font-size:14px;color:var(--ink-2)}
+.g-pass b{color:var(--ink)}
+.gi-play{max-width:420px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:8px;font-size:18px;padding:15px;
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,var(--gold)))}
+.gi-play svg,.g-card .cta svg{width:18px;height:18px}
+.gi-best{font-size:14.5px;color:var(--muted);margin:14px 0 4px}
+.gi-best b{color:var(--gold);font-size:17px}
+.gi-rules{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
 .gi-rules span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);padding:6px 11px;border-radius:999px;
   background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
 .gi-rules b{color:var(--ink);font-weight:700}
-.gi-h{color:#E0475B!important;display:inline-flex}.gi-h svg{width:14px;height:14px}
-.gi-gold{color:var(--gold)!important}
-.gi-scope{max-width:380px;margin:0 auto 16px}
-.gi-scope button{font-size:13.5px}
-.gi-scope button:disabled{opacity:.4}
-.gi-play{max-width:380px;margin:0 auto;display:block;font-size:18px;padding:15px;
-  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,var(--gold)))}
-.gi-best{font-size:14.5px;color:var(--muted);margin:14px 0 4px}
-.gi-best b{color:var(--gold);font-size:17px}
-.gi-foot{font-size:12.5px;color:var(--faint);margin:8px auto 0;max-width:32em;line-height:1.5}
+.gi-foot{font-size:12.5px;color:var(--faint);margin:10px auto 0;max-width:32em;line-height:1.5}
+.linkbtn{display:block;margin:10px auto 0;font-size:14px;font-weight:600;color:var(--accent);padding:6px 10px}
 
 .game{position:relative}
-.game.shake{animation:wob .38s}
-.g-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.g-hud{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
-.g-score{display:flex;flex-direction:column;line-height:1}
-.g-score b{font-size:28px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.g-score b.bump{animation:bump .3s}
-.g-score span{font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-top:3px}
-@keyframes bump{50%{transform:scale(1.18)}}
-.g-combo{flex:1;text-align:center;font-weight:760;font-size:19px;color:var(--accent);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.g-combo small{font-size:12px;font-weight:600;color:var(--muted)}
-.g-combo.hot{color:var(--gold);text-shadow:0 0 14px color-mix(in srgb,var(--gold) 55%,transparent);animation:bump .35s}
-.g-lives{display:flex;gap:2px}
-.g-heart{display:inline-flex;color:#E0475B;animation:pulse 1.4s ease-in-out infinite}
-.g-heart svg{width:19px;height:19px}
-@keyframes pulse{50%{transform:scale(1.12)}}
-.g-icon{flex:none;width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);
+.game.shake .rush-board{animation:wob .38s}
+.rush-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rush-clock{position:relative;width:58px;height:58px;flex:none;display:grid;place-items:center}
+.rush-clock svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.rc-bg{fill:none;stroke:var(--sep);stroke-width:4.5}
+.rc-fg{fill:none;stroke:var(--accent);stroke-width:4.5;stroke-linecap:round;transition:stroke .2s}
+.rush-clock b{position:relative;font-size:17px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.rush-clock.low{animation:pulse .8s ease-in-out infinite}
+.rush-clock.low .rc-fg{stroke:var(--bad)}
+.rush-clock.low b{color:var(--bad)}
+.rush-clock.frozen .rc-fg{stroke:var(--gold)}
+.rush-clock.frozen b{color:var(--gold)}
+.rush-score{display:flex;flex-direction:column;line-height:1;min-width:0}
+.rush-score b{font-size:28px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.rush-score span{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-top:5px;white-space:nowrap}
+.rush-streak{flex:1;display:flex;flex-direction:column;align-items:center;line-height:1.15;color:var(--accent);min-width:0;text-align:center}
+.rush-streak b{font-size:21px;font-weight:780}
+.rush-streak small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rush-streak.hot{color:var(--gold)}
+.rush-streak.hot b{text-shadow:0 0 14px color-mix(in srgb,var(--gold) 55%,transparent)}
+.rush-streak.frenzy{color:var(--gold);flex-direction:row;gap:6px;align-items:center;justify-content:center}
+.rush-streak.frenzy svg{width:18px;height:18px;animation:pulse .5s ease-in-out infinite}
+.rush-streak.frenzy b{text-transform:uppercase;letter-spacing:.06em;font-size:17px}
+.g-icon{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);
   background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
 .g-icon svg{width:17px;height:17px}
-.g-prompt{text-align:center;padding:11px 16px 13px;border-radius:18px;margin-bottom:10px;
-  background:var(--glass-strong);border:1px solid var(--glass-border);
-  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
-  box-shadow:inset 0 1px 0 var(--glass-edge),0 16px 34px -22px var(--glass-drop)}
-.g-mean{font-family:"Source Serif 4",Georgia,serif;font-size:20px;font-weight:600;line-height:1.35;min-height:27px;text-wrap:balance}
-.g-mean.pop{animation:popin .32s cubic-bezier(.2,1.4,.4,1)}
-@keyframes popin{0%{opacity:0;transform:translateY(-6px) scale(.96)}100%{opacity:1;transform:none}}
-.g-arena{position:relative;height:clamp(380px,58vh,540px);border-radius:22px;overflow:hidden;touch-action:manipulation;
-  user-select:none;-webkit-user-select:none;
+.rush-board{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border-radius:22px;min-height:330px;
   background:
-    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb,var(--accent) 20%,transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb,var(--accent) 7%,transparent), color-mix(in srgb,var(--gold) 9%,transparent));
-  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 -30px 50px -40px var(--glass-drop)}
-.g-ground{position:absolute;left:0;right:0;bottom:0;height:5px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 45%,transparent),transparent);transition:background .2s}
-.g-arena.danger .g-ground{background:linear-gradient(90deg,transparent,var(--bad),transparent);box-shadow:0 0 22px var(--bad)}
-.g-drop{position:absolute;left:0;top:0;padding:3px 14px;border-radius:16px;color:var(--ink);will-change:transform;
-  background:var(--glass-strong);border:1px solid var(--glass-border);
-  box-shadow:inset 0 1px 0 var(--glass-edge),0 12px 26px -14px var(--glass-drop);cursor:pointer;
-  display:flex;flex-direction:column;align-items:center}
-.g-drop .ar{font-size:26px;line-height:1.5;white-space:normal;text-align:center;max-width:100%}
-.g-drop.long .ar{font-size:20px;line-height:1.55}
-.g-drop.gold{background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 34%,var(--surface)),color-mix(in srgb,var(--gold) 14%,var(--surface)));
-  border-color:color-mix(in srgb,var(--gold) 70%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent),0 0 26px color-mix(in srgb,var(--gold) 45%,transparent)}
-.g-drop.caught{animation:catch .3s forwards;pointer-events:none}
-@keyframes catch{to{opacity:0;scale:1.35}}
-.g-drop.fade{opacity:0;transition:opacity .35s;pointer-events:none}
-.g-drop.wrongtap{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);pointer-events:none}
-.g-drop.landed{border-color:var(--bad);background:var(--bad-soft);opacity:1!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--bad) 30%,transparent)}
-.g-gloss{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:12.5px;line-height:1.25;color:var(--ink-2);
-  max-width:150px;white-space:normal;text-align:center;padding-bottom:3px}
-.g-spark{position:absolute;width:7px;height:7px;border-radius:50%;pointer-events:none;
-  background:var(--accent);animation:spark .65s ease-out forwards}
-.g-spark.gold{background:var(--gold)}
-.g-spark.good:nth-child(3n){background:var(--good)}
-@keyframes spark{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2);opacity:0}}
-.g-float{position:absolute;transform:translateX(-50%);font-weight:800;font-size:20px;pointer-events:none;
-  color:var(--good);animation:rise .9s ease-out forwards;text-shadow:0 2px 10px var(--glass-drop)}
-.g-float.gold{color:var(--gold);font-size:24px}
-@keyframes rise{to{transform:translate(-50%,-56px);opacity:0}}
-.g-over{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:5;padding:16px}
+    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb,var(--accent) 18%,transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb,var(--accent) 6%,transparent), color-mix(in srgb,var(--gold) 8%,transparent));
+  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 -30px 50px -40px var(--glass-drop);
+  transition:box-shadow .3s,border-color .3s}
+.rt{position:relative;min-height:60px;border-radius:15px;padding:8px 12px;display:flex;align-items:center;justify-content:center;text-align:center;
+  color:var(--ink);background:var(--glass-strong);border:1.5px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-edge),0 8px 20px -14px var(--glass-drop);
+  transition:transform .12s,background .15s,border-color .15s;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.rt-t{font-family:"Source Serif 4",Georgia,serif;font-size:15.5px;line-height:1.3;text-wrap:balance}
+.rt .ar{font-size:25px;line-height:1.5}
+.rt:active{transform:scale(.96)}
+.rt.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.rt.hit{border-color:var(--good);background:var(--good-soft);color:var(--good);animation:hit .26s ease-out forwards}
+.rt.miss{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);animation:wob .4s}
+.rt.empty{background:transparent;border-style:dashed;border-color:var(--hair);box-shadow:none;transition:none}
+.rt.in{animation:tileIn .34s cubic-bezier(.2,1.3,.4,1)}
+.rt kbd{display:none;position:absolute;top:5px;left:8px;font:650 10px/1 -apple-system,BlinkMacSystemFont,sans-serif;color:var(--faint)}
+@media (hover:hover) and (pointer:fine){.rt kbd{display:block}}
+@keyframes hit{to{transform:scale(.88);opacity:.1}}
+@keyframes tileIn{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.game.frenzy .rush-board{border-color:color-mix(in srgb,var(--gold) 70%,transparent);animation:glow 1s ease-in-out infinite alternate}
+.game.frenzy .rt:not(.empty){border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
+@keyframes glow{
+  from{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent),0 0 30px color-mix(in srgb,var(--gold) 30%,transparent)}
+  to{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 50%,transparent),0 0 60px color-mix(in srgb,var(--gold) 55%,transparent)}}
+@keyframes bump{50%{transform:scale(1.18)}}
+@keyframes pulse{50%{transform:scale(1.08)}}
+
+/* overlays on the board: countdown, banners, pause */
+.g-over{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:5;padding:16px;border-radius:22px}
 .g-over.show{display:flex}
 .g-over.count,.g-over.banner{pointer-events:none}
-.g-over.final,.g-over.show:not(.count):not(.banner){background:color-mix(in srgb,var(--ground) 55%,transparent);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);overflow-y:auto;align-items:flex-start}
-.g-count{font-family:"Source Serif 4",Georgia,serif;font-size:96px;font-weight:700;color:var(--accent);animation:countin .62s ease-out}
+.g-over.show:not(.count):not(.banner){background:color-mix(in srgb,var(--ground) 60%,transparent);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.g-count{font-family:"Source Serif 4",Georgia,serif;font-size:96px;font-weight:700;color:var(--accent);animation:countin .6s ease-out}
 @keyframes countin{0%{transform:scale(1.8);opacity:0}40%{opacity:1}100%{transform:scale(.9);opacity:.15}}
 .g-banner{text-align:center;padding:14px 26px;border-radius:20px;background:var(--glass-strong);border:1px solid var(--glass-border);
   box-shadow:inset 0 1px 0 var(--glass-edge),0 20px 40px -18px var(--glass-drop);animation:popin .4s cubic-bezier(.2,1.4,.4,1)}
 .g-banner b{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:32px;color:var(--gold)}
 .g-banner span{font-size:13px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+@keyframes popin{0%{opacity:0;transform:translateY(-6px) scale(.96)}100%{opacity:1;transform:none}}
 .g-card{width:100%;max-width:420px;margin:auto;text-align:center;padding:20px 16px 16px;border-radius:22px;
   background:var(--glass-strong);border:1px solid var(--glass-border);
   box-shadow:inset 0 1px 0 var(--glass-edge),0 24px 50px -20px var(--glass-drop);display:flex;flex-direction:column;gap:10px}
+.g-card .cta{display:flex;align-items:center;justify-content:center;gap:8px}
 .g-card .group{text-align:left;margin:0}
 .g-card .grouplabel{text-align:left;margin:6px 0 -2px}
+.rush-result{max-width:none;animation:popin .4s cubic-bezier(.2,1.4,.4,1)}
 .go-title{font-size:13px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted)}
 .g-new{font-size:14px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--gold);animation:bump .6s 2}
 .go-score{font-family:"Source Serif 4",Georgia,serif;font-size:58px;font-weight:700;line-height:1;letter-spacing:-.02em}
@@ -858,6 +894,19 @@ body{font-size:17.5px;line-height:1.55}
 .go-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0}
 .go-stats span{display:flex;flex-direction:column;font-size:11.5px;color:var(--muted);padding:8px 2px;border-radius:12px;background:var(--glass-quiet)}
 .go-stats b{font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
+.go-line{font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.45;color:var(--ink-2);margin:0}
+.go-line b{color:var(--ink)}
+.g-spark{position:absolute;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:4;
+  background:var(--good);animation:spark .65s ease-out forwards}
+.g-spark.gold{background:var(--gold)}
+.g-spark:nth-child(3n){background:var(--accent)}
+@keyframes spark{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2);opacity:0}}
+.g-float{position:absolute;transform:translateX(-50%);font-weight:800;font-size:19px;pointer-events:none;z-index:4;white-space:nowrap;
+  color:var(--good);animation:rise .9s ease-out forwards;text-shadow:0 2px 10px var(--glass-drop)}
+.g-float.gold{color:var(--gold);font-size:23px}
+.g-float.bad{color:var(--bad)}
+@keyframes rise{to{transform:translate(-50%,-52px);opacity:0}}
+@media (max-width:380px){ .rt .ar{font-size:22px} .rt-t{font-size:14.5px} .rush-score b{font-size:24px} }
 
 /* ================= the verse once, word by word ================= */
 .wbw.solo{border-top:0;margin-top:0;padding-top:0}
@@ -925,48 +974,94 @@ body{font-size:17.5px;line-height:1.55}
   .sf-ar{font-size:21px}
 }
 
-/* ================= word rain: speed, passes, mistakes ================= */
-.gi-speed{max-width:420px;margin:0 auto 14px}
-.gi-speed .dlabel{margin-bottom:6px}
-.g-speeds{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
-.g-speeds button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px 7px;border-radius:12px;
-  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge);color:var(--muted);transition:.15s}
-.g-speeds button span{font-size:12px;font-weight:620}
-.g-speeds i{display:flex;gap:2px;align-items:flex-end;height:12px}
-.g-speeds i b{width:4px;border-radius:2px;background:currentColor;opacity:.55}
-.g-speeds i b:nth-child(1){height:4px}.g-speeds i b:nth-child(2){height:6px}.g-speeds i b:nth-child(3){height:8px}
-.g-speeds i b:nth-child(4){height:10px}.g-speeds i b:nth-child(5){height:12px}
-.g-speeds button[aria-checked="true"]{color:var(--accent);background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
-.g-speeds button[aria-checked="true"] i b{opacity:1}
-.g-pass{max-width:420px;margin:0 auto 12px;text-align:left;padding:12px 14px;border-radius:16px;
+/* ================= home: carry on, totals, the two juz ================= */
+.home-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.home-title .ar{font-size:34px;font-weight:400;color:var(--gold);line-height:1.2}
+.resume{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:20px;margin:0 0 12px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 15%,var(--glass)),color-mix(in srgb,var(--gold) 12%,var(--glass)));
+  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge),0 18px 40px -22px var(--glass-drop);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);transition:transform .16s cubic-bezier(.2,.8,.3,1)}
+.resume:active{transform:scale(.985)}
+.resume-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.resume-k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.resume-name{font-family:"Source Serif 4",Georgia,serif;font-size:20px;font-weight:600}
+.resume-sub{font-size:13.5px;color:var(--muted)}
+.resume-ar{font-size:30px;color:var(--gold);flex:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 26px}
+.stat{display:flex;flex-direction:column;align-items:center;padding:10px 4px;border-radius:16px;font-size:12px;color:var(--muted);letter-spacing:.03em;
+  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+.stat b{font-size:21px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+button.stat b{color:var(--gold)}
+.stat.warn b{color:var(--bad)}
+.list-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 6px}
+.list-head .grouplabel{margin:0 0 0 4px}
+.orderbtn{font-size:12.5px;font-weight:650;color:var(--accent);padding:5px 11px;border-radius:999px;font-variant-numeric:tabular-nums;
   background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
-.g-pass .progress{display:block;height:7px;margin:7px 0 2px}
-.g-pass .progress i{background:linear-gradient(90deg,var(--accent),var(--gold))}
-.g-pass p{margin:6px 0 0;font-size:14px;color:var(--ink-2)}
-.g-pass b{color:var(--ink)}
-.g-pass.mist{background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 30%,transparent)}
-.g-pass.mist .dlabel{color:var(--bad)}
-.g-pass.done{background:var(--good-soft);border-color:color-mix(in srgb,var(--good) 28%,transparent)}
-.g-pass.done .dlabel{color:var(--good)}
-.cta.mist,.gi-play.mist{background:linear-gradient(135deg,var(--bad),color-mix(in srgb,var(--bad) 55%,var(--gold)))}
-.linkbtn{display:block;margin:10px auto 0;font-size:14px;font-weight:600;color:var(--accent);padding:6px 10px}
-.g-spd{flex:none;height:38px;display:inline-flex;align-items:center;gap:6px;padding:0 11px;border-radius:19px;color:var(--ink-2);
-  background:var(--glass);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-edge)}
-.g-spd-dots{display:flex;gap:2px;align-items:flex-end;height:12px}
-.g-spd-dots b{width:3.5px;border-radius:2px;background:currentColor;opacity:.25}
-.g-spd-dots b:nth-child(1){height:4px}.g-spd-dots b:nth-child(2){height:6px}.g-spd-dots b:nth-child(3){height:8px}
-.g-spd-dots b:nth-child(4){height:10px}.g-spd-dots b:nth-child(5){height:12px}
-.g-spd-dots b.on{opacity:1;color:var(--accent)}
-.g-spd-name{font-size:12.5px;font-weight:650}
-.g-prog{display:flex;align-items:center;gap:10px;margin-top:8px}
-.g-prog .progress{height:5px}
-.g-prog .progress i{background:linear-gradient(90deg,var(--accent),var(--gold))}
-.g-prog span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.game.mist .g-prompt{border-color:color-mix(in srgb,var(--bad) 35%,transparent)}
-.game.mist .g-prompt .dlabel{color:var(--bad)}
-.go-line{font-family:"Source Serif 4",Georgia,serif;font-size:16.5px;line-height:1.45;color:var(--ink-2)}
-.go-line b{color:var(--ink)}
-@media (max-width:420px){ .g-spd-name{display:none} .g-spd{padding:0 10px} }
+.juz-head{display:flex;align-items:baseline;justify-content:space-between;margin:20px 4px 8px}
+.juz-head:first-child{margin-top:8px}
+.juz-head .grouplabel{margin:0;color:var(--muted)}
+.juz-ar{font-size:19px;color:var(--faint)}
+.surah-sub{white-space:normal;overflow:visible}
+.surah-meta{display:block;font-size:12.5px;color:var(--faint);margin-top:2px}
+.surah-meta b{color:var(--good);font-weight:650}
+.mini-prog{display:block;height:4px;border-radius:2px;background:var(--sep);overflow:hidden;margin-top:7px}
+.mini-prog i{display:block;height:100%;border-radius:2px;background:linear-gradient(90deg,var(--good),var(--gold));transition:width .4s}
+.empty .empty-tip{font-size:14px;color:var(--faint);margin:10px auto 0;max-width:30em;line-height:1.5}
+
+/* ================= the surah: progress, a mode bar that stays in reach ================= */
+.hero-prog{display:flex;align-items:center;gap:10px;margin-top:14px}
+.hero-prog .mini-prog{flex:1;margin:0;height:5px}
+.hp-t{font-size:13px;color:var(--muted);white-space:nowrap}
+.hp-t b{color:var(--ink-2)}
+.hp-t .hp-b{color:var(--bad)}
+.segmented.five{position:sticky;top:58px;z-index:30;background:var(--glass-strong)}
+
+/* the word an entry teaches, lit inside its phrase */
+.fx{color:var(--gold)}
+.wordrow .wr-ar .fx{text-shadow:0 0 18px color-mix(in srgb,var(--gold) 22%,transparent)}
+.wr-ok{flex:none;align-self:center;font-size:13px;font-weight:800;color:var(--good)}
+
+/* ================= the word card ================= */
+.sheet-head{justify-content:space-between;gap:8px;padding:6px 12px 2px}
+.sheet-nav{display:flex;align-items:center;gap:6px;min-width:0}
+.sheet-nav:empty{display:none}
+.navbtn{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;color:var(--accent);background:var(--surface-2)}
+.navbtn svg{width:9px;height:15px}
+.navbtn:disabled{color:var(--faint);opacity:.45}
+.sheet-pos{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sheet .word-hero{padding-top:10px}
+.sheet .hero-hint{margin-top:4px}
+.word-hero .ar.hero-word.m{font-size:42px}
+.word-hero .ar.hero-word.s{font-size:33px;line-height:1.8}
+.word-hero .ar.hero-word.xs{font-size:27px;line-height:1.9}
+.hero-gl{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px}
+.hero-g{display:inline-flex;align-items:baseline;gap:7px;color:var(--ink-2);font-size:13px;letter-spacing:0}
+.word-hero .hero-g .ar{font-size:18px;color:var(--gold);line-height:1.3}
+.pill.pill-ok{color:var(--good)}
+.pill.pill-warn{color:var(--bad)}
+
+/* ================= the quiz, word first ================= */
+.quiz-q .ar.q-word{font-size:46px;line-height:1.6}
+.quiz-q .ar.q-word.m{font-size:36px}
+.quiz-q .ar.q-word.s{font-size:29px;line-height:1.85}
+.quiz-q .ar.q-word.xs{font-size:24px;line-height:1.9}
+.q-ctx{margin-top:14px;padding-top:12px;border-top:1px solid var(--hair);display:flex;flex-direction:column;gap:2px}
+.q-ctx .dlabel{margin:0}
+.quiz-q .q-ctx .ar{font-size:22px;line-height:1.9;color:var(--ink-2)}
+.keepsake .fb-ar{font-size:25px;line-height:1.8;margin-bottom:4px}
+.keepsake .fb-line{font-size:15px;color:var(--ink-2);margin-bottom:8px}
+.fb-line b.ar{font-size:20px;color:var(--gold);font-weight:400}
+
+/* keyboard hints, only where there is a keyboard */
+.kbd,.kbd-help{display:none}
+@media (hover:hover) and (pointer:fine){
+  .kbd{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:6px;flex:none;
+    font:650 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-style:normal;
+    color:var(--faint);border:1px solid var(--sep);background:var(--surface-2)}
+  .kbd.on-dark{color:inherit;opacity:.7;background:transparent;border-color:currentColor;margin-left:6px}
+  .kbd-help{display:block;text-align:center;font-size:12.5px;color:var(--faint);margin:12px 0 0}
+}
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
@@ -983,7 +1078,7 @@ body{font-size:17.5px;line-height:1.55}
       <span class="nav-slot right"><button class="iconbtn" id="themeBtn" aria-label="Switch light or dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M18.4 5.6l-1.1 1.1M6.7 17.3l-1.1 1.1"/><circle cx="12" cy="12" r="4"/></svg></button></span>
     </div>
     <div class="wrap">
-      <h1 class="large-title">Kalimah</h1>
+      <h1 class="large-title home-title">Kalimah <span class="ar" lang="ar">كَلِمَة</span></h1>
       <p class="deck" id="homeDeck"></p>
       <div class="searchbar" id="homeSearchWrap">
         <svg class="mag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -992,13 +1087,15 @@ body{font-size:17.5px;line-height:1.55}
       </div>
       <div id="homeResults" hidden></div>
       <div id="homeBrowse">
-        <p class="grouplabel">Surahs</p>
+        <div id="homeTop"></div>
+        <div class="list-head"><p class="grouplabel">Surahs</p><button class="orderbtn" id="orderBtn"></button></div>
         <div id="surahList"></div>
         <p class="grouplabel" style="margin-top:26px">How to use this</p>
         <div class="group">
-          <div class="row" style="display:block"><div class="dlabel">Tap a word</div><div class="dval">The Words tab walks the surah verse by verse, with the taught words lit in gold. Every entry opens a card with its root, what it means here, the grammar, and why this exact word was chosen &mdash; and every verb comes with its full &#7779;arf &#7779;agh&#299;r, from past tense to the noun of instrument.</div></div>
+          <div class="row" style="display:block"><div class="dlabel">Tap a word</div><div class="dval">The Words tab walks the surah verse by verse, with the taught words lit in gold. Every entry opens a card with its root, what it means here, the grammar, and why this exact word was chosen &mdash; and every verb comes with its full &#7779;arf &#7779;agh&#299;r, from past tense to the noun of instrument. On a card, the arrows step to the next word; pull the card down to close it.</div></div>
           <div class="row" style="display:block"><div class="dlabel">Star what you want back</div><div class="dval">Saved words gather in the Saved tab and stay in this browser.</div></div>
-          <div class="row" style="display:block"><div class="dlabel">Then test it</div><div class="dval">Each surah has flashcards, a quiz that walks through every word ten at a time and keeps a basket of your mistakes, and Play &amp; Learn &mdash; a game that drops every word once at the speed you choose, then replays only the ones you missed.</div></div>
+          <div class="row" style="display:block"><div class="dlabel">Then test it</div><div class="dval">Each surah has flashcards you grade yourself, a quiz that walks through every word ten at a time and keeps a basket of your mistakes, and Word Rush &mdash; a race against the clock to pair each word with its meaning. Every word you get right counts toward the surah&rsquo;s &ldquo;learned&rdquo; bar.</div></div>
+          <div class="row" style="display:block"><div class="dlabel">Share anything</div><div class="dval">Every surah, mode and word card has its own link, and your phone&rsquo;s Back button steps back through them.</div></div>
         </div>
         <p class="footnote">Transliteration follows a light academic scheme. Meanings are study glosses, not a translation of the Qur&rsquo;an.</p>
       </div>
@@ -1045,7 +1142,7 @@ body{font-size:17.5px;line-height:1.55}
   </section>
 </div>
 
-<nav class="tabbar" role="tablist" aria-label="Sections">
+<nav class="tabbar" id="tabbar" role="tablist" aria-label="Sections">
   <div class="tabbar-inner">
     <button class="tab" role="tab" data-tab="home" aria-selected="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 015.5 4H10a2 2 0 012 2v13a2 2 0 00-2-2H5.5A1.5 1.5 0 014 15.5z"/><path d="M20 5.5A1.5 1.5 0 0018.5 4H14a2 2 0 00-2 2v13a2 2 0 012-2h4.5a1.5 1.5 0 001.5-1.5z"/></svg>
@@ -1063,17 +1160,17 @@ body{font-size:17.5px;line-height:1.55}
 </nav>
 
 <div class="scrim" id="scrim"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Word detail">
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Word detail" inert aria-hidden="true">
   <div class="grabber"></div>
-  <div class="sheet-head"><button class="closebtn" id="sheetClose" aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M1 1l12 12M13 1L1 13"/></svg></button></div>
+  <div class="sheet-head"><div class="sheet-nav" id="sheetNav"></div><button class="closebtn" id="sheetClose" aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M1 1l12 12M13 1L1 13"/></svg></button></div>
   <div class="sheet-scroll" id="sheetBody"></div>
 </div>
 
 
-<script src="data/verses.js?v=26"></script>
-<script src="data/morph.js?v=26"></script>
-<script src="data/surahs.js?v=26"></script>
-<script src="data/sarf.js?v=26"></script>
+<script src="data/verses.js?v=89c91d12"></script>
+<script src="data/morph.js?v=34a59a77"></script>
+<script src="data/surahs.js?v=8d0b85df"></script>
+<script src="data/sarf.js?v=e31718f7"></script>
 <script>
 
 /* ===================== helpers ===================== */
@@ -1082,49 +1179,472 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const CHEV = '<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>';
 const STAR = '<svg class="wr-star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>';
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
-/* every word gets a stable id: surah number + index */
-const ALL = [];
-SURAHS.forEach(s => s.words.forEach((w, i) => {
-  w.id = s.num + "-" + i; w.surah = s.num; w.surahName = s.name; ALL.push(w);
-}));
+const HAVE_VERSES = typeof VERSES !== "undefined" && VERSES;
+const HAVE_MORPH  = typeof MORPH  !== "undefined" && MORPH;
+const HAVE_SARF   = typeof SARF   !== "undefined" && SARF;
 
-/* saved words, per browser */
+/* ===================== matching Arabic ===================== */
+
+/* "1" · "1–2" · "17 · 37" · "19 · 26, 45"  ->  [1] · [1,2] · [17,37] · [19,26,45] */
+function verseNums(v){
+  const out = [], re = /(\d+)\s*[–—-]\s*(\d+)|(\d+)/g;
+  let m;
+  while ((m = re.exec(String(v || "")))){
+    if (m[1]){
+      let a = +m[1], b = +m[2];
+      if (b < a){ const t = a; a = b; b = t; }
+      if (b - a > 12) b = a;                     // a stray number, not a range
+      for (let i = a; i <= b; i++) out.push(i);
+    } else out.push(+m[3]);
+  }
+  return out.filter((n, i) => out.indexOf(n) === i);
+}
+
+/* strip harakat and flatten the letters that vary between scripts, so the
+   guide's spelling can be matched against the Uthmani text */
+function skeleton(s){
+  return String(s || "")
+    .replace(/ىٰ/g, "ا")   // alef maqsura + dagger alef = one long ā
+    .replace(/ٰ/g, "ا")          // dagger alef on its own = long ā
+    .replace(/[ً-ٟۖ-ۭـٓ-ٕ]/g, "")  // marks, tatweel
+    .replace(/[آأإٱؤ]/g, "ا")            // hamza carriers -> alef
+    .replace(/ئ/g, "ي")          // hamza on ya -> ya
+    .replace(/ء/g, "")                // bare hamza
+    .replace(/ة/g, "ه")          // ta marbuta -> ha
+    .replace(/[^؀-ۿ]/g, "")
+    .replace(/[اىي]+$/, "ا")   // whatever long vowel ends the word
+    .replace(/ى/g, "ي");         // any alef maqsura left inside
+}
+const squeeze = t => t.replace(/(.)\1/g, "$1");   // a shadda doubles a letter in one text, not the other
+
+/* the verse carries prefixes the vocabulary entry doesn't: wa-, li-, al- ... */
+function variants(t){
+  const out = [t];
+  const withoutArticle = t.replace(/^(?:و|ف)?(?:ب|ك|ل)?ال/, "");
+  if (withoutArticle !== t && withoutArticle.length >= 4) out.push(withoutArticle);
+  const withoutPrefix = t.replace(/^[وفبكل]/, "");
+  if (withoutPrefix !== t && withoutPrefix.length >= 4) out.push(withoutPrefix);
+  return out;
+}
+/* The tokens an entry is matched by. Normally only words of three letters or
+   more are usable — a two-letter particle would light up half the verse. But
+   an entry made ENTIRELY of short words (qul · qul huwa) would then have
+   nothing to match on at all and would silently lose its verse link, so for
+   those we keep the short skeletons and demand an exact match instead. */
+function matchTokens(ar){
+  const parts = String(ar || "").split(/\s+/).map(skeleton).filter(Boolean);
+  const long  = [].concat.apply([], parts.filter(t => t.length >= 3).map(variants));
+  if (long.length) return long;
+  const short = parts.slice();
+  short.exact = true;
+  return short;
+}
+function sameWord(verseWord, entryTokens){
+  const a = skeleton(verseWord), a2 = squeeze(a);
+  if (entryTokens && entryTokens.exact) return entryTokens.indexOf(a) >= 0;
+  if (a.length < 3) return false;
+  return entryTokens.some(b => {
+    const b2 = squeeze(b);
+    return (b.length  >= 3 && (a.indexOf(b)   >= 0 || b.indexOf(a)   >= 0)) ||
+           (b2.length >= 3 && (a2.indexOf(b2) >= 0 || b2.indexOf(a2) >= 0));
+  });
+}
+
+/* ===================== every word, with an id that lasts =====================
+   A word's id is its surah, its first verse and its letters — "96:1:اقرا" —
+   so adding, removing or reordering words in a guide never moves a star, a
+   mistake or a quiz pass onto a different word. (Ids used to be the word's
+   position in the guide; old ones are carried across once, below.)          */
+const ALL = [], BYID = new Map(), OLD_ID = {};
+SURAHS.forEach(s => {
+  const taken = {};
+  s.words.forEach((w, i) => {
+    let id = s.num + ":" + (verseNums(w.v)[0] || 0) + ":" + (skeleton(w.ar) || "w" + i);
+    taken[id] = (taken[id] || 0) + 1;
+    if (taken[id] > 1) id += "~" + taken[id];
+    w.id = id; w.surah = s.num; w.surahName = s.name; w.idx = i;
+    ALL.push(w); BYID.set(id, w); OLD_ID[s.num + "-" + i] = id;
+  });
+});
+const byId = id => BYID.get(id);
+const surahOf = n => SURAHS.find(s => s.num === +n);
+
+/* ===================== what this browser remembers ===================== */
 let saved = new Set();
 try { saved = new Set(JSON.parse(localStorage.getItem("kalimah.saved") || "[]")); } catch (e) {}
 function persist(){ try { localStorage.setItem("kalimah.saved", JSON.stringify([...saved])); } catch (e) {} }
-const byId = id => ALL.find(w => w.id === id);
+
+/* quiz passes, the mistakes basket, the words you know, Word Rush */
+const QM_KEY = "kalimah.quiz.v1";
+let QM = { cycle:{}, basket:{}, known:{}, rush:{}, mute:false };
+try {
+  const raw = JSON.parse(localStorage.getItem(QM_KEY) || "null");
+  if (raw && typeof raw === "object") QM = Object.assign(QM, raw);
+} catch (e) {}
+["cycle", "basket", "known", "rush"].forEach(k => { if (!QM[k] || typeof QM[k] !== "object") QM[k] = {}; });
+function qmSave(){ try { localStorage.setItem(QM_KEY, JSON.stringify(QM)); } catch (e) {} }
+
+(function migrateIds(){
+  let done = null;
+  try { done = localStorage.getItem("kalimah.ids"); } catch (e) {}
+  if (done === "2") return;
+  const fix = list => (Array.isArray(list) ? list : [])
+    .map(id => /^\d+-\d+$/.test(id) ? OLD_ID[id] : id).filter(id => id && BYID.has(id));
+  saved = new Set(fix([...saved]));
+  Object.keys(QM.cycle).forEach(k => QM.cycle[k] = fix(QM.cycle[k]));
+  Object.keys(QM.basket).forEach(k => QM.basket[k] = fix(QM.basket[k]));
+  delete QM.game; delete QM.speed; delete QM.best;     // Word Rain's places and scores — that game is gone
+  persist(); qmSave();
+  try { localStorage.setItem("kalimah.ids", "2"); } catch (e) {}
+})();
+
 function toggleSaved(id){
   const on = !saved.has(id);
   on ? saved.add(id) : saved.delete(id);
   persist();
   refreshStars();
-  if (document.querySelector("#scr-saved.active")) renderSaved();
+  if (route.base === "/saved") renderSaved();
   return on;
 }
+function basketIds(n){ return (QM.basket[n] || []).filter(id => byId(id)); }
+const inBasket = w => (QM.basket[w.surah] || []).indexOf(w.id) >= 0;
+function toBasket(w){
+  if (!w) return;
+  const b = QM.basket[w.surah] || (QM.basket[w.surah] = []);
+  if (b.indexOf(w.id) < 0){ b.push(w.id); qmSave(); }
+}
+function outOfBasket(w){
+  const b = w && QM.basket[w.surah];
+  if (!b) return;
+  const i = b.indexOf(w.id);
+  if (i >= 0){ b.splice(i, 1); qmSave(); }
+}
+/* a word is learned once you have got it right, and stays learned while it
+   isn't sitting in the mistakes basket */
+function markKnown(w){ if (w && !QM.known[w.id]){ QM.known[w.id] = 1; qmSave(); } }
+const isLearned = w => !!QM.known[w.id] && !inBasket(w);
+const learnedIn = s => s.words.filter(isLearned).length;
 
+/* ===================== the word being taught =====================
+   Most entries are a phrase — often the whole verse — but each is really
+   about one or two of its words. The guide gives them away: they are the
+   words its notes keep naming ("ṢAR-ṢAR — the word HOWLS"), the root it
+   spells out (√q-r-r), the headword its root line opens with. Every word
+   of the phrase is lined up against the verse, scored by how often the
+   notes talk about it, and the winners become the words the games and the
+   quiz test — each with its own meaning from the word-by-word. A phrase
+   the guide teaches as one unit (kulū wa'shrabū, mā lakum) stays whole,
+   and so does a short phrase that no single word stands out in.            */
+const FOCUS = new Map();
+
+function lat(s){
+  return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/kh/g, "x").replace(/sh/g, "$").replace(/th/g, "8").replace(/dh/g, "9").replace(/gh/g, "g")
+    .replace(/[^a-z$89]/g, "").replace(/(.)\1+/g, "$1");
+}
+/* the shapes a transliterated word can be compared in: with and without
+   wa-/fa-, bi-/li-, the article (also when it has melted into the letter, aṣ-ṣ…)
+   and the case ending */
+const LATFORMS = new Map();
+function latForms(s){
+  s = String(s || "");
+  if (LATFORMS.has(s)) return LATFORMS.get(s);
+  const out = new Set(), x = lat(s);
+  const add = t => { if (t.length >= 3) out.add(t); const e = t.replace(/(?:un|in|an|u|i|a)$/, ""); if (e.length >= 3) out.add(e); };
+  add(x);
+  const y = x.replace(/^(?:wa|fa)/, ""); add(y);
+  [y, x].forEach(t => {
+    add(t.replace(/^(?:bi|li|la|ka)/, ""));
+    add(t.replace(/^(?:bi|li|la|ka)?(?:al|l)/, ""));
+    add(t.replace(/^a(?=[tdrzsn$89])/, ""));
+  });
+  const v = [...out];
+  LATFORMS.set(s, v);
+  return v;
+}
+function latLike(a, b){
+  if (a.length > b.length){ const t = a; a = b; b = t; }
+  return a.length >= 3 && a.length >= b.length * 0.6 && b.startsWith(a.slice(0, Math.max(3, a.length - 1)));
+}
+function sameLat(x, y){ const X = latForms(x), Y = latForms(y); return X.some(a => Y.some(b => latLike(a, b))); }
+const AR2LAT = {"ب":"b","ت":"t","ث":"8","ج":"j","ح":"h","خ":"x","د":"d","ذ":"9","ر":"r","ز":"z","س":"s","ش":"$","ص":"s",
+                "ض":"d","ط":"t","ظ":"z","غ":"g","ف":"f","ق":"q","ك":"k","ل":"l","م":"m","ن":"n","ه":"h","و":"w","ي":"y"};
+const rootLat = r => String(r || "").split(/\s+/).map(c => AR2LAT[c] || "").join("").replace(/(.)\1+/g, "$1");
+const CONS = new Map();
+const consOf = t => { if (!CONS.has(t)) CONS.set(t, lat(t).replace(/[aeiou]/g, "").replace(/(.)\1+/g, "$1")); return CONS.get(t); };
+/* a root written out in the notes: "√q-r-r", "ʿ-b-d", "l-w-m" */
+function notedRoots(text){
+  const out = [], L = "[A-Za-zʿʾ'\\u0100-\\u024F\\u1E00-\\u1EFF]{1,2}";
+  String(text || "").replace(new RegExp("(" + L + ")-(" + L + ")-(" + L + ")(?![A-Za-z])", "g"),
+    (_, a, b, c) => { out.push((lat(a) + lat(b) + lat(c)).replace(/(.)\1+/g, "$1")); return _; });
+  return out;
+}
+const wordsOf = t => String(t || "").split(/[\s,.;:!?()\[\]"“”‘’…\/=+→←—–]+/).filter(Boolean);
+const isCaps = s => { const L = s.replace(/[^A-Za-zÀ-ɏḀ-ỿ]/g, ""); return L.length >= 3 && L === L.toUpperCase(); };
+const cleanGloss = g => String(g || "").replace(/[()\[\]]/g, "").replace(/\s+/g, " ").trim();
+
+/* line the entry's words up against its verse(s), LCS-style, so a word
+   that occurs twice lands on the right occurrence */
+function alignEntry(et, w){
+  const book = HAVE_VERSES && VERSES[w.surah];
+  if (!book) return null;
+  const vw = [];
+  verseNums(w.v).forEach(n => { const v = book[n]; if (v) v.w.forEach((x, i) => vw.push({ n: n, i: i, x: x })); });
+  if (!vw.length) return null;
+  const loose = t => squeeze(t.replace(/^ال/, "").replace(/[اوي]/g, ""));
+  const eq = (e, v) => {
+    const a = skeleton(e), b = skeleton(v);
+    if (!a || !b) return false;
+    if (a === b || squeeze(a) === squeeze(b)) return true;
+    if (a.length < 3 || b.length < 3) return false;
+    if (sameWord(v, matchTokens(e))) return true;
+    return loose(a).length >= 3 && loose(a) === loose(b);   // spellings that differ only in long vowels and hamza seats
+  };
+  const E = et.length, V = vw.length, dp = [];
+  for (let i = 0; i <= E; i++) dp.push(new Array(V + 1).fill(0));
+  for (let i = E - 1; i >= 0; i--) for (let j = V - 1; j >= 0; j--)
+    dp[i][j] = eq(et[i], vw[j].x[0]) ? 1 + dp[i + 1][j + 1] : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const map = new Array(E).fill(null);
+  let i = 0, j = 0;
+  while (i < E && j < V){
+    if (eq(et[i], vw[j].x[0]) && dp[i][j] === 1 + dp[i + 1][j + 1]){ map[i] = vw[j]; i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++;
+  }
+  return map;
+}
+
+const FOCUS_WEIGHT = { head: 3, root: 1, note: 3, why: 2, magic: 2, grammar: 1.5 };
+function focusOf(w){
+  if (FOCUS.has(w.id)) return FOCUS.get(w.id);
+  const orig = String(w.ar).trim().split(/\s+/);
+  const keep = [];                                   // entry word -> its place in the original text
+  orig.forEach((t, i) => { if (skeleton(t)) keep.push(i); });
+  const et = keep.map(i => orig[i]);
+  const map = alignEntry(et, w);
+  const rows = et.map((t, k) => {
+    const vw = map && map[k];
+    const m = vw && HAVE_MORPH ? ((MORPH[w.surah] || {})[vw.n] || [])[vw.i] : null;
+    return { k: k, t: t, vw: vw, m: m, tr: vw ? vw.x[2] : "",
+             rl: m ? rootLat(m.r) : "", score: 0,
+             /* a word with a root, a name, or a rootless noun of three letters or more — never a bare مَنْ or مَا */
+             content: !!(m && (m.r || /Proper noun/.test(m.k) || (/^Noun|Adjective|Verb/.test(m.k) && skeleton(t).length >= 3))) };
+  });
+
+  /* "a / b / c" lists separate words, each one taught */
+  let spans = null;
+  if (orig.indexOf("/") >= 0){
+    spans = []; let a = 0;
+    orig.concat("/").forEach((t, i) => {
+      if (t !== "/") return;
+      const ks = keep.map((o, k) => o >= a && o < i ? k : -1).filter(k => k >= 0);
+      if (ks.length) spans.push([ks[0], ks[ks.length - 1]]);
+      a = i + 1;
+    });
+  }
+
+  const root = String(w.root || ""), heads = [];
+  root.replace(/(?:^|[.;]\s+)([^—–.;(=:]{1,40}?)\s+[—–]/g, (_, h) => { heads.push(h); return _; });
+  if (!spans && et.length > 1){
+    const fields = { head: heads.join(" "), root: root, note: w.note, why: w.why, magic: w.magic, grammar: w.grammar };
+    const noted = notedRoots(root + " " + (w.rk || "") + " " + w.note + " " + w.why + " " + w.grammar);
+    rows.forEach(r => {
+      if (!r.content || !r.tr) return;
+      for (const f in fields) wordsOf(fields[f]).forEach(fw => {
+        const parts = fw.indexOf("-") > 0 ? [fw].concat(fw.split("-")) : [fw];
+        if (parts.some(p => sameLat(p, r.tr))) r.score += FOCUS_WEIGHT[f] * (isCaps(fw) ? 1.5 : 1);
+        else if (r.rl.length >= 3 && consOf(fw).indexOf(r.rl) >= 0) r.score += FOCUS_WEIGHT[f] * 0.5;   // the root verb named in the notes
+      });
+      if (r.rl.length >= 2 && noted.indexOf(r.rl) >= 0) r.score += 3;
+    });
+    /* a multi-word headword that lands on neighbouring words is one unit */
+    let unit = null;
+    heads.forEach(h => {
+      const hw = wordsOf(h);
+      if (hw.length < 2 || unit) return;
+      const ks = hw.map(x => rows.findIndex(r => r.tr && (sameLat(x, r.tr) ||
+        (lat(x).length <= 3 && lat(r.tr).replace(/^(?:wa|fa)/, "") === lat(x)))));
+      if (ks.every(k => k >= 0) && ks.every((k, i) => !i || k === ks[i - 1] + 1)) unit = [ks[0], ks[ks.length - 1]];
+    });
+    const best = Math.max(0, ...rows.map(r => r.score));
+    if (unit) spans = [unit];
+    else if (best > 0) spans = rows.filter(r => r.score >= best * 0.5).sort((a, b) => b.score - a.score).slice(0, 3)
+                                   .sort((a, b) => a.k - b.k).map(r => [r.k, r.k]);
+    else {
+      const c = rows.filter(r => r.content);
+      if (c.length === 1 && et.length > 3) spans = [[c[0].k, c[0].k]];
+    }
+  }
+  if (!spans || !spans.length) spans = [[0, Math.max(0, et.length - 1)]];
+
+  const whole = spans.length === 1 && spans[0][0] === 0 && spans[0][1] === et.length - 1;
+  const items = spans.map(([a, b], n) => {
+    const rs = rows.slice(a, b + 1), mapped = rs.length && rs.every(r => r.vw);
+    let gloss = mapped ? cleanGloss(rs.map(r => r.vw.x[1]).join(" ")) : "";
+    if (!gloss && whole) gloss = plainMean(w.meaning, 60);
+    return { id: w.id + "|" + n, w: w, n: n, a: a, b: b,
+             ar: rs.map(r => r.t).join(" ").replace(/[.…·]+/g, "").trim(),
+             gloss: gloss, tr: mapped ? rs.map(r => r.vw.x[2]).join(" ") : (whole ? w.tr : ""),
+             m: rs.length === 1 ? rs[0].m : null, rows: rs,
+             score: Math.max(0, ...rs.map(r => r.score)) };
+  });
+  const primary = items.slice().sort((x, y) => y.score - x.score)[0];
+  const hl = new Set();
+  if (!whole) items.forEach(it => { for (let k = it.a; k <= it.b; k++) hl.add(keep[k]); });
+  const f = { whole: whole, items: items, primary: primary, hl: hl };
+  FOCUS.set(w.id, f);
+  return f;
+}
+const primaryOf = w => focusOf(w).primary;
+/* the dictionary form behind a taught word, so رَبِّكَ and لِرَبِّكَ count as one word */
+const lemKey = it => it.m && it.m.l ? skeleton(it.m.l)
+  : skeleton(it.ar).replace(/^(?:\u0648|\u0641)?(?:\u0628|\u0644|\u0643)?(?:\u0627\u0644)?/, "");
+
+/* the entry's Arabic, with the taught word(s) lit gold; pass an item to light only that one */
+function phraseHTML(w, only){
+  const f = focusOf(w);
+  const toks = String(w.ar).trim().split(/(\s+)/);
+  let o = -1, k = -1;
+  return toks.map(t => {
+    if (!t || /^\s+$/.test(t)) return t;
+    o++;
+    if (skeleton(t)) k++;
+    const lit = only && !f.whole ? (skeleton(t) && k >= only.a && k <= only.b) : f.hl.has(o);
+    return lit ? '<span class="fx">' + esc(t) + '</span>' : esc(t);
+  }).join('');
+}
+/* up to three verse words behind an entry's taught words — for their root and grammar */
+function focusTargets(w){
+  const f = focusOf(w), out = [], seen = {};
+  f.items.forEach(it => {
+    const rs = it.rows.filter(r => r.vw && r.content);
+    (rs.length ? rs : it.rows.filter(r => r.vw)).forEach(r => {
+      const key = skeleton(r.vw.x[0]);
+      if (out.length >= 3 || seen[key]) return;
+      seen[key] = 1; out.push([w.surah, r.vw.n, r.vw.i]);
+    });
+  });
+  return out;
+}
 
 /* ===================== theme ===================== */
+const SUN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M18.4 5.6l-1.1 1.1M6.7 17.3l-1.1 1.1"/><circle cx="12" cy="12" r="4"/></svg>';
+const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg>';
+const darkNow = () => {
+  const t = document.documentElement.getAttribute("data-theme");
+  return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+};
+function syncTheme(){
+  const dark = darkNow(), btn = $("#themeBtn");
+  if (btn){ btn.innerHTML = dark ? SUN : MOON; btn.setAttribute("aria-label", dark ? "Switch to light" : "Switch to dark"); }
+  /* the phone's status bar follows a theme you picked, not only the system's */
+  if (document.documentElement.getAttribute("data-theme"))
+    $$('meta[name="theme-color"]').forEach(m => m.setAttribute("content", dark ? "#0C0E14" : "#EFF0F5"));
+}
 (function(){
   let stored = null;
   try { stored = localStorage.getItem("kalimah.theme"); } catch (e) {}
   if (stored) document.documentElement.setAttribute("data-theme", stored);
+  syncTheme();
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncTheme); } catch (e) {}
   $("#themeBtn").addEventListener("click", () => {
-    const dark = matchMedia("(prefers-color-scheme: dark)").matches;
-    const cur = document.documentElement.getAttribute("data-theme") || (dark ? "dark" : "light");
-    const next = cur === "dark" ? "light" : "dark";
+    const next = darkNow() ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     try { localStorage.setItem("kalimah.theme", next); } catch (e) {}
+    syncTheme();
   });
 })();
 
+/* ===================== routes =====================
+   Every screen has an address after the #, so the phone's Back button steps
+   back through the app instead of leaving it, and any surah, mode or word
+   can be shared as a link:
+     #/                          the surah list
+     #/surah/96                  a surah — and …/read, …/cards, …/quiz, …/play
+     #/threads  #/threads/roots  #/saved
+     …?w=<word id>               a word's card, open on top of any of them    */
+let route = { base: null }, prevBase = null, landedOnWord = false;
+const scrollMem = {};
+
+function parseHash(){
+  const h = location.hash.replace(/^#/, "");
+  const qi = h.indexOf("?");
+  const params = new URLSearchParams(qi >= 0 ? h.slice(qi + 1) : "");
+  return { base: (qi >= 0 ? h.slice(0, qi) : h) || "/", w: params.get("w"), r: params.get("r") };
+}
+function go(base, opts){
+  opts = opts || {};
+  const h = "#" + base + (opts.w ? "?w=" + encodeURIComponent(opts.w) : opts.r ? "?r=" + encodeURIComponent(opts.r) : "");
+  if (opts.replace){ history.replaceState(null, "", h); applyRoute(); }
+  else if (location.hash === h) applyRoute();
+  else location.hash = h;                         // -> hashchange -> applyRoute
+}
+const surahPath = (num, m) => "/surah/" + num + (m && m !== "words" ? "/" + m : "");
+
+function applyRoute(){
+  const r = parseHash();
+  if (r.base !== route.base){
+    const was = route.base;
+    const a = was && was.match(/^\/surah\/(\d+)/), b = r.base.match(/^\/surah\/(\d+)/);
+    const modeOnly = !!(a && b && a[1] === b[1] && $("#scr-surah").classList.contains("active"));
+    if (was != null && !modeOnly){ scrollMem[was] = window.scrollY; prevBase = was; }
+    route.base = r.base;
+    renderBase(r.base);
+    if (modeOnly){
+      /* switching mode keeps your place, unless the new mode starts above it */
+      const seg = $("#modeSeg"), body = $("#modeBody");
+      if (seg && body){
+        const y = body.getBoundingClientRect().top + window.scrollY - seg.offsetHeight - 70;
+        if (window.scrollY > y) window.scrollTo(0, Math.max(0, y));
+      }
+    } else window.scrollTo(0, scrollMem[r.base] || 0);
+    syncNav();
+  }
+  if (r.w && byId(r.w)) openSheet(r.w);
+  else { closeSheetUI(); landedOnWord = false; }
+  if (r.r) openRoot(r.r);
+}
+
+function renderBase(base){
+  const m = base.match(/^\/surah\/(\d+)(?:\/(words|read|cards|quiz|play))?$/);
+  const s = m && surahOf(m[1]);
+  if (!(s && mode === "play" && m[2] === "play" && cur === s)) rushStop();
+  let tab = "home", title = "Kalimah";
+  if (s){
+    const md = m[2] || "words";
+    const fresh = cur !== s || !$("#scr-surah").classList.contains("active");
+    if (fresh){ cur = s; mode = md; renderSurah(); }
+    else if (md !== mode){ mode = md; renderMode(); }
+    show("scr-surah");
+    QM.last = { s: s.num, mode: md }; qmSave();
+    title = s.name + " · Kalimah";
+  } else if (base === "/threads" || base === "/threads/roots"){
+    threadMode = base === "/threads" ? "links" : "roots";
+    $$("[data-thread]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.thread === threadMode)));
+    renderThreads(); show("scr-roots"); tab = "roots"; title = "Threads · Kalimah";
+  } else if (base === "/saved"){
+    renderSaved(); show("scr-saved"); tab = "saved"; title = "Saved · Kalimah";
+  } else {
+    renderHome(); show("scr-home");
+  }
+  $$(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
+  document.title = title;
+}
+function show(id){ $$(".screen").forEach(s => s.classList.toggle("active", s.id === id)); }
+function syncNav(){
+  const nav = document.querySelector(".screen.active .navbar");
+  if (nav) nav.classList.toggle("stuck", window.scrollY > 26);
+}
+
 /* ===================== word rows ===================== */
 function wordRow(w, showSurah){
-  return '<button class="row wordrow" data-word="' + w.id + '">' +
-    '<span class="ar wr-ar">' + esc(w.ar) + '</span>' +
+  return '<button class="row wordrow" data-word="' + esc(w.id) + '">' +
+    '<span class="ar wr-ar">' + phraseHTML(w) + '</span>' +
     '<span class="wr-line"><span class="wr-tr">' + esc(w.tr) + '</span>' +
+      (isLearned(w) ? '<span class="wr-ok" title="Learned">&#10003;</span>' : '') +
       STAR.replace('wr-star', 'wr-star' + (saved.has(w.id) ? ' on' : '')) +
-      '<span class="wr-badge">' + (showSurah ? w.surah + ':' + w.v : 'v. ' + w.v) + '</span></span>' +
+      '<span class="wr-badge">' + (showSurah ? w.surah + ':' + esc(w.v) : 'v. ' + esc(w.v)) + '</span></span>' +
     '<span class="wr-mean">' + esc(w.meaning) + '</span></button>';
 }
 function wordGroup(list, showSurah){
@@ -1132,31 +1652,97 @@ function wordGroup(list, showSurah){
 }
 
 /* ===================== home ===================== */
-function renderSurahList(){
-  $("#homeDeck").textContent = SURAHS.length + " surahs, " + ALL.length +
-    " words \u2014 each with its root, its grammar, and the one image that makes it stick.";
-  $("#surahList").innerHTML = SURAHS.map(s =>
-    '<button class="surah-card" data-surah="' + s.num + '">' +
-      '<span class="surah-num">' + s.num + '</span>' +
-      '<span class="surah-body"><span class="surah-name">' + esc(s.name) + '</span>' +
-      '<span class="surah-sub">' + esc(s.en) + ' \u00b7 ' + s.words.length + ' words</span></span>' +
-      '<span class="ar surah-ar">' + esc(s.ar) + '</span>' + CHEV +
-    '</button>').join('');
+const JUZ = [
+  { from: 67, to: 77,  label: "Juz 29", name: "Tabārak", ar: "تبارك" },
+  { from: 78, to: 114, label: "Juz 30", name: "ʿAmma",   ar: "عمّ" }
+];
+const MODE_NAME = { words: "Words", read: "Read", cards: "Cards", quiz: "Quiz", play: "Word Rush" };
+
+function surahCard(s){
+  const n = s.words.length, k = learnedIn(s);
+  return '<button class="surah-card" data-surah="' + s.num + '">' +
+    '<span class="surah-num">' + s.num + '</span>' +
+    '<span class="surah-body"><span class="surah-name">' + esc(s.name) + '</span>' +
+      '<span class="surah-sub">' + esc(s.en) + '</span>' +
+      '<span class="surah-meta">' + n + ' words' + (k ? ' &middot; <b>' + k + ' learned</b>' : '') + '</span>' +
+      (k ? '<span class="mini-prog"><i style="width:' + Math.round(k / n * 100) + '%"></i></span>' : '') +
+    '</span>' +
+    '<span class="ar surah-ar">' + esc(s.ar) + '</span>' + CHEV + '</button>';
 }
 
+function renderHome(){
+  $("#homeDeck").textContent = SURAHS.length + " surahs, " + ALL.length +
+    " words — each with its root, its grammar, and the one image that makes it stick.";
+  const learned = ALL.filter(isLearned).length;
+  const review = SURAHS.reduce((a, s) => a + basketIds(s.num).length, 0);
+  const last = QM.last && surahOf(QM.last.s);
+  let top = '';
+  if (last){
+    const n = last.words.length, k = learnedIn(last), md = MODE_NAME[QM.last.mode] ? QM.last.mode : "words";
+    top += '<button class="resume" data-go="' + surahPath(last.num, md) + '">' +
+      '<span class="resume-body"><span class="resume-k">Continue</span>' +
+        '<span class="resume-name">' + esc(last.name) + ' &middot; ' + MODE_NAME[md] + '</span>' +
+        '<span class="resume-sub">' + k + ' of ' + n + ' words learned</span>' +
+        '<span class="mini-prog"><i style="width:' + Math.round(k / n * 100) + '%"></i></span></span>' +
+      '<span class="ar resume-ar">' + esc(last.ar) + '</span>' + CHEV + '</button>';
+  }
+  top += '<div class="stats">' +
+    '<span class="stat"><b>' + learned + '</b>learned</span>' +
+    '<button class="stat" data-go="/saved"><b>' + saved.size + '</b>saved</button>' +
+    '<span class="stat' + (review ? ' warn' : '') + '"><b>' + review + '</b>to review</span></div>';
+  $("#homeTop").innerHTML = top;
+
+  const desc = QM.order === "desc";
+  const groups = JUZ.map(j => ({ j: j, list: SURAHS.filter(s => s.num >= j.from && s.num <= j.to) })).filter(g => g.list.length);
+  if (desc){ groups.reverse(); groups.forEach(g => g.list.reverse()); }
+  $("#orderBtn").innerHTML = (desc ? '114 &rarr; 69' : '69 &rarr; 114');
+  $("#orderBtn").setAttribute("aria-label", desc ? "Showing An-Nās first — tap to show Al-Ḥāqqah first" : "Showing Al-Ḥāqqah first — tap to show An-Nās first");
+  $("#surahList").innerHTML = groups.map(g =>
+    '<div class="juz-head"><span class="grouplabel">' + g.j.label + ' &middot; ' + g.j.name + '</span>' +
+    '<span class="ar juz-ar">' + g.j.ar + '</span></div>' + g.list.map(surahCard).join('')).join('');
+}
+
+/* ---------- search ----------
+   English is matched without its accents (qariah finds qāriʿah); Arabic is
+   matched by its letters, so you can type it with or without the vowel
+   marks; "96:3" jumps to a verse. Best matches first.                     */
+const plain = t => String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[ʿʾ'’]/g, "");
 function search(q){
-  q = q.trim().toLowerCase();
+  q = q.trim();
   if (!q) return null;
-  const plain = t => String(t || "").toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[ʿʾ]/g, "");
-  return ALL.filter(w =>
-    plain(w.tr).includes(plain(q)) || plain(w.meaning).includes(plain(q)) ||
-    plain(w.root).includes(plain(q)) || plain(w.note).includes(plain(q)) ||
-    plain(w.magic).includes(plain(q)) || plain(w.grammar).includes(plain(q)) ||
-    plain(w.why).includes(plain(q)) || plain(w.surahName).includes(plain(q)) ||
-    (w.rk && plain(w.rk).includes(plain(q))) || w.ar.includes(q)
-  );
+  const ref = q.match(/^(\d{1,3})\s*[:.]\s*(\d{1,3})$/);
+  if (ref) return ALL.filter(w => w.surah === +ref[1] && verseNums(w.v).indexOf(+ref[2]) >= 0);
+  const scored = [];
+  if (/[؀-ۿ]/.test(q)){
+    const qs = q.split(/\s+/).map(skeleton).filter(Boolean);
+    if (!qs.length) return [];
+    ALL.forEach(w => {
+      const toks = String(w.ar).split(/\s+/).map(skeleton).filter(Boolean);
+      const roots = focusOf(w).items.map(it => it.m && it.m.r ? it.m.r.replace(/\s+/g, "") : "").filter(Boolean);
+      let sc = 0;
+      const all = qs.every(x => {
+        if (toks.some(t => t === x || t.replace(/^ال/, "") === x)){ sc += 5; return true; }
+        if (toks.some(t => t.indexOf(x) >= 0 || squeeze(t).indexOf(squeeze(x)) >= 0)){ sc += 3; return true; }
+        if (roots.some(r => skeleton(r) === x)){ sc += 4; return true; }
+        return false;
+      });
+      if (all) scored.push([sc, w]);
+    });
+  } else {
+    const p = plain(q);
+    ALL.forEach(w => {
+      const f = focusOf(w);
+      let sc = 0;
+      if (plain(w.tr).includes(p)) sc += 5;
+      if (f.items.some(it => plain(it.gloss).includes(p))) sc += 4;
+      if (plain(w.meaning).includes(p)) sc += 3;
+      if (plain(w.root).includes(p) || (w.rk && plain(w.rk).includes(p))) sc += 2;
+      if (plain(w.surahName).includes(p)) sc += 2;
+      if (plain(w.note).includes(p) || plain(w.magic).includes(p) || plain(w.grammar).includes(p) || plain(w.why).includes(p)) sc += 1;
+      if (sc) scored.push([sc, w]);
+    });
+  }
+  return scored.sort((a, b) => b[0] - a[0]).map(x => x[1]);
 }
 
 function runHomeSearch(){
@@ -1168,39 +1754,41 @@ function runHomeSearch(){
   }
   $("#homeBrowse").hidden = true; $("#homeResults").hidden = false;
   $("#homeResults").innerHTML = hits.length
-    ? '<p class="grouplabel">' + hits.length + (hits.length === 1 ? ' match' : ' matches') + '</p>' + wordGroup(hits, true)
-    : '<div class="empty"><div class="ar">لا شيء</div><p>Nothing matches &ldquo;' + esc(q) + '&rdquo;.</p></div>';
+    ? '<p class="grouplabel">' + hits.length + (hits.length === 1 ? ' match' : ' matches') + '</p>' + wordGroup(hits.slice(0, 150), true) +
+      (hits.length > 150 ? '<p class="footnote">Showing the best 150. Add a word to narrow it down.</p>' : '')
+    : '<div class="empty"><div class="ar">لا شيء</div><p>Nothing matches &ldquo;' + esc(q) + '&rdquo;.</p>' +
+      '<p class="empty-tip">Try an English meaning, a transliteration like <i>qariah</i>, Arabic with or without vowel marks, or a verse like <i>96:3</i>.</p></div>';
 }
 
 /* ===================== surah screen ===================== */
-let cur = null, mode = "words";
-
-function openSurah(num){
-  cur = SURAHS.find(s => s.num === num);
-  mode = "words";
-  $("#surahNavTitle").textContent = cur.name;
-  renderSurah();
-  show("scr-surah");
-}
+let cur = null, mode = "words", pendingPractice = false;
 
 function renderSurah(){
-  const s = cur;
+  const s = cur, n = s.words.length, k = learnedIn(s);
   const head =
     '<div class="surah-hero">' +
       '<div class="hero-top"><div><div class="hero-name">' + esc(s.name) + '</div>' +
       '<div class="hero-en">Surah ' + s.num + ' &middot; ' + esc(s.en) + '<br>' +
-      esc(s.place) + ' &middot; ' + s.verses + ' verses &middot; ' + s.words.length + ' words</div></div>' +
+      esc(s.place) + ' &middot; ' + s.verses + ' verses &middot; ' + n + ' words</div></div>' +
       '<div class="ar hero-ar">' + esc(s.ar) + '</div></div>' +
       (s.blurb ? '<p class="hero-blurb">' + esc(s.blurb) + '</p>' : '') +
+      '<div class="hero-prog" id="heroProg">' + heroProg(s) + '</div>' +
     '</div>' +
-    '<div class="segmented five" role="tablist">' +
+    '<div class="segmented five" role="tablist" id="modeSeg" aria-label="Study mode">' +
       ['words','read','cards','quiz','play'].map(m =>
         '<button role="tab" data-mode="' + m + '" aria-selected="' + (mode === m) + '">' +
         ({words:'Words', read:'Read', cards:'Cards', quiz:'Quiz', play:'Play &amp; Learn'})[m] + '</button>').join('') +
     '</div><div id="modeBody"></div>';
   $("#surahBody").innerHTML = head;
+  $("#surahNavTitle").textContent = s.name;
   renderMode();
 }
+function heroProg(s){
+  const n = s.words.length, k = learnedIn(s), b = basketIds(s.num).length;
+  return '<span class="mini-prog"><i style="width:' + Math.round(k / Math.max(1, n) * 100) + '%"></i></span>' +
+    '<span class="hp-t"><b>' + k + '</b> of ' + n + ' learned' + (b ? ' &middot; <b class="hp-b">' + b + '</b> to review' : '') + '</span>';
+}
+function refreshProgress(){ const p = $("#heroProg"); if (p && cur) p.innerHTML = heroProg(cur); }
 
 function linkRow(l, from){
   return '<div class="link"><div class="link-pair"><span class="ar">' + esc(l.w) + '</span>' +
@@ -1235,30 +1823,37 @@ function verseWordsHTML(s){
     const v = VERSES[s.num][n];
     const ws = home[n] || [];
     const marks = {};                 // token index -> word id
-    /* exact matches first, then single words before the longer phrases that
-       contain them — so مَنِيٍّ doesn't take the يُمْنَىٰ next to it */
+    /* an entry lights only the words it teaches — when an entry is the whole
+       verse, lighting all of it would point at nothing */
     const entries = (lit[n] || []).slice().sort((a, b) => a.ar.split(/\s+/).length - b.ar.split(/\s+/).length);
+    const placed = {};
+    entries.forEach(w => focusOf(w).items.forEach(it => it.rows.forEach(r => {
+      if (r.vw && r.vw.n === n && marks[r.vw.i] === undefined){ marks[r.vw.i] = w.id; placed[w.id] = 1; }
+    })));
+    /* entries that could not be lined up with the verse fall back to letter
+       matching: exact matches first, then single words before the longer
+       phrases that contain them — so مَنِيٍّ doesn't take the يُمْنَىٰ next to it */
     const exactDone = {};
-    entries.forEach(w => {
+    entries.filter(w => !placed[w.id]).forEach(w => {
       const tokens = matchTokens(w.ar);
       v.w.forEach((t, i) => {
         const k = skeleton(t[0]);
         if (marks[i] === undefined && tokens.some(x => x === k || squeeze(x) === squeeze(k))){ marks[i] = w.id; exactDone[w.id] = 1; }
       });
     });
-    entries.forEach(w => {
+    entries.filter(w => !placed[w.id]).forEach(w => {
       if (exactDone[w.id] && w.ar.split(/\s+/).length === 1) return;
       const tokens = matchTokens(w.ar);
       if (!tokens.length) return;
       v.w.forEach((t, i) => { if (marks[i] === undefined && sameWord(t[0], tokens)) marks[i] = w.id; });
     });
     const ar = v.w.map((t, i) => marks[i] !== undefined
-      ? '<span class="vb-hit" data-word="' + marks[i] + '" role="button" tabindex="0">' + esc(t[0]) + '</span>'
+      ? '<span class="vb-hit" data-word="' + esc(marks[i]) + '" role="button" tabindex="0">' + esc(t[0]) + '</span>'
       : '<span>' + esc(t[0]) + '</span>').join(' ');
     return '<section class="vblock' + (ws.length ? '' : ' quiet') + '" id="vb-' + n + '">' +
       '<div class="vb-head"><span class="vb-no">' + n + '</span>' +
         '<span class="vb-count">' + (ws.length ? ws.length + (ws.length === 1 ? ' word' : ' words') : 'no new word') + '</span></div>' +
-      '<div class="ar vb-ar">' + ar + ' <span class="vb-end">۝' + toArabicDigits(n) + '</span></div>' +
+      '<div class="ar vb-ar">' + ar + ' <span class="vb-end">' + toArabicDigits(n) + '</span></div>' +
       (v.e ? '<div class="vb-en">' + esc(v.e) + '</div>' : '') +
       (ws.length ? '<div class="vb-words">' + ws.map(w => wordRow(w, false)).join('') + '</div>' : '') +
     '</section>';
@@ -1277,7 +1872,7 @@ function wordsView(){
         '<div class="dlabel">What makes this surah</div>' +
         '<p>' + esc(s.special[0]) + '</p>' +
         (s.special.length > 1
-          ? '<div class="rest">' + s.special.slice(1).map(p => '<p>' + esc(p) + '</p>').join('') + '</div>' +
+          ? '<div class="rest">' + s.special.slice(1).filter(p => p !== "--").map(p => '<p>' + esc(p) + '</p>').join('') + '</div>' +
             '<button class="more" id="moreOne">Read the rest</button>'
           : '') +
       '</div>';
@@ -1301,60 +1896,111 @@ function wordsView(){
 }
 
 function renderMode(){
-  gameStop();
+  rushStop();
+  $$("[data-mode]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === mode)));
   if (mode === "words") $("#modeBody").innerHTML = wordsView();
   else if (mode === "read") $("#modeBody").innerHTML = readView();
   else if (mode === "cards") startCards();
   else if (mode === "play") $("#modeBody").innerHTML = playView();
-  else startQuiz(false);
+  else { startQuiz(pendingPractice); pendingPractice = false; }
 }
 
-/* ---------- flashcards ---------- */
+/* ---------- flashcards ----------
+   The front is the phrase with its taught word lit gold; the back gives the
+   word's own meaning, then the guide's. "Got it" and "Still learning" are
+   your own verdict: the first counts the word as learned, the second drops
+   it into the mistakes basket for the quiz to bring back.                 */
 const STARBTN = on => '<svg viewBox="0 0 24 24" fill="' + (on ? 'currentColor' : 'none') +
   '" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">' +
   '<path d="M12 3.6l2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L3.6 9.8l5.8-.9z"/></svg>';
 
-let deck = { order:[], i:0, flipped:false };
+let deck = { order:[], i:0, flipped:false, got:0, again:0, done:false };
 function startCards(){
-  deck = { order: cur.words.map((_, i) => i), i:0, flipped:false };
+  deck = { order: cur.words.map((_, i) => i), i:0, flipped:false, got:0, again:0, done:false };
   drawCards();
 }
+const arSize = t => { const n = String(t).length; return n > 70 ? " xs" : n > 38 ? " s" : n > 18 ? " m" : ""; };
 function drawCards(){
-  const w = cur.words[deck.order[deck.i]];
+  if (deck.done){
+    $("#modeBody").innerHTML =
+      '<div class="score"><div class="dlabel">Deck done</div>' +
+        '<div class="big">' + deck.got + '<span style="font-size:26px;color:var(--muted)"> / ' + deck.order.length + '</span></div>' +
+        '<div class="lbl">got it' + (deck.again ? ' &middot; ' + deck.again + ' still learning' : '') + '</div>' +
+        '<p class="msg">' + (deck.again ? 'The ones you are still learning are in your mistakes basket — the quiz will bring them back.' : 'Every card, first time. These words are yours.') + '</p></div>' +
+      '<div class="score-btns">' +
+        (basketIds(cur.num).length ? '<button class="cta" id="cardsPractice">Quiz me on my mistakes</button>' : '') +
+        '<button class="abtn wide" id="cardsAgain">Go through the deck again</button></div>';
+    return;
+  }
+  const w = cur.words[deck.order[deck.i]], f = focusOf(w);
+  const glosses = f.items.filter(it => it.gloss).map(it =>
+    '<div class="fc-g"><span class="ar">' + esc(it.ar) + '</span><span class="fc-gt">' + esc(it.gloss) + '</span></div>').join('');
   $("#modeBody").innerHTML =
-    '<div class="flash-stage"><div class="flash-card' + (deck.flipped ? ' flipped' : '') + '" id="flashCard" role="button" tabindex="0" aria-label="Flip card">' +
-      '<div class="face front"><div class="ar">' + esc(w.ar) + '</div>' +
-        '<div class="tr">' + esc(w.tr) + '</div>' +
-        '<div class="hint">Tap to reveal</div></div>' +
-      '<div class="face back"><div class="mean">' + esc(w.meaning) + '</div>' +
-        (w.root ? '<div class="root">' + esc(w.root) + '</div>' : '') +
+    '<div class="flash-stage' + (deck.flipped ? ' is-flipped' : '') + '"><div class="flash-card' + (deck.flipped ? ' flipped' : '') + '" id="flashCard" role="button" tabindex="0" aria-label="Flip card">' +
+      '<div class="face front"' + (deck.flipped ? ' aria-hidden="true"' : '') + '>' +
+        '<div class="fc-top"><span>Card ' + (deck.i + 1) + ' of ' + deck.order.length + '</span><span>v. ' + esc(w.v) + '</span></div>' +
+        '<div class="fc-mid"><div class="ar fc-ar' + arSize(w.ar) + '">' + phraseHTML(w) + '</div>' +
+        '<div class="tr">' + esc(w.tr) + '</div></div>' +
+        '<div class="hint">' + (f.whole ? 'What does it mean? Tap to reveal' : 'What does the gold word mean? Tap to reveal') + '</div></div>' +
+      '<div class="face back"' + (deck.flipped ? '' : ' aria-hidden="true"') + '>' +
+        (glosses ? '<div class="fc-gs">' + glosses + '</div>' : '') +
+        '<div class="mean">' + esc(w.meaning) + '</div>' +
+        (w.root ? '<div class="root">' + esc(brief(w.root, 140)) + '</div>' : '') +
         '<div class="note">' + esc(w.note) + '</div>' +
         '<div class="hint">Tap to flip back</div></div>' +
     '</div></div>' +
+    '<div class="fc-grade"' + (deck.flipped ? '' : ' hidden') + '>' +
+      '<button class="abtn fc-again" id="cardAgain"><span class="kbd">1</span>Still learning</button>' +
+      '<button class="cta fc-got" id="cardGot"><span class="kbd">2</span>Got it</button></div>' +
     '<div class="flash-controls">' +
       '<button class="fbtn" id="prevCard" aria-label="Previous card"' + (deck.i === 0 ? ' disabled' : '') + '><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2L2 10l8 8"/></svg></button>' +
       '<span class="progress"><i style="width:' + ((deck.i + 1) / deck.order.length * 100) + '%"></i></span>' +
       '<span class="flash-count">' + (deck.i + 1) + ' / ' + deck.order.length + '</span>' +
       '<button class="fbtn" id="nextCard" aria-label="Next card"' + (deck.i === deck.order.length - 1 ? ' disabled' : '') + '><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l8 8-8 8"/></svg></button>' +
       '<button class="fbtn' + (saved.has(w.id) ? ' on' : '') + '" id="saveCard" aria-label="' +
-        (saved.has(w.id) ? 'Saved \u2014 tap to remove' : 'Save this word') + '">' + STARBTN(saved.has(w.id)) + '</button>' +
+        (saved.has(w.id) ? 'Saved — tap to remove' : 'Save this word') + '">' + STARBTN(saved.has(w.id)) + '</button>' +
       '<button class="fbtn" id="shuffleCards" aria-label="Shuffle deck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h4l4 12h6"/><path d="M3 18h4l2-6"/><path d="M17 3l3 3-3 3"/><path d="M17 15l3 3-3 3"/></svg></button>' +
-    '</div>';
+    '</div>' +
+    '<p class="kbd-help">Swipe or use &larr; &rarr; to move &middot; Space flips &middot; 1 / 2 to grade</p>';
+}
+function flipCard(){
+  deck.flipped = !deck.flipped;
+  const c = $("#flashCard"); if (!c) return;
+  c.classList.toggle("flipped", deck.flipped);
+  c.parentElement.classList.toggle("is-flipped", deck.flipped);
+  c.querySelector(".front").setAttribute("aria-hidden", String(deck.flipped));
+  c.querySelector(".back").setAttribute("aria-hidden", String(!deck.flipped));
+  $(".fc-grade").hidden = !deck.flipped;
+}
+function moveCard(d){
+  const i = Math.max(0, Math.min(deck.order.length - 1, deck.i + d));
+  if (i === deck.i) return;
+  deck.i = i; deck.flipped = false; drawCards();
+}
+function gradeCard(got){
+  const w = cur.words[deck.order[deck.i]];
+  if (got){ outOfBasket(w); markKnown(w); deck.got++; }
+  else { toBasket(w); deck.again++; }
+  refreshProgress();
+  if (deck.i >= deck.order.length - 1) deck.done = true;
+  else { deck.i++; deck.flipped = false; }
+  drawCards();
 }
 
 /* ---------- quiz ----------
    A word is more than its translation, so the quiz asks about everything the
-   card holds: what it means, which word carries a meaning, the three-letter
-   root, the root family, the grammar, why this word was chosen, and which
-   word a memory hook belongs to — plus two hands-on kinds, Match and
-   Arrange. Wrong answers are always real answers borrowed from other words
-   in the same surah, so nothing is a giveaway. */
+   card holds: what the taught word means, which word carries a meaning, the
+   three-letter root, the root family, the grammar, why this word was chosen,
+   and which word a memory hook belongs to — plus two hands-on kinds, Match
+   and Arrange. When an entry is a phrase, the question is about the word it
+   teaches (lit gold), not the whole phrase. Wrong answers are always real
+   answers borrowed from other words in the same surah, so nothing is a
+   giveaway. */
 let quiz = null;
-function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
 function firstSentence(s){
   const t = String(s || "").trim();
-  const m = t.match(/^[^.!?]*[.!?]["\u201d')\]]?/);
+  const m = t.match(/^[^.!?]*[.!?]["”')\]]?/);
   return (m ? m[0] : t).trim();
 }
 function brief(s, cap){
@@ -1368,43 +2014,65 @@ function brief(s, cap){
   }
   return t;
 }
-/* a hook usually says the word out loud — hide it, or there's nothing to ask */
+/* the guides quote their glosses ("…a small band [of jinn].") — drop the
+   quote marks and trailing dots so it reads as a plain meaning */
+function plainMean(s, cap){
+  return brief(s, cap).replace(/^[\s"“”'‘’…\.]+/, "").replace(/[\s"“”'‘’]+$/, "").replace(/([^.])\.$/, "$1")
+    .replace(/[\s"“”'‘’]+$/, "") || brief(s, cap);
+}
+/* a hook usually says the word out loud — hide it, or there's nothing to ask.
+   The transliteration is broken at every hyphen and apostrophe (minhu'l-watīn
+   -> watīn) and matched without its accents and in any case, so the hook's
+   "AL-WATĪN" is caught too. */
 function maskWord(text, w){
   let out = String(text || "");
-  String(w.tr || "").split(/[^A-Za-zÀ-ɏḀ-ỿʿʾ'-]+/)
-    .filter(b => b.length >= 4)
-    .forEach(b => {
-      out = out.replace(new RegExp(b.replace(/[.*+?^${}()|[\]\\\-]/g, "\\$&"), "gi"), "——");
-    });
-  String(w.ar || "").split(/\s+/).forEach(a => {
-    if (a.length >= 3) out = out.split(a).join("——");
+  const ars = new Set(String(w.ar || "").split(/\s+/));
+  focusOf(w).items.forEach(it => it.ar.split(/\s+/).forEach(a => ars.add(a)));
+  ars.forEach(a => { if (skeleton(a).length >= 3) out = out.split(a).join("——"); });
+  const stems = new Set();
+  const addStem = t => {
+    let p = plain(t).replace(/[^a-z]/g, "");
+    p = p.replace(/^(?:wa|fa)?(?:bi|li|la|ka)?(?:al|l)(?=[a-z]{4})/, "");
+    if (p.length >= 4) stems.add(p);
+    const q = p.replace(/(?:un|in|an|u|i|a)$/, "");
+    if (q.length >= 4) stems.add(q);
+  };
+  String(w.tr || "").split(/[^A-Za-zÀ-ɏḀ-ỿʿʾ]+/).forEach(addStem);
+  focusOf(w).items.forEach(it => String(it.tr || "").split(/[^A-Za-zÀ-ɏḀ-ỿʿʾ]+/).forEach(addStem));
+  out = out.normalize("NFD");
+  [...stems].sort((a, b) => b.length - a.length).forEach(p => {
+    const re = p.split("").map(c => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[\\u0300-\\u036f]*").join("[ʿʾ'’]?");
+    out = out.replace(new RegExp(re, "gi"), "——");
   });
-  return out;
+  return out.normalize("NFC").replace(/(——)([A-Za-zÀ-ɏḀ-ỿ]*)/g, "$1");
 }
-/* the three letters, borrowed from the morphology of the verse itself */
+/* the three letters of the taught word, from the morphology of the verse */
 function rootLetters(w){
-  if (typeof MORPH === "undefined" || !MORPH) return "";
-  const t = headwordTargets(w)[0];
-  if (!t) return "";
+  const it = primaryOf(w);
+  if (it.m && it.m.r) return it.m.r;
+  const t = focusTargets(w)[0];
+  if (!t || !HAVE_MORPH) return "";
   const m = ((MORPH[t[0]] || {})[t[1]] || [])[t[2]];
   return (m && m.r) || "";
 }
 
+/* show: "item" puts the taught word up front; "entry" shows the whole phrase,
+   for questions about the entry as a whole */
 const QUIZ_KINDS = {
-  meaning: { ask: "What does this mean?",
-             get: w => brief(w.meaning) },
-  rootfamily: { ask: "Which root family is this word from?",
-                get: w => brief(w.root) },
-  grammar: { ask: "Which of these is true of this word?",
-             get: w => brief(w.grammar) },
-  why: { ask: "Why was this exact word chosen?",
-         get: w => brief(w.why) },
+  meaning: { ask: w => focusOf(w).whole ? "What does this mean?" : "What does the gold word mean here?",
+             get: w => primaryOf(w).gloss, show: "item" },
+  reverse: { ask: "Which word means this?",
+             prompt: w => primaryOf(w).gloss ? "“" + primaryOf(w).gloss + "”" : "", get: w => primaryOf(w).ar, arOptions: true },
   rootletters: { ask: "Which three-letter root is it built on?",
-                 get: rootLetters, arOptions: true },
-  reverse: { ask: "Which word carries this meaning?",
-             prompt: w => brief(w.meaning), get: w => w.ar, arOptions: true },
+                 get: rootLetters, arOptions: true, show: "item" },
+  rootfamily: { ask: "Which root family is this from?",
+                get: w => brief(w.root), show: "entry" },
+  grammar: { ask: "Which of these is true here?",
+             get: w => brief(w.grammar), show: "entry" },
+  why: { ask: "Why was this exact word chosen?",
+         get: w => brief(w.why), show: "entry" },
   hook: { ask: "Which word does this hook belong to?",
-          prompt: w => maskWord(w.note, w), get: w => w.ar, arOptions: true }
+          prompt: w => maskWord(w.note, w), get: w => primaryOf(w).ar, arOptions: true }
 };
 
 function makeQuestion(w, kind, pool){
@@ -1412,28 +2080,22 @@ function makeQuestion(w, kind, pool){
   const right = spec.get(w);
   if (!right) return null;
   if (spec.prompt && !spec.prompt(w)) return null;
-
-  const seen = { [right]: 1 }, wrong = [];
-  shuffle(pool.slice()).forEach(x => {
+  const norm = v => spec.arOptions ? skeleton(v) : String(v).toLowerCase();
+  const seen = { [norm(right)]: 1 }, lems = { [lemKey(primaryOf(w))]: 1 }, wrong = [];
+  const byWord = kind === "meaning" || kind === "reverse" || kind === "hook";
+  const take = src => shuffle(src.slice()).forEach(x => {
     if (wrong.length >= 3 || x === w) return;
     const v = spec.get(x);
-    if (!v || seen[v]) return;
-    seen[v] = 1; wrong.push(v);
+    if (!v || seen[norm(v)]) return;
+    if (byWord){ const l = lemKey(primaryOf(x)); if (lems[l]) return; lems[l] = 1; }   // two forms of one word would both be right
+    seen[norm(v)] = 1; wrong.push(v);
   });
-  if (wrong.length < 3 && pool !== ALL){
-    shuffle(ALL.slice()).forEach(x => {
-      if (wrong.length >= 3 || x === w) return;
-      const v = spec.get(x);
-      if (!v || seen[v]) return;
-      seen[v] = 1; wrong.push(v);
-    });
-  }
+  take(pool);
+  if (wrong.length < 3 && pool !== ALL) take(ALL);
   if (wrong.length < 3) return null;
-
   return {
-    w: w, kind: kind, ask: spec.ask,
-    ar: spec.prompt ? "" : w.ar,
-    tr: spec.prompt ? "" : w.tr,
+    w: w, kind: kind, ask: typeof spec.ask === "function" ? spec.ask(w) : spec.ask,
+    show: spec.prompt ? "" : spec.show,
     text: spec.prompt ? spec.prompt(w) : "",
     arOptions: !!spec.arOptions,
     options: shuffle([{ text: right, ok: true }].concat(wrong.map(v => ({ text: v, ok: false }))))
@@ -1442,37 +2104,17 @@ function makeQuestion(w, kind, pool){
 
 /* ---------- quiz memory: cycles and the mistakes basket ----------
    A surah's words are walked in cycles, ten at a time: no word comes back
-   until every word in the surah has had its turn. Every slip — in the quiz
-   or in Play & Learn — drops the word into a mistakes basket, and getting it
-   right later takes it out again. All of it lives in this browser.          */
+   until every word in the surah has had its turn. Every slip — in the quiz,
+   the cards or Word Rush — drops the word into a mistakes basket, and getting
+   it right later takes it out again. All of it lives in this browser.     */
 const ROUND = 10;
-const QM_KEY = "kalimah.quiz.v1";
-let QM = { cycle:{}, basket:{}, best:{}, mute:false };
-try {
-  const raw = JSON.parse(localStorage.getItem(QM_KEY) || "null");
-  if (raw && typeof raw === "object") QM = Object.assign(QM, raw);
-} catch (e) {}
-function qmSave(){ try { localStorage.setItem(QM_KEY, JSON.stringify(QM)); } catch (e) {} }
-
-function basketIds(n){ return (QM.basket[n] || []).filter(id => byId(id)); }
-function toBasket(w){
-  if (!w) return;
-  const b = QM.basket[w.surah] || (QM.basket[w.surah] = []);
-  if (b.indexOf(w.id) < 0){ b.push(w.id); qmSave(); }
-}
-function outOfBasket(w){
-  const b = w && QM.basket[w.surah];
-  if (!b) return;
-  const i = b.indexOf(w.id);
-  if (i >= 0){ b.splice(i, 1); qmSave(); }
-}
 function cycleSeen(s){
   const ids = s.words.map(w => w.id);
   return (QM.cycle[s.num] || []).filter(id => ids.indexOf(id) >= 0);
 }
 /* returns true when this word was the last one the cycle was waiting for */
 function markSeen(w){
-  const s = SURAHS.find(x => x.num === w.surah);
+  const s = surahOf(w.surah);
   const seen = cycleSeen(s);
   if (seen.indexOf(w.id) < 0) seen.push(w.id);
   if (seen.length >= s.words.length){ QM.cycle[s.num] = []; qmSave(); return true; }
@@ -1493,12 +2135,16 @@ function pickRound(s){
 
 /* ---------- the hands-on kinds ---------- */
 function makeMatch(w, roundWords, pool){
-  const arSeen = { [skeleton(w.ar)]: 1 }, enSeen = { [brief(w.meaning, 64)]: 1 };
+  const p0 = primaryOf(w);
+  if (!p0.gloss) return null;
+  const arSeen = { [lemKey(p0)]: 1 }, enSeen = { [p0.gloss.toLowerCase()]: 1 };
   const pick = [w];
   [roundWords, pool, ALL].forEach(src => {
     shuffle(src.slice()).forEach(x => {
-      if (pick.length >= 4 || x === w || !x.meaning) return;
-      const a = skeleton(x.ar), m = brief(x.meaning, 64);
+      if (pick.length >= 4 || x === w) return;
+      const p = primaryOf(x);
+      if (!p.gloss) return;
+      const a = lemKey(p), m = p.gloss.toLowerCase();
       if (!a || arSeen[a] || enSeen[m]) return;
       arSeen[a] = 1; enSeen[m] = 1; pick.push(x);
     });
@@ -1518,7 +2164,7 @@ function makeArrange(w){
   let partial = false;
   const MAX = 6;
   if (words.length > MAX + 1){
-    const toks = matchTokens(w.ar);
+    const toks = matchTokens(primaryOf(w).ar);
     let hit = v.w.findIndex(x => sameWord(x[0], toks));
     if (hit < 0) hit = 0;
     const start = Math.max(0, Math.min(hit - 2, words.length - MAX));
@@ -1572,12 +2218,13 @@ function settle(q, right){
   q.done = true; q.right = right;
   if (right) quiz.score++;
   if (q.type === "match"){
-    if (right) outOfBasket(q.w);          /* the slips were already filed, word by word */
+    if (right){ outOfBasket(q.w); markKnown(q.w); }        /* the slips were already filed, word by word */
   } else if (!right){
     toBasket(q.w);
     if (quiz.misses.indexOf(q.w.id) < 0) quiz.misses.push(q.w.id);
-  } else if (!q.peeked) outOfBasket(q.w);
+  } else if (!q.peeked){ outOfBasket(q.w); markKnown(q.w); }
   if (!quiz.practice && markSeen(q.w)) quiz.cycleDone = true;
+  refreshProgress();
 }
 
 const BASKET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5h17l-1.6 9.1a2 2 0 01-2 1.6H7.1a2 2 0 01-2-1.6z"/><path d="M8 9.5l3-5.5M16 9.5l-3-5.5"/><path d="M9.5 13.5v3M14.5 13.5v3"/></svg>';
@@ -1593,15 +2240,23 @@ function quizStrip(){
     ' title="Practise your mistakes">' + BASKET + '<span>' + b + (b === 1 ? ' mistake' : ' mistakes') + '</span></button></div>';
 }
 
+function promptHTML(q){
+  if (q.text) return '<p class="qtext">' + esc(q.text) + '</p>';
+  const w = q.w, f = focusOf(w), it = f.primary;
+  if (q.show === "item" && !f.whole)
+    return '<div class="ar q-word">' + esc(it.ar) + '</div>' +
+      (it.tr ? '<div class="tr">' + esc(it.tr) + '</div>' : '') +
+      '<div class="q-ctx"><span class="dlabel">In the verse</span><span class="ar">' + phraseHTML(w, it) + '</span></div>';
+  return '<div class="ar q-word' + arSize(w.ar) + '">' + phraseHTML(w) + '</div>' +
+    '<div class="tr">' + esc(w.tr) + '</div>';
+}
 function choiceHTML(q){
-  return '<div class="quiz-q"><div class="ask">' + esc(q.ask) + '</div>' +
-      (q.ar ? '<div class="ar">' + esc(q.ar) + '</div>' : '') +
-      (q.tr ? '<div class="tr">' + esc(q.tr) + '</div>' : '') +
-      (q.text ? '<p class="qtext">' + esc(q.text) + '</p>' : '') + '</div>' +
+  return '<div class="quiz-q"><div class="ask">' + esc(q.ask) + '</div>' + promptHTML(q) + '</div>' +
     '<div class="opts">' + q.options.map((o, k) => {
       const cls = !q.done ? '' : o.ok ? ' correct' : (k === q.picked ? ' wrong' : '');
       return '<button class="opt' + (q.arOptions ? ' opt-ar' : '') + cls + '" data-opt="' + k + '"' + (q.done ? ' disabled' : '') + '>' +
-        (q.arOptions ? '<span class="ar">' + esc(o.text) + '</span>' : esc(o.text)) + '</button>';
+        '<span class="kbd">' + (k + 1) + '</span>' +
+        (q.arOptions ? '<span class="ar">' + esc(o.text) + '</span>' : '<span>' + esc(o.text) + '</span>') + '</button>';
     }).join('') + '</div>';
 }
 
@@ -1615,11 +2270,11 @@ function matchHTML(q){
   };
   return '<div class="quiz-q mq"><div class="ask">' + esc(q.ask) + '</div>' +
     '<div class="m-ar">' + q.colA.map(w =>
-      '<button class="m-tile m-a' + cls("a", w.id) + '" data-ma="' + w.id + '"' + (q.pairs[w.id] != null ? ' disabled' : '') + '>' +
-      '<span class="ar">' + esc(w.ar) + '</span></button>').join('') + '</div>' +
+      '<button class="m-tile m-a' + cls("a", w.id) + '" data-ma="' + esc(w.id) + '"' + (q.pairs[w.id] != null ? ' disabled' : '') + '>' +
+      '<span class="ar">' + esc(primaryOf(w).ar) + '</span></button>').join('') + '</div>' +
     '<div class="m-en">' + q.colE.map(w =>
-      '<button class="m-tile m-e' + cls("e", w.id) + '" data-me="' + w.id + '"' + (q.pairs[w.id] != null ? ' disabled' : '') + '>' +
-      esc(plainMean(w.meaning, 70)) + '</button>').join('') + '</div>' +
+      '<button class="m-tile m-e' + cls("e", w.id) + '" data-me="' + esc(w.id) + '"' + (q.pairs[w.id] != null ? ' disabled' : '') + '>' +
+      esc(primaryOf(w).gloss) + '</button>').join('') + '</div>' +
     (q.done ? '' : '<p class="m-help">Tap a word, then the meaning it carries. ' +
       (q.slips ? q.slips + (q.slips === 1 ? ' slip' : ' slips') + ' so far.' : '') + '</p>') +
     '</div>';
@@ -1652,7 +2307,7 @@ function feedbackHTML(q){
     '<div class="quiz-actions">' +
       '<button class="fbtn' + (on ? ' on' : '') + '" id="quizSave" aria-label="' + (on ? 'Saved' : 'Save word') + '">' + STARBTN(on) + '</button>' +
       '<button class="fbtn" id="qStudy" aria-label="Open this word’s card">' + BOOK + '</button>' +
-      '<button class="cta" id="nextQ">' + (quiz.i === quiz.qs.length - 1 ? "See score" : "Next question") + '</button>' +
+      '<button class="cta" id="nextQ">' + (quiz.i === quiz.qs.length - 1 ? "See score" : "Next question") + ' <span class="kbd on-dark">Enter</span></button>' +
     '</div>';
   const peek = q.peeked ? '<p class="peek-note">You opened the card first, so this word waits in your mistakes basket for one more look.</p>' : '';
   if (q.type === "match"){
@@ -1667,10 +2322,12 @@ function feedbackHTML(q){
         (q.verse.e && !q.partial ? '<p class="fb-en">' + esc(q.verse.e) + '</p>'
           : '<p class="fb-en">' + q.words.map(x => esc(x.en)).join(' &middot; ') + '</p>') + '</div>' + peek + actions;
   }
+  const it = primaryOf(q.w);
   return '<div class="keepsake fb' + (q.right ? '' : ' fb-miss') + '">' +
       '<div class="dlabel">' + (q.right ? "Correct" : (q.kind === "hook" ? "The answer" : "The hook")) + '</div>' +
-      '<p class="ar" style="font-size:26px;margin-bottom:4px">' + esc(q.w.ar) + '</p>' +
-      '<p style="font-size:15px;color:var(--ink-2);margin-bottom:8px">' + esc(q.w.tr) + ' — ' + esc(brief(q.w.meaning)) + '</p>' +
+      '<p class="ar fb-ar">' + phraseHTML(q.w) + '</p>' +
+      '<p class="fb-line">' + (it.gloss && !focusOf(q.w).whole ? '<b class="ar">' + esc(it.ar) + '</b> ' + esc(it.gloss) + ' &middot; ' : '') +
+        esc(q.w.tr) + ' — ' + esc(brief(q.w.meaning)) + '</p>' +
       '<p>' + esc(q.kind === "hook" ? firstSentence(q.w.root) : q.w.note) + '</p></div>' + peek + actions;
 }
 
@@ -1724,6 +2381,15 @@ function drawScore(){
     '<div class="score-btns">' + primary + secondary + '</div>';
 }
 
+function quizNext(){ quiz.i++; drawQuiz(); window.scrollTo({ top: Math.max(0, $("#modeBody").getBoundingClientRect().top + window.scrollY - 120), behavior: "smooth" }); }
+function quizPick(k){
+  const q = quiz.qs[quiz.i];
+  q.picked = k;
+  settle(q, q.options[k].ok);
+  drawQuiz();
+  const nx = $("#quizNext"); if (nx) nx.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
 /* all quiz taps land here; returns true when it handled one */
 function quizClick(t){
   if (!quiz || mode !== "quiz") return false;
@@ -1736,19 +2402,13 @@ function quizClick(t){
 
   if (t.closest("#qStudy")){
     if (!q.done && !q.peeked){ q.peeked = true; toBasket(q.w); }
-    openSheet(q.w.id); return true;
+    openWord(q.w.id); return true;
   }
   if (t.closest("#quizSave")){ toggleSaved(q.w.id); drawQuiz(); return true; }
-  if (t.closest("#nextQ")){ quiz.i++; drawQuiz(); window.scrollTo({ top: 0, behavior: "smooth" }); return true; }
+  if (t.closest("#nextQ")){ quizNext(); return true; }
 
   const opt = t.closest(".opt");
-  if (opt && q.type === "choice" && !q.done){
-    q.picked = +opt.dataset.opt;
-    settle(q, q.options[q.picked].ok);
-    drawQuiz();
-    const nx = $("#quizNext"); if (nx) nx.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    return true;
-  }
+  if (opt && q.type === "choice" && !q.done){ quizPick(+opt.dataset.opt); return true; }
 
   /* match: a word, then a meaning (or the other way round) */
   const ma = t.closest("[data-ma]"), me = t.closest("[data-me]");
@@ -1768,8 +2428,7 @@ function quizClick(t){
       }
     } else {
       q.slips++;
-      const wa = byId(aId);
-      toBasket(wa);
+      toBasket(byId(aId));
       if (quiz.misses.indexOf(aId) < 0) quiz.misses.push(aId);
       q.flash = ["a" + aId, "e" + eId];
       setTimeout(() => { if (quiz && quiz.qs[quiz.i] === q){ q.flash = null; drawQuiz(); } }, 520);
@@ -1798,71 +2457,61 @@ function quizClick(t){
   }
   return false;
 }
+/* 1–4 answer, Enter moves on */
+function quizKeys(e){
+  if (!quiz) return false;
+  const q = quiz.qs[quiz.i];
+  if (!q) return false;
+  if (q.type === "choice" && !q.done && /^[1-4]$/.test(e.key) && +e.key <= q.options.length){ e.preventDefault(); quizPick(+e.key - 1); return true; }
+  if (q.done && e.key === "Enter"){ e.preventDefault(); quizNext(); return true; }
+  return false;
+}
 
-/* ===================== play & learn: Word Rain =====================
-   The meaning sits at the top. Words fall. Catch the one that carries it
-   before it lands. Three catches in a row raise the multiplier (up to ×5);
-   every six catches the rain gets faster and thicker. Gold words score
-   double and give back a heart. A word you miss — or tap by mistake — goes
-   into the quiz's mistakes basket, so the game feeds your practice. The
-   targets walk the whole pool before any word repeats.                    */
-const GAME = { scope: "surah", run: null };
-const HEART = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.3l-1.3-1.2C5.6 14.5 2.5 11.7 2.5 8.2 2.5 5.4 4.7 3.3 7.4 3.3c1.8 0 3.5.9 4.6 2.2 1.1-1.3 2.8-2.2 4.6-2.2 2.7 0 4.9 2.1 4.9 4.9 0 3.5-3.1 6.3-8.2 10.9z"/></svg>';
+/* ===================== play & learn: Word Rush =====================
+   Meanings on the left, Arabic on the right. Tap a word and the meaning it
+   carries: a right pair bursts and new words slide in; a wrong one costs
+   seconds and your streak. The clock is short — every pair buys a little
+   time back, every twelve pairs it runs faster, and ten in a row sets off a
+   Frenzy: the clock stops and every pair scores double. Only the words the
+   guides teach come up, each on its own (a phrase only when the phrase is
+   what is taught). Unseen words and your mistakes come first; a mix-up goes
+   into the mistakes basket, a clean pair takes it out.                     */
+const RUSH_MODES = [
+  { key: "relaxed", name: "Relaxed", time: 90, gain: 2,   penalty: 0, note: "90s, no penalty" },
+  { key: "classic", name: "Classic", time: 60, gain: 1.5, penalty: 2, note: "60s, −2s a slip" },
+  { key: "blitz",   name: "Blitz",   time: 40, gain: 1,   penalty: 3, note: "40s, −3s a slip" }
+];
+const RUSH = { scope: "surah", run: null };
+const RUSH_ROWS = 5;
 const SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg>';
 const SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
-const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>';
+const BOLT = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 2L4 14h6.5L9.5 22 20 9.5h-6.6z"/></svg>';
 
-/* You choose how fast the words fall — and it stays that speed. Seconds for a
-   word to fall from the top of the arena to the ground. */
-const SPEEDS = [
-  { name: "Gentle", t: 16 },
-  { name: "Slow",   t: 12 },
-  { name: "Steady", t: 9 },
-  { name: "Quick",  t: 6.5 },
-  { name: "Fast",   t: 4.6 }
-];
-function speedIx(){ const s = QM.speed; return (s >= 0 && s < SPEEDS.length) ? s : 1; }
-function fallTime(){ return SPEEDS[speedIx()].t; }
+const rushModeIx = () => { const m = QM.rush.mode; return m >= 0 && m < RUSH_MODES.length ? m : 1; };
+const rushKey = () => RUSH.scope === "all" ? "all" : "s" + cur.num;
+const rushBestKey = () => rushKey() + ":" + RUSH_MODES[rushModeIx()].key;
+const rushBest = () => (QM.rush.best || {})[rushBestKey()] || 0;
+const rushMult = streak => Math.min(5, 1 + Math.floor(streak / 4));
+function rushSeen(key){ const s = QM.rush.seen || (QM.rush.seen = {}); return s[key] || (s[key] = []); }
 
-/* the guides quote their glosses ("…a small band [of jinn].") — drop the
-   quote marks and trailing dots so the prompt reads as a plain meaning */
-function plainMean(s, cap){
-  return brief(s, cap).replace(/^[\s"“”'‘’…\.]+/, "").replace(/[\s"“”'‘’]+$/, "").replace(/([^.])\.$/, "$1")
-    .replace(/[\s"“”'‘’]+$/, "") || brief(s, cap);
+/* every taught word in scope, each once; no two share a meaning or a spelling */
+function rushPool(scope){
+  const src = (scope || RUSH.scope) === "all" ? ALL : cur.words;
+  const out = [], ar = {}, en = {};
+  src.forEach(w => focusOf(w).items.forEach(it => {
+    const a = skeleton(it.ar), g = it.gloss.toLowerCase();
+    if (!a || !g || it.gloss.length > 46 || it.ar.length > 40 || ar[a] || en[g]) return;
+    ar[a] = en[g] = 1; out.push(it);
+  }));
+  return out;
 }
-function gameKey(){ return GAME.scope === "all" ? "all" : "s" + cur.num; }
-function gameBest(){ return (QM.best && QM.best[gameKey()]) || 0; }
-/* every word of the surah is in the pass — phrases too */
-function gamePool(scope){
-  const src = (scope || GAME.scope) === "all" ? ALL : cur.words;
-  return src.filter(w => w.ar && w.meaning);
-}
-/* what a drop shows: the first spelling when a guide gives alternatives */
-function dropText(w){ return String(w.ar).split(/\s*\/\s*/)[0].trim(); }
-const isLong = w => dropText(w).length > 24;
-
-/* ---------- the pass: every word once, then your mistakes ----------
-   QM.game[key] = { left: [ids still to come], miss: [ids you missed],
-                    total: n, done: true once every word has fallen }
-   It is saved after every word, so you can stop and carry on later.     */
-function gState(key){
-  QM.game = QM.game || {};
-  const k = key || gameKey();
-  const pool = gamePool();
-  const valid = {}; pool.forEach(w => valid[w.id] = 1);
-  let st = QM.game[k];
-  if (st){
-    st.left = (st.left || []).filter(id => valid[id]);
-    st.miss = (st.miss || []).filter(id => valid[id]);
-  }
-  return st || null;
-}
-function newPass(){
-  const ids = shuffle(gamePool().map(w => w.id));
-  QM.game = QM.game || {};
-  QM.game[gameKey()] = { left: ids, miss: [], total: ids.length, done: false };
-  qmSave();
-  return QM.game[gameKey()];
+/* unseen words first — your mistakes at the very front — then the rest */
+function rushDeck(pool, key){
+  const seen = new Set(rushSeen(key));
+  const fresh = shuffle(pool.filter(it => !seen.has(it.id)));
+  fresh.sort((a, b) => inBasket(b.w) - inBasket(a.w));
+  return fresh.concat(shuffle(pool.filter(it => seen.has(it.id))));
 }
 
 /* tiny synthesised sounds — no files to load */
@@ -1874,478 +2523,418 @@ function sfx(kind, n){
     if (AC.state === "suspended") AC.resume();
     const now = AC.currentTime, up = Math.pow(1.059, Math.min(n || 0, 14));
     const notes = {
-      good:  [523 * up, 784 * up],
-      gold:  [880, 1175, 1568],
-      bad:   [196, 147],
-      land:  [262, 175],
-      level: [523, 659, 784, 1047],
-      over:  [392, 330, 262, 196],
-      win:   [523, 659, 784, 1047, 1319],
-      tick:  [660],
-      go:    [988]
+      tap:    [880],
+      good:   [523 * up, 784 * up],
+      bad:    [196, 147],
+      tick:   [660],
+      go:     [988],
+      level:  [523, 659, 784, 1047],
+      frenzy: [784, 988, 1175, 1568, 1976],
+      over:   [392, 330, 262, 196],
+      win:    [523, 659, 784, 1047, 1319]
     }[kind] || [440];
+    const slow = kind === "over" || kind === "win" || kind === "frenzy";
     notes.forEach((f, i) => {
       const o = AC.createOscillator(), g = AC.createGain();
-      o.type = kind === "bad" || kind === "land" ? "triangle" : "sine";
+      o.type = kind === "bad" ? "triangle" : "sine";
       o.frequency.value = f;
-      const t = now + i * (kind === "over" || kind === "win" ? 0.12 : 0.075);
+      const t = now + i * (slow ? 0.09 : 0.075);
+      const peak = kind === "tap" ? 0.04 : kind === "bad" ? 0.16 : 0.11;
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(kind === "bad" ? 0.16 : 0.11, t + 0.015);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + (kind === "over" || kind === "win" ? 0.32 : 0.2));
+      g.gain.exponentialRampToValueAtTime(peak, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + (slow ? 0.3 : kind === "tap" ? 0.06 : 0.2));
       o.connect(g); g.connect(AC.destination);
       o.start(t); o.stop(t + 0.36);
     });
   } catch (e) {}
 }
 
-function speedPicker(){
-  return '<div class="g-speeds" role="radiogroup" aria-label="How fast the words fall">' +
-    SPEEDS.map((s, i) => '<button role="radio" data-speed="' + i + '" aria-checked="' + (i === speedIx()) + '">' +
-      '<i>' + '<b></b>'.repeat(i + 1) + '</i><span>' + s.name + '</span></button>').join('') + '</div>';
-}
-
 function playView(){
-  gameStop();
-  const nS = gamePool("surah").length, nA = gamePool("all").length;
-  if (nS < 4 && GAME.scope === "surah") GAME.scope = "all";
-  const st = gState();
-  const pool = gamePool();
-  let stage, buttons;
-  if (st && !st.done && st.left.length){
-    const doneN = st.total - st.left.length;
-    stage = '<div class="g-pass"><div class="dlabel">Pass in progress</div>' +
-      '<div class="progress"><i style="width:' + Math.round(doneN / Math.max(1, st.total) * 100) + '%"></i></div>' +
-      '<p><b>' + st.left.length + '</b> of ' + st.total + ' words still to fall' +
-      (st.miss.length ? ' &middot; <b>' + st.miss.length + '</b> missed so far' : '') + '</p></div>';
-    buttons = '<button class="cta gi-play" id="gameStart" data-run="main">Continue</button>' +
-      '<button class="linkbtn" id="gameNew">Start the pass again</button>';
-  } else if (st && st.done && st.miss.length){
-    stage = '<div class="g-pass mist"><div class="dlabel">Every word has fallen once</div>' +
-      '<p>Now the ones that got away: <b>' + st.miss.length + '</b> ' + (st.miss.length === 1 ? 'mistake' : 'mistakes') + ' to clear.</p></div>';
-    buttons = '<button class="cta gi-play mist" id="gameStart" data-run="mist">Play my ' + st.miss.length + ' mistake' + (st.miss.length === 1 ? '' : 's') + '</button>' +
-      '<button class="linkbtn" id="gameNew">Start a fresh pass instead</button>';
-  } else {
-    stage = (st && st.done
-      ? '<div class="g-pass done"><div class="dlabel">All clear</div><p>You caught every word, mistakes included. Go again?</p></div>'
-      : '');
-    buttons = '<button class="cta gi-play" id="gameStart" data-run="new">Play &middot; ' + pool.length + ' words</button>';
-  }
+  rushStop();
+  const nS = rushPool("surah").length, nA = rushPool("all").length;
+  if (nS < 4 && RUSH.scope === "surah") RUSH.scope = "all";
+  const pool = rushPool(), key = rushKey(), ids = new Set(pool.map(it => it.id));
+  const seen = rushSeen(key).filter(id => ids.has(id)).length;
+  const mi = rushModeIx(), best = rushBest();
+  const demo = shuffle(pool.filter(it => it.ar.length < 14 && it.gloss.length < 16)).slice(0, 3);
   return '<div class="game-intro">' +
-    '<div class="gi-art" aria-hidden="true">' + pool.slice().sort((a, b) => dropText(a).length - dropText(b).length).slice(0, 3)
-      .map(w => '<span class="ar">' + esc(dropText(w)) + '</span>').join('') + '</div>' +
+    '<div class="ri-art" aria-hidden="true">' + demo.map((it, i) =>
+      '<span class="ri-pair" style="animation-delay:' + (-i * 1.1) + 's"><span class="ri-en">' + esc(it.gloss) + '</span>' +
+      '<span class="ri-link"></span><span class="ar ri-ar">' + esc(it.ar) + '</span></span>').join('') + '</div>' +
     '<div class="gi-kicker">Play &amp; Learn</div>' +
-    '<h2 class="gi-title">Word Rain</h2>' +
-    '<p class="gi-sub">A meaning appears at the top. Words start to fall. Tap the one that carries it before it lands.</p>' +
+    '<h2 class="gi-title">Word Rush</h2>' +
+    '<p class="gi-sub">Pair each word with its meaning before the clock runs out. Every pair buys back time &mdash; ten in a row sets off a <b class="gi-gold">Frenzy</b>.</p>' +
     '<div class="segmented gi-scope" role="tablist">' +
-      '<button role="tab" data-scope="surah" aria-selected="' + (GAME.scope === "surah") + '"' + (nS < 4 ? ' disabled' : '') + '>This surah &middot; ' + nS + '</button>' +
-      '<button role="tab" data-scope="all" aria-selected="' + (GAME.scope === "all") + '">All surahs &middot; ' + nA + '</button>' +
+      '<button role="tab" data-scope="surah" aria-selected="' + (RUSH.scope === "surah") + '"' + (nS < 4 ? ' disabled' : '') + '>This surah &middot; ' + nS + '</button>' +
+      '<button role="tab" data-scope="all" aria-selected="' + (RUSH.scope === "all") + '">All surahs &middot; ' + nA + '</button>' +
     '</div>' +
-    '<div class="gi-speed"><div class="dlabel">Falling speed</div>' + speedPicker() + '</div>' +
-    stage + buttons +
+    '<div class="r-modes" role="radiogroup" aria-label="Pace">' + RUSH_MODES.map((m, i) =>
+      '<button role="radio" data-rmode="' + i + '" aria-checked="' + (i === mi) + '"><b>' + m.name + '</b><span>' + m.note + '</span></button>').join('') + '</div>' +
+    '<div class="g-pass"><div class="dlabel">This pass</div>' +
+      '<div class="progress"><i style="width:' + Math.round(seen / Math.max(1, pool.length) * 100) + '%"></i></div>' +
+      '<p><b>' + seen + '</b> of ' + pool.length + ' words paired. Unseen words and your mistakes come first.</p></div>' +
+    '<button class="cta gi-play" id="rushStart">' + BOLT + 'Play</button>' +
+    '<p class="gi-best">' + (best ? 'Your best on ' + RUSH_MODES[mi].name + ': <b>' + best + '</b>' : 'No score yet on ' + RUSH_MODES[mi].name + '. Set one.') + '</p>' +
     '<div class="gi-rules">' +
-      '<span><b>1</b>every word falls once</span>' +
-      '<span><b>2</b>then only your mistakes</span>' +
-      '<span><b>&times;5</b>combo</span>' +
-      '<span><b class="gi-gold">&#9733;</b>gold = double</span>' +
+      '<span><b>+' + RUSH_MODES[mi].gain + 's</b>every pair</span>' +
+      '<span><b>&times;5</b>streak bonus</span>' +
+      '<span><b class="gi-gold">10</b>in a row = Frenzy</span>' +
+      '<span><b>12</b>pairs = faster clock</span>' +
     '</div>' +
-    '<p class="gi-best">' + (gameBest() ? 'Your best here: <b>' + gameBest() + '</b>' : 'No score yet. Set one.') + '</p>' +
-    '<p class="gi-foot">Your place is saved after every word, so you can stop and carry on later. Misses also go into the quiz’s mistakes basket. On a keyboard: keys 1–4 catch the words left to right, [ and ] change the speed, P pauses.</p>' +
+    '<p class="gi-foot">Mix-ups go into the quiz&rsquo;s mistakes basket; a clean pair takes them out. On a keyboard: 1&ndash;5 pick a meaning, 6&ndash;0 a word, P pauses.</p>' +
   '</div>';
 }
 
-function gameHUD(r){
-  const mult = Math.min(5, 1 + Math.floor(r.combo / 3));
-  return '<div class="g-score"><b id="gScore">' + r.score + '</b><span>' + (r.kind === "mist" ? 'Mistakes' : 'Level ' + r.level) + '</span></div>' +
-    '<div class="g-combo' + (r.combo >= 3 ? ' hot' : '') + '" id="gCombo">' + (r.combo ? '&times;' + mult + ' <small>' + r.combo + ' in a row</small>' : '') + '</div>';
-}
-function gameProgress(r){
-  const done = r.total - r.list.length;
-  return '<div class="g-prog"><div class="progress"><i style="width:' + Math.round(done / Math.max(1, r.total) * 100) + '%"></i></div>' +
-    '<span>' + (r.kind === "mist" ? 'Mistake ' : 'Word ') + Math.min(r.total, done + 1) + ' of ' + r.total + '</span></div>';
-}
-function speedChip(){
-  return '<span class="g-spd-dots">' + SPEEDS.map((s, i) => '<b' + (i <= speedIx() ? ' class="on"' : '') + '></b>').join('') + '</span>' +
-    '<span class="g-spd-name">' + SPEEDS[speedIx()].name + '</span>';
-}
-
-/* kind: "new" starts a fresh pass, "main" carries on the pass, "mist" plays the mistakes */
-function gameStart(kind){
-  gameStop();
-  let st = gState();
-  if (kind === "new" || !st || (kind === "main" && (st.done || !st.left.length))) { st = newPass(); kind = "main"; }
-  if (kind === "mist" && !st.miss.length) kind = "main";
-  const list = kind === "mist" ? shuffle(st.miss.slice()) : st.left;
-  GAME.run = { kind: kind, st: st, list: list, total: kind === "mist" ? list.length : st.total,
-               score: 0, combo: 0, maxCombo: 0, caught: 0, taps: 0, level: 1, flubbed: false,
-               drops: [], missed: [], cleared: [], pool: gamePool(), over: false, paused: true,
-               last: 0, raf: 0, timers: [], key: gameKey(), waves: 0 };
+function rushStart(){
+  rushStop();
+  const pool = rushPool();
+  if (pool.length < 3){ $("#modeBody").innerHTML = playView(); return; }
+  const md = RUSH_MODES[rushModeIx()], key = rushKey();
+  const r = RUSH.run = {
+    pool: pool, key: key, md: md, deck: rushDeck(pool, key), di: 0, rows: Math.min(RUSH_ROWS, pool.length),
+    time: md.time, cap: md.time, L: [], R: [], sel: null, onBoard: new Set(), empties: [],
+    score: 0, streak: 0, top: 0, pairs: 0, slips: 0, level: 1, frenzy: 0, frenzies: 0,
+    clock: 0, lastPair: -9, mixed: [], dirty: new Set(), newPass: false,
+    paused: true, counting: true, over: false, raf: 0, last: 0, timers: [], lowTick: 99, lem: {} };
+  pool.forEach(it => r.lem[it.id] = lemKey(it));
+  const first = [];
+  for (let i = 0; i < r.rows; i++){ const it = rushDraw(r); if (it) first.push(it); }
+  r.L = shuffle(first.slice()); r.R = shuffle(first.slice());
+  for (let t = 0; t < 6 && r.rows > 2 && r.L.every((x, i) => x === r.R[i]); t++) shuffle(r.R);
+  let tiles = '';
+  for (let i = 0; i < r.rows; i++) tiles += '<button class="rt rt-en" data-rs="L' + i + '"></button><button class="rt rt-ar" data-rs="R' + i + '"></button>';
   $("#modeBody").innerHTML =
-    '<div class="game' + (kind === "mist" ? ' mist' : '') + '" id="game">' +
-      '<div class="g-top"><div class="g-hud" id="gHud">' + gameHUD(GAME.run) + '</div>' +
-        '<button class="g-spd" id="gSpeed" aria-label="Falling speed — tap to change">' + speedChip() + '</button>' +
-        '<button class="g-icon" id="gMute" aria-label="Sound on or off">' + (QM.mute ? SOUND_OFF : SOUND_ON) + '</button>' +
-        '<button class="g-icon" id="gQuit" aria-label="Stop">' + CROSS + '</button></div>' +
-      '<div class="g-prompt" id="gPrompt"><span class="dlabel">' + (kind === "mist" ? 'Second chance &middot; catch the word that means' : 'Catch the word that means') + '</span>' +
-        '<div class="g-mean" id="gMean">&nbsp;</div><div id="gProg">' + gameProgress(GAME.run) + '</div></div>' +
-      '<div class="g-arena" id="gArena"><div class="g-ground"></div><div class="g-over" id="gOverlay"></div></div>' +
+    '<div class="game" id="game">' +
+      '<div class="rush-top">' +
+        '<div class="rush-clock" id="rushClock"><svg viewBox="0 0 48 48" aria-hidden="true"><circle class="rc-bg" cx="24" cy="24" r="20"/>' +
+          '<circle class="rc-fg" id="rcFg" cx="24" cy="24" r="20"/></svg><b id="rcNum">' + md.time + '</b></div>' +
+        '<div class="rush-score"><b id="rushScore">0</b><span id="rushLvl">Level 1 &middot; ' + md.name + '</span></div>' +
+        '<div class="rush-streak" id="rushStreak"></div>' +
+        '<button class="g-icon" id="rushMute" aria-label="Sound on or off">' + (QM.mute ? SOUND_OFF : SOUND_ON) + '</button>' +
+        '<button class="g-icon" id="rushPauseBtn" aria-label="Pause">' + PAUSE + '</button>' +
+      '</div>' +
+      '<div class="rush-board" id="rushBoard">' + tiles + '<div class="g-over" id="rushOverlay"></div></div>' +
     '</div>';
-  $("#gArena").addEventListener("pointerdown", gamePointer);
-  const top = $("#game").getBoundingClientRect().top + window.scrollY - 100;
+  for (let i = 0; i < r.rows; i++){ rushPaint("L", i); rushPaint("R", i); }
+  rushClock(); rushHud();
+  const top = $("#game").getBoundingClientRect().top + window.scrollY - 120;
   window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-  gameCountdown();
+  rushCountdown();
 }
-
-function later(fn, ms){
-  const r = GAME.run;
+/* the next word from the deck that isn't on the board — nor another form of one that is */
+function rushDraw(r){
+  const lems = new Set([...r.onBoard].map(id => r.lem[id]));
+  for (let n = 0; n < r.pool.length * 2 + 2; n++){
+    if (r.di >= r.deck.length){ r.deck = shuffle(r.pool.slice()); r.di = 0; }
+    const it = r.deck[r.di++];
+    if (!r.onBoard.has(it.id) && (!lems.has(r.lem[it.id]) || n > r.pool.length)){ r.onBoard.add(it.id); return it; }
+  }
+  return null;
+}
+function rushLater(fn, ms){
+  const r = RUSH.run;
   if (!r) return;
-  r.timers.push(setTimeout(() => { if (GAME.run === r && !r.over) fn(); }, ms));
+  r.timers.push(setTimeout(() => { if (RUSH.run === r && !r.over) fn(); }, ms));
 }
-
-function gameCountdown(){
-  const ov = $("#gOverlay"), r = GAME.run;
-  r.paused = true;
-  let n = 3;
-  const step = () => {
-    if (n === 0){
-      ov.className = "g-over"; ov.innerHTML = "";
-      sfx("go"); r.paused = false; r.last = 0;
-      gameWave();
-      r.raf = requestAnimationFrame(gameTick);
-      return;
-    }
-    ov.className = "g-over show count"; ov.innerHTML = '<div class="g-count">' + n + '</div>';
-    sfx("tick"); n--;
-    later(step, 650);
-  };
-  step();
-}
-
-function gameStop(){
-  const r = GAME.run;
+function rushStop(){
+  const r = RUSH.run;
   if (!r) return;
   r.over = true;
   cancelAnimationFrame(r.raf);
   r.timers.forEach(clearTimeout);
-  GAME.run = null;
+  RUSH.run = null;
 }
 
-/* the word now falling is always the last id in the list; it only leaves
-   the list once it has been caught or has landed */
-function settleTarget(ok){
-  const r = GAME.run, w = r.target;
-  if (!w) return;
-  const at = r.list.lastIndexOf(w.id);
-  if (at >= 0) r.list.splice(at, 1);
-  const miss = r.st.miss;
-  if (r.kind === "main"){
-    if (!ok && miss.indexOf(w.id) < 0) miss.push(w.id);
-  } else {
-    const i = miss.indexOf(w.id);
-    if (ok && i >= 0) miss.splice(i, 1);
-  }
-  (ok ? r.cleared : r.missed).push(w.id);
-  if (r.kind === "main" && !r.list.length) r.st.done = true;
-  qmSave();
-  r.target = null;
-  const p = $("#gProg"); if (p) p.innerHTML = gameProgress(r);
+const KEYS_L = ["1", "2", "3", "4", "5"], KEYS_R = ["6", "7", "8", "9", "0"];
+function rushPaint(side, i, anim){
+  const r = RUSH.run, el = document.querySelector('[data-rs="' + side + i + '"]');
+  if (!r || !el) return;
+  const it = (side === "L" ? r.L : r.R)[i];
+  el.className = "rt " + (side === "L" ? "rt-en" : "rt-ar") + (it ? "" : " empty") + (anim ? " " + anim : "") +
+    (r.sel && r.sel.side === side && r.sel.i === i ? " sel" : "");
+  el.disabled = !it;
+  el.innerHTML = it
+    ? (side === "L" ? '<span class="rt-t">' + esc(it.gloss) + '</span>' : '<span class="ar">' + esc(it.ar) + '</span>') +
+      '<kbd>' + (side === "L" ? KEYS_L : KEYS_R)[i] + '</kbd>'
+    : '';
+}
+function rushClock(){
+  const r = RUSH.run; if (!r) return;
+  const fg = $("#rcFg"), num = $("#rcNum"), box = $("#rushClock");
+  if (!fg) return;
+  const C = 2 * Math.PI * 20, t = Math.max(0, r.time);
+  fg.style.strokeDasharray = C;
+  fg.style.strokeDashoffset = C * (1 - Math.min(1, t / r.cap));
+  num.textContent = t < 10 ? t.toFixed(1) : Math.ceil(t);
+  box.classList.toggle("low", t <= 10 && r.frenzy <= 0);
+  box.classList.toggle("frozen", r.frenzy > 0);
+}
+function rushHud(){
+  const r = RUSH.run; if (!r) return;
+  const sc = $("#rushScore"); if (sc) sc.textContent = r.score;
+  const lv = $("#rushLvl"); if (lv) lv.innerHTML = 'Level ' + r.level + ' &middot; ' + r.md.name;
+  const st = $("#rushStreak"); if (!st) return;
+  st.className = "rush-streak" + (r.frenzy > 0 ? " frenzy" : rushMult(r.streak) > 1 ? " hot" : "");
+  st.innerHTML = r.frenzy > 0
+    ? BOLT + '<b>Frenzy</b><small>' + r.frenzy.toFixed(1) + 's</small>'
+    : r.streak ? '<b>&times;' + rushMult(r.streak) + '</b><small>' + r.streak + ' in a row</small>' : '<b>&times;1</b><small>streak</small>';
 }
 
-function gameWave(){
-  const r = GAME.run;
-  if (!r || r.over) return;
-  const arena = $("#gArena");
-  r.drops.forEach(d => d.el.remove());
-  r.drops = [];
-  let target = null;
-  while (r.list.length && !(target = byId(r.list[r.list.length - 1]))) r.list.pop();
-  if (!target){ passEnd(); return; }
-  r.waves++;
-  r.flubbed = false;
-  let k = Math.min(4, 2 + Math.floor(r.level / 2));            // 2, 3, 3, 4 …
-  if (isLong(target)) k = Math.min(k, dropText(target).length > 40 ? 2 : 3);   // long phrases need room
-  const arSeen = { [skeleton(target.ar)]: 1 }, enSeen = { [brief(target.meaning, 70)]: 1 };
-  const decoys = [];
-  const src = r.pool.length >= k + 2 ? r.pool : ALL;
-  const tl = dropText(target).length;
-  /* decoys of a similar length, so the size of a drop never gives the answer away */
-  const near = shuffle(src.slice()).filter(x => x !== target)
-    .sort((a, b) => Math.abs(dropText(a).length - tl) - Math.abs(dropText(b).length - tl))
-    .slice(0, Math.max(10, k * 4));
-  shuffle(near).forEach(x => {
-    if (decoys.length >= k - 1) return;
-    const a = skeleton(x.ar), m = brief(x.meaning, 70);
-    if (!a || arSeen[a] || enSeen[m]) return;
-    arSeen[a] = 1; enSeen[m] = 1; decoys.push(x);
-  });
-  const gold = r.waves > 3 && Math.random() < 0.14;
-  const words = shuffle([{ w: target, ok: true }].concat(decoys.map(w => ({ w: w, ok: false }))));
-  const W = arena.clientWidth, H = arena.clientHeight;
-  const slot = W / words.length;
-  const fall = fallTime();
-  words.forEach((o, i) => {
-    const el = document.createElement("button");
-    el.className = "g-drop" + (o.ok && gold ? " gold" : "") + (isLong(o.w) ? " long" : "");
-    el.innerHTML = '<span class="ar">' + esc(dropText(o.w)) + '</span>';
-    el.style.maxWidth = Math.max(70, slot - 10) + "px";
-    arena.appendChild(el);
-    const w = el.offsetWidth, h = el.offsetHeight;
-    const jitter = (slot - w) > 8 ? (Math.random() - 0.5) * (slot - w - 8) : 0;
-    const d = { el: el, w: o.w, ok: o.ok, gold: o.ok && gold, h: h,
-                x: Math.max(4, Math.min(W - w - 4, slot * i + (slot - w) / 2 + jitter)),
-                y: -h - 10 - Math.random() * 50, vy: (H + h) / fall * (0.94 + Math.random() * 0.12), dead: false };
-    el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
-    el._drop = d;
-    r.drops.push(d);
-  });
-  r.target = target;
-  const mean = $("#gMean");
-  mean.textContent = plainMean(target.meaning, 80);
-  mean.classList.remove("pop"); void mean.offsetWidth; mean.classList.add("pop");
-}
-
-function gameTick(ts){
-  const r = GAME.run;
-  if (!r || r.over) return;
-  const arena = $("#gArena");
-  if (!arena){ gameStop(); return; }
-  const visible = !document.hidden && $("#scr-surah").classList.contains("active") && !$("#sheet").classList.contains("open");
-  if (!visible && !r.paused && !r.ending){ gamePause(); }
-  if (r.paused){ r.last = 0; r.raf = requestAnimationFrame(gameTick); return; }
-  const dt = r.last ? Math.min(0.05, (ts - r.last) / 1000) : 0;
-  r.last = ts;
-  const H = arena.clientHeight;
-  let danger = false;
-  r.drops.forEach(d => {
-    if (d.dead) return;
-    d.y += d.vy * dt;
-    d.el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
-    if (d.ok && d.y > H * 0.66) danger = true;
-    if (d.y >= H - d.h - 4){
-      d.dead = true;
-      if (d.ok) gameLanded(d);
-      else d.el.classList.add("fade");
+function rushCountdown(){
+  const ov = $("#rushOverlay"), r = RUSH.run;
+  r.paused = true; r.counting = true;
+  let n = 3;
+  const step = () => {
+    if (n === 0){
+      ov.className = "g-over"; ov.innerHTML = "";
+      sfx("go"); r.paused = false; r.counting = false; r.last = 0;
+      r.raf = requestAnimationFrame(rushTick);
+      return;
     }
-  });
-  arena.classList.toggle("danger", danger);
-  r.raf = requestAnimationFrame(gameTick);
+    ov.className = "g-over show count"; ov.innerHTML = '<div class="g-count">' + n + '</div>';
+    sfx("tick"); n--;
+    rushLater(step, 620);
+  };
+  step();
 }
 
-function gamePointer(e){
-  const el = e.target.closest(".g-drop");
-  if (!el || !el._drop) return;
-  e.preventDefault();
-  gameHit(el._drop);
-}
-
-function gameHit(d){
-  const r = GAME.run;
-  if (!r || r.over || r.paused || d.dead || d.wrongDone || r.ending) return;
-  r.taps++;
-  const arena = $("#gArena");
-  if (d.ok){
-    d.dead = true;
-    const clean = !r.flubbed;
-    if (clean){ r.combo++; r.maxCombo = Math.max(r.maxCombo, r.combo); }
-    r.caught++;
-    const mult = Math.min(5, 1 + Math.floor((Math.max(r.combo, 1) - 1) / 3));
-    const early = Math.max(0, Math.round(10 * (1 - d.y / arena.clientHeight)));
-    const pts = clean ? (10 + early) * mult * (d.gold ? 2 : 1) : 2;
-    r.score += pts;
-    if (clean) outOfBasket(d.w);
-    sfx(d.gold && clean ? "gold" : "good", r.combo);
-    burst(d, d.gold ? "gold" : "good");
-    floatText(d, "+" + pts + (d.gold && clean ? " ★" : ""), d.gold && clean ? "gold" : "good");
-    d.el.classList.add("caught");
-    r.drops.forEach(o => { if (!o.dead){ o.dead = true; o.el.classList.add("fade"); } });
-    settleTarget(clean);
-    let lvl = false;
-    if (r.kind === "main" && clean && r.caught % 6 === 0 && r.level < 5){ r.level++; lvl = r.level <= 5; }
-    $("#gHud").innerHTML = gameHUD(r);
-    const sc = $("#gScore"); if (sc){ sc.classList.add("bump"); }
-    if (lvl && r.list.length){ banner("Level " + r.level, "One more word in the rain"); sfx("level"); later(gameWave, 1050); }
-    else later(gameWave, 420);
+function rushTick(ts){
+  const r = RUSH.run;
+  if (!r || r.over) return;
+  if (!$("#rushBoard")){ rushStop(); return; }
+  if (document.hidden || $("#sheet").classList.contains("open")){ rushPause(); return; }
+  if (r.paused){ r.raf = 0; return; }
+  const dt = r.last ? Math.min(0.05, (ts - r.last) / 1000) : 0;
+  r.last = ts; r.clock += dt;
+  if (r.frenzy > 0){
+    r.frenzy = Math.max(0, r.frenzy - dt);
+    if (!r.frenzy){ const g = $("#game"); if (g) g.classList.remove("frenzy"); }
+    rushHud();
   } else {
-    d.el.classList.add("wrongtap");
-    d.el.innerHTML += '<small class="g-gloss">' + esc(plainMean(d.w.meaning, 40)) + '</small>';
-    reclamp(d);
-    d.vy *= 0.4; d.wrongDone = true;   // keep it falling, slowly, so you can read what it means
-    flub("tap");
+    r.time -= dt * (1 + 0.12 * (r.level - 1));
+    if (r.time <= 5){ const s = Math.ceil(r.time); if (s > 0 && s < r.lowTick){ r.lowTick = s; sfx("tick"); } }
+    else r.lowTick = 99;
   }
+  rushClock();
+  if (r.time <= 0){ r.time = 0; rushClock(); rushEnd(); return; }
+  r.raf = requestAnimationFrame(rushTick);
 }
 
-/* a wrong tap: the right word can still be caught, but it now counts as a mistake */
-function flub(why){
-  const r = GAME.run;
-  r.combo = 0;
-  r.flubbed = true;
-  if (r.target) toBasket(r.target);
-  sfx(why === "land" ? "land" : "bad");
-  try { if (navigator.vibrate) navigator.vibrate(why === "land" ? 90 : 50); } catch (e) {}
+function rushTap(side, i){
+  const r = RUSH.run;
+  if (!r || r.over || r.paused) return;
+  const it = (side === "L" ? r.L : r.R)[i];
+  if (!it) return;
+  if (!r.sel || r.sel.side === side){
+    const prev = r.sel;
+    r.sel = prev && prev.i === i ? null : { side: side, i: i };
+    if (prev) rushPaint(prev.side, prev.i);
+    rushPaint(side, i);
+    sfx("tap");
+    return;
+  }
+  const li = side === "L" ? i : r.sel.i, ri = side === "R" ? i : r.sel.i;
+  r.sel = null;
+  if (r.L[li] && r.L[li] === r.R[ri]) rushGood(li, ri); else rushBad(li, ri);
+}
+
+function rushGood(li, ri){
+  const r = RUSH.run, it = r.L[li];
+  const quick = r.pairs > 0 && r.clock - r.lastPair < 1.8;
+  r.lastPair = r.clock;
+  r.streak++; r.top = Math.max(r.top, r.streak); r.pairs++;
+  const pts = (10 * rushMult(r.streak) + (quick ? 5 : 0)) * (r.frenzy > 0 ? 2 : 1);
+  r.score += pts;
+  if (r.frenzy <= 0) r.time = Math.min(r.cap, r.time + r.md.gain);
+  if (!r.dirty.has(it.id)){ outOfBasket(it.w); markKnown(it.w); }
+  const seen = rushSeen(r.key);
+  if (seen.indexOf(it.id) < 0) seen.push(it.id);
+  if (seen.length >= r.pool.length){ QM.rush.seen[r.key] = []; r.newPass = true; }
+  qmSave();
+  sfx("good", r.streak);
+  try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
+  rushPaint("L", li, "hit"); rushPaint("R", ri, "hit");
+  rushBurst(ri, r.frenzy > 0 ? "gold" : "good");
+  rushFloat(ri, "+" + pts + (quick ? " quick!" : ""), r.frenzy > 0 ? "gold" : "good");
+  r.L[li] = null; r.R[ri] = null;
+  rushLater(() => {
+    r.onBoard.delete(it.id);
+    r.empties.push([li, ri]);
+    rushPaint("L", li); rushPaint("R", ri);
+    rushRefill();
+  }, 260);
+  if (r.streak % 10 === 0){
+    r.frenzy = 6; r.frenzies++;
+    const g = $("#game"); if (g) g.classList.add("frenzy");
+    rushBanner("Frenzy!", "Clock stopped · double points"); sfx("frenzy");
+  } else if (r.pairs % 12 === 0){
+    r.level++;
+    rushBanner("Level " + r.level, "The clock runs faster"); sfx("level");
+  } else if (r.newPass){
+    r.newPass = false;
+    rushBanner("Every word paired", "A fresh pass starts now");
+  }
+  rushHud(); rushClock();
+}
+/* new words arrive two at a time, so a fresh pair never gives itself away */
+function rushRefill(){
+  const r = RUSH.run;
+  if (!r || r.over) return;
+  const live = r.L.filter(Boolean).length;
+  if (r.empties.length < 2 && live >= Math.min(3, r.rows)) return;
+  const slots = r.empties.splice(0);
+  const items = [];
+  slots.forEach(() => { const it = rushDraw(r); if (it) items.push(it); });
+  const Ls = shuffle(slots.map(s => s[0])), Rs = shuffle(slots.map(s => s[1]));
+  items.forEach((it, k) => { r.L[Ls[k]] = it; r.R[Rs[k]] = it; });
+  for (let k = items.length; k < slots.length; k++) r.empties.push([Ls[k], Rs[k]]);
+  Ls.slice(0, items.length).forEach(i => rushPaint("L", i, "in"));
+  Rs.slice(0, items.length).forEach(i => rushPaint("R", i, "in"));
+}
+function rushBad(li, ri){
+  const r = RUSH.run, a = r.R[ri], e = r.L[li];
+  r.slips++; r.streak = 0;
+  if (r.frenzy <= 0 && r.md.penalty) r.time = Math.max(0, r.time - r.md.penalty);
+  r.dirty.add(a.id); r.dirty.add(e.id);
+  toBasket(a.w);
+  if (r.mixed.indexOf(a.w.id) < 0) r.mixed.push(a.w.id);
+  sfx("bad");
+  try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {}
+  rushPaint("L", li, "miss"); rushPaint("R", ri, "miss");
+  if (r.md.penalty && r.frenzy <= 0) rushFloat(ri, "−" + r.md.penalty + "s", "bad");
   const g = $("#game"); if (g){ g.classList.remove("shake"); void g.offsetWidth; g.classList.add("shake"); }
-  $("#gHud").innerHTML = gameHUD(r);
+  rushLater(() => { rushPaint("L", li); rushPaint("R", ri); }, 430);
+  rushHud(); rushClock();
 }
 
-function gameLanded(d){
-  const r = GAME.run;
-  d.el.classList.add("landed");
-  d.el.innerHTML += '<small class="g-gloss">' + esc(plainMean(d.w.meaning, 40)) + '</small>';
-  reclamp(d);
-  d.y = Math.min(d.y, $("#gArena").clientHeight - d.el.offsetHeight - 4);
-  d.el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
-  r.drops.forEach(o => { if (!o.dead){ o.dead = true; o.el.classList.add("fade"); } });
-  flub("land");
-  settleTarget(false);
-  later(gameWave, 1500);       // a beat to read the word you missed
+function rushTileBox(ri){
+  const board = $("#rushBoard"), el = document.querySelector('[data-rs="R' + ri + '"]');
+  if (!board || !el) return null;
+  const b = board.getBoundingClientRect(), t = el.getBoundingClientRect();
+  return { x: t.left - b.left + t.width / 2, y: t.top - b.top + t.height / 2 };
 }
-
-function reclamp(d){
-  const W = $("#gArena").clientWidth;
-  d.x = Math.max(4, Math.min(d.x, W - d.el.offsetWidth - 4));
-  d.h = d.el.offsetHeight;
-  d.el.style.transform = "translate(" + d.x + "px," + d.y + "px)";
-}
-function burst(d, kind){
-  const arena = $("#gArena");
-  const cx = d.x + d.el.offsetWidth / 2, cy = d.y + d.h / 2;
-  for (let i = 0; i < 14; i++){
+function rushBurst(ri, kind){
+  const p0 = rushTileBox(ri), board = $("#rushBoard");
+  if (!p0) return;
+  for (let i = 0; i < 12; i++){
     const p = document.createElement("i");
     p.className = "g-spark " + kind;
-    const a = Math.PI * 2 * i / 14 + Math.random() * 0.4, dist = 40 + Math.random() * 46;
-    p.style.left = cx + "px"; p.style.top = cy + "px";
+    const a = Math.PI * 2 * i / 12 + Math.random() * 0.4, dist = 30 + Math.random() * 40;
+    p.style.left = p0.x + "px"; p.style.top = p0.y + "px";
     p.style.setProperty("--dx", Math.cos(a) * dist + "px");
     p.style.setProperty("--dy", Math.sin(a) * dist + "px");
-    arena.appendChild(p);
+    board.appendChild(p);
     setTimeout(() => p.remove(), 700);
   }
 }
-function floatText(d, text, kind){
-  const arena = $("#gArena");
+function rushFloat(ri, text, kind){
+  const p0 = rushTileBox(ri), board = $("#rushBoard");
+  if (!p0) return;
   const f = document.createElement("span");
   f.className = "g-float " + kind;
   f.textContent = text;
-  f.style.left = (d.x + d.el.offsetWidth / 2) + "px"; f.style.top = d.y + "px";
-  arena.appendChild(f);
+  f.style.left = p0.x + "px"; f.style.top = (p0.y - 18) + "px";
+  board.appendChild(f);
   setTimeout(() => f.remove(), 900);
 }
-function banner(big, small){
-  const ov = $("#gOverlay");
+function rushBanner(big, small){
+  const ov = $("#rushOverlay");
   if (!ov) return;
   ov.className = "g-over show banner";
   ov.innerHTML = '<div class="g-banner"><b>' + esc(big) + '</b><span>' + esc(small) + '</span></div>';
-  later(() => { if (ov.classList.contains("banner")){ ov.className = "g-over"; ov.innerHTML = ""; } }, 1000);
+  rushLater(() => { if (ov.classList.contains("banner")){ ov.className = "g-over"; ov.innerHTML = ""; } }, 1100);
 }
 
-/* change speed — words already falling change pace too */
-function setSpeed(i){
-  const old = fallTime();
-  QM.speed = Math.max(0, Math.min(SPEEDS.length - 1, i)); qmSave();
-  const r = GAME.run;
-  if (r) r.drops.forEach(d => { d.vy *= old / fallTime(); });
-  const chip = $("#gSpeed"); if (chip) chip.innerHTML = speedChip();
-  $$("[data-speed]").forEach(b => b.setAttribute("aria-checked", String(+b.dataset.speed === speedIx())));
-}
-
-function gamePause(){
-  const r = GAME.run;
-  if (!r || r.paused) return;
+function rushPause(){
+  const r = RUSH.run;
+  if (!r || r.over || r.counting) return;
   r.paused = true;
-  const ov = $("#gOverlay");
+  cancelAnimationFrame(r.raf); r.raf = 0;
+  const ov = $("#rushOverlay");
+  if (!ov) return;
   ov.className = "g-over show";
   ov.innerHTML = '<div class="g-card"><div class="go-title">Paused</div>' +
-    '<div class="gi-speed"><div class="dlabel">Falling speed</div>' + speedPicker() + '</div>' +
-    '<button class="cta" id="gResume">Resume</button>' +
-    '<button class="abtn wide" id="gQuit2">Stop here &middot; your place is saved</button></div>';
+    '<div class="go-score">' + r.score + '</div><div class="go-best">' + Math.ceil(r.time) + ' seconds left</div>' +
+    '<button class="cta" id="rushResume">Resume</button>' +
+    '<button class="abtn wide" id="rushQuit">Stop here</button></div>';
 }
-function gameResume(){
-  const r = GAME.run;
-  if (!r) return;
-  const ov = $("#gOverlay"); ov.className = "g-over"; ov.innerHTML = "";
+function rushResume(){
+  const r = RUSH.run;
+  if (!r || r.over || !r.paused || r.counting) return;
+  const ov = $("#rushOverlay"); ov.className = "g-over"; ov.innerHTML = "";
   r.paused = false; r.last = 0;
+  r.raf = requestAnimationFrame(rushTick);
 }
 
-function keepBest(r){
-  const prev = (QM.best && QM.best[r.key]) || 0;
-  QM.best = QM.best || {}; QM.best[r.key] = Math.max(prev, r.score); qmSave();
-  return prev;
-}
-
-/* the list ran out: the main pass is complete, or a mistakes round is */
-function passEnd(){
-  const r = GAME.run;
+function rushEnd(){
+  const r = RUSH.run;
   if (!r) return;
-  r.paused = true; r.ending = true;
-  const prev = keepBest(r);
-  const st = r.st;
-  const left = st.miss.length;
-  sfx(left ? "over" : "win");
-  const acc = r.taps ? Math.round(r.caught / r.taps * 100) : 0;
-  const missedWords = (r.kind === "main" ? st.miss : r.missed).map(byId).filter(Boolean);
-  const head = r.kind === "main"
-    ? '<div class="go-title">Pass complete</div><div class="go-line">Every word fell once. You caught <b>' + r.cleared.length + '</b> of ' + r.total + ' clean.</div>'
-    : (left ? '<div class="go-title">Mistakes round done</div><div class="go-line">Cleared <b>' + r.cleared.length + '</b>. Still to clear: <b>' + left + '</b>.</div>'
-            : '<div class="g-new">All clear</div><div class="go-line">Every mistake caught. These words are yours now.</div>');
-  const ov = $("#gOverlay");
-  ov.className = "g-over show final";
-  ov.innerHTML = '<div class="g-card">' + head +
-    (r.score > prev && r.score > 0 ? '<div class="g-new">New best</div>' : '') +
-    '<div class="go-score">' + r.score + '</div>' +
-    '<div class="go-best">Best ' + Math.max(prev, r.score) + '</div>' +
-    '<div class="go-stats"><span><b>' + r.cleared.length + '</b>clean</span><span><b>' + r.missed.length + '</b>missed</span>' +
-      '<span><b>' + acc + '%</b>accuracy</span><span><b>&times;' + Math.min(5, 1 + Math.floor((Math.max(r.maxCombo, 1) - 1) / 3)) + '</b>top combo</span></div>' +
-    (left ? '<button class="cta mist" id="gameStart" data-run="mist">Play my ' + left + ' mistake' + (left === 1 ? '' : 's') + '</button>'
-          : '<button class="cta" id="gameStart" data-run="new">Start a fresh pass</button>') +
-    (missedWords.length ? '<p class="grouplabel">' + (r.kind === "main" ? 'Your mistakes pool' : 'Still slipping') + ' &middot; tap one to revise it</p>' +
-      wordGroup(missedWords.slice(0, 40), GAME.scope === "all") : '') +
-    (left && cur && basketIds(cur.num).length ? '<button class="abtn wide" id="gamePractice">' + BASKET + '<span>Practise them in the quiz instead</span></button>' : '') +
-    '<button class="linkbtn" id="gameHome">Back to Word Rain</button>' +
-  '</div>';
-  ov.scrollTop = 0;
-  r.over = true;
+  r.over = true; r.paused = true;
   cancelAnimationFrame(r.raf);
+  r.timers.forEach(clearTimeout);
+  const bests = QM.rush.best || (QM.rush.best = {});
+  const bk = r.key + ":" + r.md.key, prev = bests[bk] || 0;
+  bests[bk] = Math.max(prev, r.score); qmSave();
+  const fresh = r.score > prev && r.score > 0;
+  sfx(fresh ? "win" : "over");
+  const acc = r.pairs + r.slips ? Math.round(r.pairs / (r.pairs + r.slips) * 100) : 0;
+  const ids = new Set(r.pool.map(it => it.id)), seen = rushSeen(r.key).filter(id => ids.has(id)).length;
+  const mixed = r.mixed.map(byId).filter(Boolean);
+  const b = cur ? basketIds(cur.num).length : 0;
+  const pb = $("#rushPauseBtn"); if (pb) pb.hidden = true;
+  const board = $("#rushBoard");
+  if (!board) return;
+  board.outerHTML = '<div class="g-card rush-result" id="rushResult">' +
+    '<div class="go-title">Time!</div>' +
+    (fresh ? '<div class="g-new">New best</div>' : '') +
+    '<div class="go-score">' + r.score + '</div>' +
+    '<div class="go-best">Best on ' + r.md.name + ': ' + Math.max(prev, r.score) + '</div>' +
+    '<div class="go-stats"><span><b>' + r.pairs + '</b>pairs</span><span><b>' + acc + '%</b>accuracy</span>' +
+      '<span><b>' + r.top + '</b>best streak</span><span><b>' + r.frenzies + '</b>' + (r.frenzies === 1 ? 'frenzy' : 'frenzies') + '</span></div>' +
+    '<p class="go-line">This pass: <b>' + seen + '</b> of ' + r.pool.length + ' words paired.</p>' +
+    '<button class="cta" id="rushStart">' + BOLT + 'Play again</button>' +
+    (b && RUSH.scope === "surah" ? '<button class="abtn wide" id="rushPractice">' + BASKET + '<span>Practise ' + b + (b === 1 ? ' mistake' : ' mistakes') + ' in the quiz</span></button>' : '') +
+    (mixed.length ? '<p class="grouplabel">Mixed up &middot; tap one to revise it</p>' + wordGroup(mixed.slice(0, 30), RUSH.scope === "all") : '') +
+    '<button class="linkbtn" id="rushHome">Back to Word Rush</button>' +
+  '</div>';
+  const res = $("#rushResult");
+  if (res && res.getBoundingClientRect().top < 60) res.scrollIntoView({ block: "start", behavior: "smooth" });
+  refreshProgress();
 }
 
-function gameClick(t){
+function rushClick(t){
   if (mode !== "play") return false;
+  const tile = t.closest("[data-rs]");
+  if (tile){ const k = tile.dataset.rs; rushTap(k[0], +k.slice(1)); return true; }
   const sc = t.closest("[data-scope]");
-  if (sc && !sc.disabled){ GAME.scope = sc.dataset.scope; $("#modeBody").innerHTML = playView(); return true; }
-  const sp = t.closest("[data-speed]");
-  if (sp){ setSpeed(+sp.dataset.speed); return true; }
-  if (t.closest("#gSpeed")){ setSpeed((speedIx() + 1) % SPEEDS.length); return true; }
-  const go = t.closest("#gameStart");
-  if (go){ gameStart(go.dataset.run || "main"); return true; }
-  if (t.closest("#gameNew")){ gameStart("new"); return true; }
-  if (t.closest("#gResume")){ gameResume(); return true; }
-  if (t.closest("#gameHome")){ gameStop(); $("#modeBody").innerHTML = playView(); return true; }
-  if (t.closest("#gQuit") || t.closest("#gQuit2")){
-    const r = GAME.run;
-    if (r && !r.over) keepBest(r);
-    gameStop(); $("#modeBody").innerHTML = playView();
-    return true;
-  }
-  if (t.closest("#gMute")){
+  if (sc && !sc.disabled){ RUSH.scope = sc.dataset.scope; $("#modeBody").innerHTML = playView(); return true; }
+  const md = t.closest("[data-rmode]");
+  if (md){ QM.rush.mode = +md.dataset.rmode; qmSave(); $("#modeBody").innerHTML = playView(); return true; }
+  if (t.closest("#rushStart")){ rushStart(); return true; }
+  if (t.closest("#rushPauseBtn")){ rushPause(); return true; }
+  if (t.closest("#rushResume")){ rushResume(); return true; }
+  if (t.closest("#rushQuit")){ const r = RUSH.run; if (r){ r.time = 0; rushEnd(); } return true; }
+  if (t.closest("#rushHome")){ rushStop(); $("#modeBody").innerHTML = playView(); return true; }
+  if (t.closest("#rushMute")){
     QM.mute = !QM.mute; qmSave();
-    t.closest("#gMute").innerHTML = QM.mute ? SOUND_OFF : SOUND_ON;
+    t.closest("#rushMute").innerHTML = QM.mute ? SOUND_OFF : SOUND_ON;
     return true;
   }
-  if (t.closest("#gamePractice")){
-    gameStop(); mode = "quiz";
-    $$("[data-mode]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === mode)));
-    startQuiz(true); return true;
-  }
+  if (t.closest("#rushPractice")){ rushStop(); pendingPractice = true; go(surahPath(cur.num, "quiz"), { replace: true }); return true; }
   return false;
 }
-
-function gameKeys(e){
-  const r = GAME.run;
-  if (!r || r.over || mode !== "play") return;
-  if (e.key === "Escape" || e.key === "p" || e.key === "P"){ r.paused ? gameResume() : gamePause(); return; }
-  if (e.key === "[" || e.key === "-"){ setSpeed(speedIx() - 1); return; }
-  if (e.key === "]" || e.key === "=" || e.key === "+"){ setSpeed(speedIx() + 1); return; }
-  if (!/^[1-4]$/.test(e.key)) return;
-  const live = r.drops.filter(d => !d.dead).sort((a, b) => a.x - b.x);
-  const d = live[+e.key - 1];
-  if (d){ e.preventDefault(); gameHit(d); }
+function rushKeys(e){
+  const r = RUSH.run;
+  if (!r || r.over || r.counting) return false;
+  if (e.key === "Escape" || e.key === "p" || e.key === "P"){ e.preventDefault(); r.paused ? rushResume() : rushPause(); return true; }
+  if (r.paused) return false;
+  let i = KEYS_L.indexOf(e.key);
+  if (i >= 0 && i < r.rows){ e.preventDefault(); rushTap("L", i); return true; }
+  i = KEYS_R.indexOf(e.key);
+  if (i >= 0 && i < r.rows){ e.preventDefault(); rushTap("R", i); return true; }
+  return false;
 }
+document.addEventListener("visibilitychange", () => { if (document.hidden) rushPause(); });
 
 /* ===================== threads ===================== */
 let threadMode = "links";
@@ -2364,9 +2953,9 @@ function rootIndex(){
 }
 function glossOf(w){
   const root = String(w.root || "");
-  const m = root.match(/^\u221a\S+\s+[\u00b7\u2014\u2013-]\s+(.+)$/);
+  const m = root.match(/^√\S+\s+[·—–-]\s+(.+)$/);
   if (m) return m[1];
-  if (/^\u221a\S+$/.test(root)) return String(w.meaning || "");
+  if (/^√\S+$/.test(root)) return String(w.meaning || "");
   return root;
 }
 
@@ -2379,9 +2968,10 @@ function renderThreads(){
 function linksView(q){
   let rows = ALL_LINKS;
   if (q) rows = rows.filter(r =>
-    (r.l.w + " " + r.l.e + " " + r.l.t + " " + r.from).toLowerCase().includes(q));
+    plain(r.l.w + " " + r.l.e + " " + r.l.t + " " + r.from).includes(plain(q)) ||
+    (/[؀-ۿ]/.test(q) && skeleton(r.l.w + " " + r.l.e).includes(skeleton(q))));
   if (!rows.length)
-    return '<div class="empty"><div class="ar">\u0631\u0627\u0628\u0637</div><p>No connection matches that.</p></div>';
+    return '<div class="empty"><div class="ar">رابط</div><p>No connection matches that.</p></div>';
   const bySurah = new Map();
   rows.forEach(r => { if (!bySurah.has(r.from)) bySurah.set(r.from, []); bySurah.get(r.from).push(r.l); });
   return [...bySurah.entries()].map(([from, ls]) =>
@@ -2391,21 +2981,28 @@ function linksView(q){
 
 function rootsView(q){
   let list = rootIndex();
-  if (q) list = list.filter(r => r.key.toLowerCase().includes(q) || r.gloss.toLowerCase().includes(q)
-    || r.words.some(w => w.tr.toLowerCase().includes(q)));
+  if (q) list = list.filter(r => r.key.toLowerCase().includes(q) || plain(r.gloss).includes(plain(q))
+    || r.words.some(w => plain(w.tr).includes(plain(q))));
   const shared = list.filter(r => new Set(r.words.map(w => w.surah)).size > 1);
   const rest = list.filter(r => new Set(r.words.map(w => w.surah)).size === 1);
   const card = r => {
     const cross = new Set(r.words.map(w => w.surah)).size > 1;
-    return '<div class="rootcard" data-root="' + r.key + '">' +
-      '<button class="roothead"><span class="rootkey">\u221a' + esc(r.key) + '</span>' +
+    return '<div class="rootcard" data-root="' + esc(r.key) + '">' +
+      '<button class="roothead" aria-expanded="false"><span class="rootkey">√' + esc(r.key) + '</span>' +
       '<span class="rootgloss">' + esc(r.gloss) + '</span>' +
       '<span class="rootcount' + (cross ? ' linked' : '') + '">' + r.words.length + '</span>' + CHEV + '</button>' +
       '<div class="rootbody">' + r.words.map(w => wordRow(w, true)).join('') + '</div></div>';
   };
   return (shared.length ? '<p class="grouplabel">Shared across surahs</p>' + shared.map(card).join('') : '') +
     (rest.length ? '<p class="grouplabel" style="margin-top:22px">Every other root</p>' + rest.map(card).join('') : '') +
-    (!list.length ? '<div class="empty"><div class="ar">\u062c\u0630\u0631</div><p>No root matches that.</p></div>' : '');
+    (!list.length ? '<div class="empty"><div class="ar">جذر</div><p>No root matches that.</p></div>' : '');
+}
+function openRoot(rk){
+  const card = document.querySelector('.rootcard[data-root="' + (window.CSS && CSS.escape ? CSS.escape(rk) : rk) + '"]');
+  if (!card) return;
+  card.classList.add("open");
+  const h = card.querySelector(".roothead"); if (h) h.setAttribute("aria-expanded", "true");
+  card.scrollIntoView({ block: "center", behavior: "smooth" });
 }
 
 /* ===================== saved ===================== */
@@ -2416,76 +3013,11 @@ function renderSaved(){
         const ws = list.filter(w => w.surah === s.num);
         return ws.length ? '<p class="grouplabel">' + esc(s.name) + '</p>' + wordGroup(ws, false) : '';
       }).join('')
-    : '<div class="empty"><div class="ar">★</div><p>No saved words yet. Tap the star on any word&rsquo;s card to keep it here.</p></div>';
+    : '<div class="empty"><div class="ar">★</div><p>No saved words yet.</p><p class="empty-tip">Tap the star on any word&rsquo;s card — or on a flashcard, or after a quiz question — to keep it here.</p></div>';
 }
 
 /* ===================== the verse, word by word ===================== */
-const HAVE_VERSES = typeof VERSES !== "undefined" && VERSES;
 
-/* "1" · "1–2" · "17 · 37" · "19 · 26, 45"  ->  [1] · [1,2] · [17,37] · [19,26,45] */
-function verseNums(v){
-  const out = [], re = /(\d+)\s*[–—-]\s*(\d+)|(\d+)/g;
-  let m;
-  while ((m = re.exec(String(v || "")))){
-    if (m[1]){
-      let a = +m[1], b = +m[2];
-      if (b < a){ const t = a; a = b; b = t; }
-      if (b - a > 12) b = a;                     // a stray number, not a range
-      for (let i = a; i <= b; i++) out.push(i);
-    } else out.push(+m[3]);
-  }
-  return out.filter((n, i) => out.indexOf(n) === i);
-}
-
-/* strip harakat and flatten the letters that vary between scripts, so the
-   guide's spelling can be matched against the Uthmani text */
-function skeleton(s){
-  return String(s || "")
-    .replace(/\u0649\u0670/g, "\u0627")   // alef maqsura + dagger alef = one long \u0101
-    .replace(/\u0670/g, "\u0627")          // dagger alef on its own = long \u0101
-    .replace(/[\u064B-\u065F\u06D6-\u06ED\u0640\u0653-\u0655]/g, "")  // marks, tatweel
-    .replace(/[\u0622\u0623\u0625\u0671\u0624]/g, "\u0627")            // hamza carriers -> alef
-    .replace(/\u0626/g, "\u064A")          // hamza on ya -> ya
-    .replace(/\u0621/g, "")                // bare hamza
-    .replace(/\u0629/g, "\u0647")          // ta marbuta -> ha
-    .replace(/[^\u0600-\u06FF]/g, "")
-    .replace(/[\u0627\u0649\u064A]+$/, "\u0627")   // whatever long vowel ends the word
-    .replace(/\u0649/g, "\u064A");         // any alef maqsura left inside
-}
-const squeeze = t => t.replace(/(.)\1/g, "$1");   // a shadda doubles a letter in one text, not the other
-
-/* the verse carries prefixes the vocabulary entry doesn't: wa-, li-, al- ... */
-function variants(t){
-  const out = [t];
-  const withoutArticle = t.replace(/^(?:\u0648|\u0641)?(?:\u0628|\u0643|\u0644)?\u0627\u0644/, "");
-  if (withoutArticle !== t && withoutArticle.length >= 4) out.push(withoutArticle);
-  const withoutPrefix = t.replace(/^[\u0648\u0641\u0628\u0643\u0644]/, "");
-  if (withoutPrefix !== t && withoutPrefix.length >= 4) out.push(withoutPrefix);
-  return out;
-}
-/* The tokens an entry is matched by. Normally only words of three letters or
-   more are usable — a two-letter particle would light up half the verse. But
-   an entry made ENTIRELY of short words (qul · qul huwa) would then have
-   nothing to match on at all and would silently lose its verse link, so for
-   those we keep the short skeletons and demand an exact match instead. */
-function matchTokens(ar){
-  const parts = String(ar || "").split(/\s+/).map(skeleton).filter(Boolean);
-  const long  = [].concat.apply([], parts.filter(t => t.length >= 3).map(variants));
-  if (long.length) return long;
-  const short = parts.slice();
-  short.exact = true;
-  return short;
-}
-function sameWord(verseWord, entryTokens){
-  const a = skeleton(verseWord), a2 = squeeze(a);
-  if (entryTokens && entryTokens.exact) return entryTokens.indexOf(a) >= 0;
-  if (a.length < 3) return false;
-  return entryTokens.some(b => {
-    const b2 = squeeze(b);
-    return (b.length  >= 3 && (a.indexOf(b)   >= 0 || b.indexOf(a)   >= 0)) ||
-           (b2.length >= 3 && (a2.indexOf(b2) >= 0 || b2.indexOf(a2) >= 0));
-  });
-}
 /* The verse is shown ONCE: as its words, each with its meaning underneath.
    Tap a word for its root, grammar and ṣarf. */
 function oneVerseHTML(surahNum, n, tokens, showSrc){
@@ -2522,7 +3054,7 @@ function verseHTML(surahNum, nums, entryAr){
 function readView(){
   const s = cur;
   if (!HAVE_VERSES || !VERSES[s.num])
-    return '<div class="empty"><p>The text of this surah isn’t loaded.</p></div>';
+    return '<div class="empty"><p>The text of this surah isn’t loaded yet.</p><p class="empty-tip">It is fetched automatically the next time the site is published.</p></div>';
   const nums = Object.keys(VERSES[s.num]).map(Number).sort((a, b) => a - b);
   return '<p class="grouplabel">' + esc(s.name) + ' · ' + nums.length + ' verses</p>' +
     '<p class="wbw-hint" style="margin:-6px 0 14px">Each verse is written once, word by word. Tap any word for its root, its grammar and — for verbs — its full ṣarf.</p>' +
@@ -2530,7 +3062,6 @@ function readView(){
 }
 
 /* ---------- tap a word: root, lemma, grammar ---------- */
-const HAVE_MORPH = typeof MORPH !== "undefined" && MORPH;
 
 /* every place a root shows up across the surahs on this site */
 let ROOTMAP = null;
@@ -2572,8 +3103,10 @@ function morphHTML(s, v, i){
 
   let also = "";
   if (m && m.r){
+    /* other surahs first — that is where a root's echo teaches most */
     const uses = (rootMap()[m.r] || [])
-      .filter(u => !(u[0] === String(s) && u[1] === String(v) && u[2] === i)).slice(0, 4);
+      .filter(u => !(u[0] === String(s) && u[1] === String(v) && u[2] === i))
+      .sort((a, b) => (a[0] === String(s)) - (b[0] === String(s))).slice(0, 4);
     if (uses.length){
       also = '<div class="walso"><b>Same root elsewhere:</b> ' + uses.map(u => {
         const uw = ((VERSES[u[0]] || {})[u[1]] || { w: [] }).w[u[2]];
@@ -2598,7 +3131,6 @@ function morphHTML(s, v, i){
    participle and maṣdar), the classic madrasa recitation:
    past · present · maṣdar · doer · passive past · passive present · maṣdar ·
    done-to · command · prohibition · place/time · instrument.             */
-const HAVE_SARF = typeof SARF !== "undefined" && SARF;
 const ROMAN = { I:1, II:2, III:3, IV:4, V:5, VI:6, VII:7, VIII:8, IX:9, X:10 };
 const BAB_NAME = {
   "فَتَحَ": "fataḥa · a–a", "نَصَرَ": "naṣara · a–u", "ضَرَبَ": "ḍaraba · a–i",
@@ -2661,7 +3193,7 @@ function sarfHTML(m){
         .concat(ok(x.ala) ? ['وَالْآلَةُ مِنْهُ', x.ala] : []).filter(ok).join(' ')
     : '';
   return '<details class="sarf"' + (sarfOpen ? ' open' : '') + '>' +
-    '<summary><span class="sf-k">Ṣarf</span><span class="sf-kar">صرفِ صغیر</span>' +
+    '<summary><span class="sf-k">Ṣarf</span><span class="sf-kar">الصَّرْفُ الصَّغِير</span>' +
       '<span class="sf-sum">' + esc(x.past) + (ok(x.present) ? ' · ' + esc(x.present) : '') + '</span>' +
       '<svg class="caret" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l4 4 4-4"/></svg></summary>' +
     '<div class="sf-meta">' +
@@ -2697,35 +3229,10 @@ function tapVerseWord(el){
   const panel = verse && verse.querySelector(".wpanel");
   if (!panel) return;
   const already = el.classList.contains("open");
-  verse.querySelectorAll(".wbw-w.open").forEach(o => o.classList.remove("open"));
+  verse.querySelectorAll(".wbw-w.open").forEach(o => { o.classList.remove("open"); o.setAttribute("aria-expanded", "false"); });
   if (already){ panel.innerHTML = ""; return; }
-  el.classList.add("open");
+  el.classList.add("open"); el.setAttribute("aria-expanded", "true");
   panel.innerHTML = morphHTML(s, v, i);
-}
-
-/* ---------- the headword at the top of a card ----------
-   The vocabulary entry's Arabic is sometimes one word, sometimes a short
-   phrase. Find it inside its own verse — the same fuzzy match that paints a
-   word gold — and we can show its root and grammar without storing anything
-   extra. Up to three distinct words, so a phrase like "iktālū… yastawfūn"
-   explains both of its verbs.                                              */
-function headwordTargets(w){
-  if (!HAVE_VERSES || !HAVE_MORPH) return [];
-  const book = VERSES[w.surah]; if (!book) return [];
-  const tokens = matchTokens(w.ar);
-  if (!tokens.length) return [];
-  const out = [], seen = {};
-  verseNums(w.v).forEach(n => {
-    const v = book[n]; if (!v) return;
-    v.w.forEach((word, i) => {
-      if (out.length >= 3 || !sameWord(word[0], tokens)) return;
-      const key = skeleton(word[0]);
-      if (seen[key]) return;
-      seen[key] = 1;
-      out.push([w.surah, n, i]);
-    });
-  });
-  return out;
 }
 
 let headPinned = false;
@@ -2739,10 +3246,27 @@ function showHeadword(on){
 
 /* ===================== sheet ===================== */
 let sheetWord = null, lastFocus = null;
+const sheetOpen = () => $("#sheet").classList.contains("open");
+
+/* open a word's card: it gets its own history entry, so Back closes it */
+function openWord(id){
+  const r = parseHash();
+  if (sheetOpen()) go(r.base, { w: id, replace: true });
+  else go(r.base, { w: id });
+}
+function closeWord(){
+  if (!sheetOpen()) return;
+  if (landedOnWord){ landedOnWord = false; go(parseHash().base, { replace: true }); }
+  else history.back();
+}
+
 function openSheet(id){
   const w = byId(id); if (!w) return;
-  sheetWord = w; lastFocus = document.activeElement;
-  const s = SURAHS.find(x => x.num === w.surah);
+  if (sheetOpen() && sheetWord === w) return;
+  const was = sheetOpen();
+  sheetWord = w;
+  if (!was) lastFocus = document.activeElement;
+  const s = surahOf(w.surah), at = s.words.indexOf(w), f = focusOf(w);
   const rows = [
     ["Root", w.root ? (w.root.length < 70 ? '<span class="rootmono">' + esc(w.root) + '</span>' : esc(w.root)) : null],
     ["Here it means", esc(w.meaning)],
@@ -2758,7 +3282,7 @@ function openSheet(id){
     ? '<button class="pill pill-btn" id="verseBtn" aria-expanded="false" aria-controls="verseBox">' +
       ref + ' &middot; read it' + CARET + '</button>'
     : '<span class="pill">' + ref + '</span>';
-  const heads = headwordTargets(w);
+  const heads = focusTargets(w);
   const headCard = heads.length
     ? '<div class="heromorph" id="heroMorph" hidden>' +
       heads.map(t => morphHTML(t[0], t[1], t[2])).join('') + '</div>'
@@ -2767,17 +3291,28 @@ function openSheet(id){
     ? '<div class="hero-hint"><span class="hov">Hover the word for its root and grammar</span>' +
       '<span class="tap">Tap the word for its root and grammar</span></div>'
     : '';
+  const glosses = !f.whole ? '<div class="hero-gl">' + f.items.filter(it => it.gloss).map(it =>
+      '<span class="pill hero-g"><span class="ar">' + esc(it.ar) + '</span>' + esc(it.gloss) + '</span>').join('') + '</div>' : '';
+
+  $("#sheetNav").innerHTML =
+    '<button class="navbtn" id="sheetPrev" aria-label="Previous word"' + (at > 0 ? '' : ' disabled') + '><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2L2 10l8 8"/></svg></button>' +
+    '<span class="sheet-pos">' + (at + 1) + ' of ' + s.words.length + ' &middot; ' + esc(s.name) + '</span>' +
+    '<button class="navbtn" id="sheetNext" aria-label="Next word"' + (at < s.words.length - 1 ? '' : ' disabled') + '><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l8 8-8 8"/></svg></button>';
+
   $("#sheetBody").innerHTML =
     '<div class="word-hero">' +
       '<div class="hero-anchor">' +
-        '<div class="ar hero-word' + (heads.length ? ' has-morph" id="heroWord" tabindex="0" ' +
+        '<div class="ar hero-word' + arSize(w.ar) + (heads.length ? ' has-morph" id="heroWord" tabindex="0" ' +
           'role="button" aria-expanded="false" aria-controls="heroMorph"' : '"') + '>' +
-          esc(w.ar) + '</div>' + headHint + headCard +
+          phraseHTML(w) + '</div>' + headHint + headCard +
       '</div>' +
       '<div class="tr">' + esc(w.tr) + '</div>' +
+      glosses +
       '<div class="mean">' + esc(w.meaning) + '</div>' +
       '<div class="meta">' + verseLabel +
-      (w.rk ? '<span class="pill">√' + esc(w.rk) + '</span>' : '') + '</div></div>' +
+      (w.rk ? '<span class="pill">√' + esc(w.rk) + '</span>' : '') +
+      (isLearned(w) ? '<span class="pill pill-ok">&#10003; learned</span>' : inBasket(w) ? '<span class="pill pill-warn">in your mistakes</span>' : '') +
+      '</div></div>' +
     vHTML +
     '<div class="detail">' + rows.map(r =>
       '<div class="drow"><div class="dlabel">' + r[0] + '</div><div class="dval">' + r[1] + '</div></div>').join('') + '</div>' +
@@ -2794,8 +3329,12 @@ function openSheet(id){
       '<span>' + (saved.has(w.id) ? 'Saved' : 'Save word') + '</span></button>' +
       (w.rk ? '<button class="abtn" id="rootBtn">See √' + esc(w.rk) + '</button>' : '') +
     '</div>';
-  $("#sheet").classList.add("open"); $("#scrim").classList.add("open");
-  $("#sheetClose").focus();
+  const sh = $("#sheet");
+  sh.classList.add("open"); $("#scrim").classList.add("open");
+  sh.inert = false; sh.removeAttribute("aria-hidden");
+  $("#app").inert = true; $("#tabbar").inert = true;
+  $("#sheetBody").scrollTop = 0;
+  if (!was) $("#sheetClose").focus({ preventScroll: true });
 
   headPinned = false;
   const head = $("#heroWord");
@@ -2806,29 +3345,49 @@ function openSheet(id){
     });
   }
 }
-function closeSheet(){
-  $("#sheet").classList.remove("open"); $("#scrim").classList.remove("open");
-  if (lastFocus && lastFocus.focus) lastFocus.focus();
+function closeSheetUI(){
+  const sh = $("#sheet");
+  if (!sh.classList.contains("open")) return;
+  sh.classList.remove("open"); $("#scrim").classList.remove("open");
+  sh.inert = true; sh.setAttribute("aria-hidden", "true");
+  $("#app").inert = false; $("#tabbar").inert = false;
+  sheetWord = null;
+  if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+  refreshStars();
+}
+function sheetStep(d){
+  if (!sheetWord) return;
+  const s = surahOf(sheetWord.surah), w = s.words[s.words.indexOf(sheetWord) + d];
+  if (w) go(parseHash().base, { w: w.id, replace: true });
 }
 
-/* ===================== navigation ===================== */
-function show(id){
-  $$(".screen").forEach(s => s.classList.toggle("active", s.id === id));
-  window.scrollTo(0, 0);
-  syncNav();
-}
-function selectTab(tab){
-  $$(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
-  if (tab === "home") show("scr-home");
-  if (tab === "roots"){ renderThreads(); show("scr-roots"); }
-  if (tab === "saved"){ renderSaved(); show("scr-saved"); }
-}
-function syncNav(){
-  const nav = document.querySelector(".screen.active .navbar");
-  if (nav) nav.classList.toggle("stuck", window.scrollY > 26);
-}
+/* pull the sheet down to close it */
+(function(){
+  const sh = $("#sheet"), body = $("#sheetBody");
+  let y0 = null, dy = 0, drag = false;
+  sh.addEventListener("touchstart", e => {
+    if (!sheetOpen() || e.touches.length !== 1) return;
+    if (!e.target.closest(".grabber, .sheet-head") && body.scrollTop > 0) return;
+    y0 = e.touches[0].clientY; dy = 0; drag = false;
+  }, { passive: true });
+  sh.addEventListener("touchmove", e => {
+    if (y0 == null) return;
+    dy = e.touches[0].clientY - y0;
+    if (!drag && dy > 10 && body.scrollTop <= 0){ drag = true; sh.style.transition = "none"; }
+    if (drag){ sh.style.transform = "translateY(" + Math.max(0, dy) + "px)"; if (e.cancelable) e.preventDefault(); }
+  }, { passive: false });
+  const end = () => {
+    if (y0 == null) return;
+    y0 = null; sh.style.transition = ""; sh.style.transform = "";
+    if (drag && dy > 110) closeWord();
+    drag = false;
+  };
+  sh.addEventListener("touchend", end);
+  sh.addEventListener("touchcancel", end);
+})();
 
 /* ===================== events ===================== */
+let swiped = false;
 document.addEventListener("click", e => {
   const t = e.target;
 
@@ -2848,48 +3407,46 @@ document.addEventListener("click", e => {
   const verseWord = t.closest(".wbw-w");
   if (verseWord){ tapVerseWord(verseWord); return; }
 
+  if (t.closest("#sheetPrev")){ sheetStep(-1); return; }
+  if (t.closest("#sheetNext")){ sheetStep(1); return; }
+  if (t.closest("#sheetClose") || t === $("#scrim")){ closeWord(); return; }
+
+  const link = t.closest("[data-go]");
+  if (link){ go(link.dataset.go); return; }
+
   const surahBtn = t.closest("[data-surah]");
-  if (surahBtn){ openSurah(+surahBtn.dataset.surah); return; }
+  if (surahBtn){ go(surahPath(+surahBtn.dataset.surah)); return; }
 
   const wordBtn = t.closest("[data-word]");
-  if (wordBtn){ openSheet(wordBtn.dataset.word); return; }
+  if (wordBtn){ openWord(wordBtn.dataset.word); return; }
 
   const tabBtn = t.closest(".tab");
-  if (tabBtn){ selectTab(tabBtn.dataset.tab); return; }
-
-  const modeBtn = t.closest("[data-mode]");
-  if (modeBtn){
-    mode = modeBtn.dataset.mode;
-    $$("[data-mode]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === mode)));
-    renderMode(); return;
+  if (tabBtn){
+    const p = { home: "/", roots: threadMode === "roots" ? "/threads/roots" : "/threads", saved: "/saved" }[tabBtn.dataset.tab];
+    if (p !== route.base) go(p); else window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
   }
 
-  if (t.closest("#surahBack")){ selectTab("home"); return; }
-  if (t.closest("#sheetClose") || t === $("#scrim")){ closeSheet(); return; }
+  const modeBtn = t.closest("[data-mode]");
+  if (modeBtn){ go(surahPath(cur.num, modeBtn.dataset.mode), { replace: true }); return; }
+
+  if (t.closest("#surahBack")){ if (prevBase === "/") history.back(); else go("/"); return; }
 
   if (t.closest("#homeClear")){ $("#homeSearch").value = ""; runHomeSearch(); $("#homeSearch").focus(); return; }
   if (t.closest("#rootClear")){ $("#rootSearch").value = ""; renderThreads(); $("#rootSearch").focus(); return; }
+  if (t.closest("#orderBtn")){ QM.order = QM.order === "desc" ? "asc" : "desc"; qmSave(); renderHome(); return; }
 
   /* sheet actions */
   const sb = t.closest("#saveBtn");
-  if (sb){
-    const id = sheetWord.id;
-    const on = !saved.has(id);
-    on ? saved.add(id) : saved.delete(id);
-    persist();
+  if (sb && sheetWord){
+    const on = toggleSaved(sheetWord.id);
     sb.classList.toggle("saved", on);
     sb.querySelector("span").textContent = on ? "Saved" : "Save word";
     sb.querySelector("svg").setAttribute("fill", on ? "currentColor" : "none");
-    refreshStars();
-    if (document.querySelector("#scr-saved.active")) renderSaved();
     return;
   }
   const thr = t.closest("[data-thread]");
-  if (thr){
-    threadMode = thr.dataset.thread;
-    $$("[data-thread]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.thread === threadMode)));
-    renderThreads(); return;
-  }
+  if (thr){ go(thr.dataset.thread === "roots" ? "/threads/roots" : "/threads", { replace: true }); return; }
 
   if (t.closest("#moreBtn")){
     $("#moreBox").hidden = false;
@@ -2901,49 +3458,68 @@ document.addEventListener("click", e => {
     t.closest("#moreOne").remove(); return;
   }
 
-  if (t.closest("#rootBtn")){
-    const rk = sheetWord.rk; closeSheet(); selectTab("roots");
-    threadMode = "roots";
-    $$("[data-thread]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.thread === "roots")));
-    $("#rootSearch").value = ""; renderThreads();
-    const card = document.querySelector('.rootcard[data-root="' + rk + '"]');
-    if (card){ card.classList.add("open"); card.scrollIntoView({ block:"center", behavior:"smooth" }); }
-    return;
-  }
+  if (t.closest("#rootBtn") && sheetWord){ go("/threads/roots", { r: sheetWord.rk }); return; }
 
   /* flashcards */
-  if (t.closest("#flashCard")){ deck.flipped = !deck.flipped; $("#flashCard").classList.toggle("flipped", deck.flipped); return; }
-  if (t.closest("#prevCard")){ deck.i = Math.max(0, deck.i - 1); deck.flipped = false; drawCards(); return; }
-  if (t.closest("#nextCard")){ deck.i = Math.min(deck.order.length - 1, deck.i + 1); deck.flipped = false; drawCards(); return; }
+  if (t.closest("#flashCard")){ if (swiped){ swiped = false; return; } flipCard(); return; }
+  if (t.closest("#prevCard")){ moveCard(-1); return; }
+  if (t.closest("#nextCard")){ moveCard(1); return; }
+  if (t.closest("#cardGot")){ gradeCard(true); return; }
+  if (t.closest("#cardAgain")){ gradeCard(false); return; }
+  if (t.closest("#cardsAgain")){ startCards(); return; }
+  if (t.closest("#cardsPractice")){ pendingPractice = true; go(surahPath(cur.num, "quiz"), { replace: true }); return; }
   if (t.closest("#shuffleCards")){ deck.order = shuffle(deck.order); deck.i = 0; deck.flipped = false; drawCards(); return; }
   if (t.closest("#saveCard")){ toggleSaved(cur.words[deck.order[deck.i]].id); drawCards(); return; }
 
   /* quiz and play */
   if (quizClick(t)) return;
-  if (gameClick(t)) return;
+  if (rushClick(t)) return;
 
   /* roots accordion */
   const rh = t.closest(".roothead");
-  if (rh){ rh.parentElement.classList.toggle("open"); return; }
+  if (rh){ const open = rh.parentElement.classList.toggle("open"); rh.setAttribute("aria-expanded", String(open)); return; }
 });
+
+/* swipe a flashcard left or right to move through the deck */
+(function(){
+  let x0 = null, y0 = 0;
+  document.addEventListener("pointerdown", e => { if (e.target.closest("#flashCard")){ x0 = e.clientX; y0 = e.clientY; } });
+  document.addEventListener("pointerup", e => {
+    if (x0 == null) return;
+    const dx = e.clientX - x0, dy = e.clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) > 55 && Math.abs(dy) < 45){ swiped = true; moveCard(dx < 0 ? 1 : -1); setTimeout(() => { swiped = false; }, 350); }
+  });
+})();
 
 document.addEventListener("toggle", e => {
   if (e.target && e.target.classList && e.target.classList.contains("sarf")) sarfOpen = e.target.open;
 }, true);
 
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && $("#sheet").classList.contains("open")){ closeSheet(); return; }
-  gameKeys(e);
-  if (e.key === "Enter" && document.activeElement && document.activeElement.id === "flashCard"){
-    deck.flipped = !deck.flipped; $("#flashCard").classList.toggle("flipped", deck.flipped);
+  if (e.key === "Escape" && sheetOpen()){ e.preventDefault(); closeWord(); return; }
+  const el = e.target;
+  /* shortcuts never fire while you are typing */
+  if (el && el.matches && (el.matches("input, textarea, select") || el.isContentEditable)) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  /* things that act like buttons without being <button>s */
+  if ((e.key === "Enter" || e.key === " ") && el && el.matches && el.matches('[role="button"]') && el.tagName !== "BUTTON"){
+    e.preventDefault(); el.click(); return;
   }
-  if ((e.key === "Enter" || e.key === " ") && document.activeElement &&
-      document.activeElement.classList.contains("wbw-w")){
-    e.preventDefault(); tapVerseWord(document.activeElement);
+  if (sheetOpen()){
+    if (e.key === "ArrowLeft"){ sheetStep(-1); return; }
+    if (e.key === "ArrowRight"){ sheetStep(1); return; }
+    return;
   }
-  if ((e.key === "Enter" || e.key === " ") && document.activeElement &&
-      document.activeElement.id === "heroWord"){
-    e.preventDefault(); headPinned = !headPinned; showHeadword(headPinned);
+  if (!$("#scr-surah").classList.contains("active")) return;
+  if (mode === "play"){ rushKeys(e); return; }
+  if (mode === "quiz"){ quizKeys(e); return; }
+  if (mode === "cards" && !deck.done){
+    if (e.key === "ArrowLeft"){ moveCard(-1); return; }
+    if (e.key === "ArrowRight"){ moveCard(1); return; }
+    if ((e.key === " " || e.key === "Enter") && (el === document.body || !el.closest("button"))){ e.preventDefault(); flipCard(); return; }
+    if (deck.flipped && e.key === "1"){ gradeCard(false); return; }
+    if (deck.flipped && e.key === "2"){ gradeCard(true); return; }
   }
 });
 
@@ -2957,11 +3533,17 @@ function refreshStars(){
 $("#homeSearch").addEventListener("input", runHomeSearch);
 $("#rootSearch").addEventListener("input", renderThreads);
 window.addEventListener("scroll", syncNav, { passive:true });
+window.addEventListener("hashchange", applyRoute);
 
 /* ===================== boot ===================== */
-renderSurahList();
-renderThreads();
-renderSaved();
+landedOnWord = !!parseHash().w;
+applyRoute();
+/* work out every entry's taught word in the background, a few at a time,
+   so the first search or game never has to wait for it */
+(function warm(i){
+  const idle = window.requestIdleCallback || (f => setTimeout(() => f({ timeRemaining: () => 8 }), 30));
+  idle(d => { while (i < ALL.length && d.timeRemaining() > 2) focusOf(ALL[i++]); if (i < ALL.length) warm(i); });
+})(0);
 
 </script>
 </body>
