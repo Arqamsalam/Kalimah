@@ -4,7 +4,7 @@ Pulls the Qur'an text for every surah in data/surahs.js and writes data/verses.j
 
 For each verse it stores:
   t   the Uthmani Arabic text of the whole verse
-  e   the English translation (The Clear Quran, Dr. Mustafa Khattab, by default)
+  e   the English translation (M.A.S. Abdel Haleem by default)
   w   the word-by-word list: [arabic, english, transliteration] per word
 
 Run it after adding a surah:   python3 fetch_verses.py
@@ -22,15 +22,16 @@ HERE        = os.path.dirname(os.path.abspath(__file__))
 SURAHS_JS   = os.path.join(HERE, "data", "surahs.js")
 VERSES_JS   = os.path.join(HERE, "data", "verses.js")
 # Which English translation appears under each verse. Change the number and
-# the next run fetches every surah again in the new one. Some of the API's
-# English options:
-#   131 The Clear Quran (Khattab)   20  Saheeh International
-#   85  M.A.S. Abdel Haleem         84  Mufti Taqi Usmani
-#   19  Pickthall                   22  Yusuf Ali
-#   95  Maududi (Tafhim)           203  Hilali & Khan
-# If the chosen one ever comes back empty, FALLBACK is used instead, so the
-# site never loses its English.
-TRANSLATION = 131
+# the next run fetches every surah again in the new one. The API's English
+# options (as it listed them in October 2026):
+#   85  M.A.S. Abdel Haleem         20  Saheeh International
+#   84  Mufti Taqi Usmani           19  Pickthall
+#   22  Yusuf Ali                   95  Maududi (Tafhim)
+#   203 Hilali & Khan              149  Bridges
+# The Clear Quran (Khattab, 131) is not among them: the free API returns it
+# empty. If the chosen one ever comes back empty, FALLBACK is used instead, so
+# the site never loses its English.
+TRANSLATION = 85
 FALLBACK    = 20
 NAMES = {131: "The Clear Quran, Dr. Mustafa Khattab", 20: "Saheeh International",
          85: "M.A.S. Abdel Haleem", 84: "Mufti Taqi Usmani", 19: "Pickthall",
