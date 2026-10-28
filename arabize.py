@@ -162,7 +162,9 @@ def forms(word, first=True, pausal=True, weak=False):
     if pausal:
         res.add(re.sub(r"(un|in|u|i|a)$", "", base))
         if base.endswith("an"):
-            res |= {base[:-2], base[:-2] + "ā"}
+            res.add(base[:-2])
+            if weak:                               # abadā for أَبَدًا — said in pause, but ʿadwā is
+                res.add(base[:-2] + "ā")           # عَدْوَى, not عَدْوًا: only in a quote or its own verse
         res |= {re.sub(r"iy$", "ī", r) for r in list(res)}
         res |= {re.sub(r"uw$", "ū", r) for r in list(res)}
         if word.rstrip("".join(MARKS)).endswith("ة"):
@@ -270,7 +272,7 @@ class Lexicon:
                 wd["keys"] = {skey(f) for f in forms(wd["ar"])}
                 wd["head"] = {skey(x) for x in expand(translit(wd["ar"]))}
                 wd["inner"] = {skey(x) for x in expand(translit(wd["ar"], first=False))}
-                wd["last"] = {skey(f) for f in forms(wd["ar"], first=False)}
+                wd["last"] = {skey(f) for f in forms(wd["ar"], first=False, weak=True)}
                 wd["vmap"], wd["vweak"] = {}, {}
                 for var in sorted(self.variants(wd["segs"], wd["ar"]) | {wd["ar"]}, key=len, reverse=True):
                     for f in forms(var) | expand(translit(var, first=False)):

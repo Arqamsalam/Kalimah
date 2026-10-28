@@ -18,10 +18,12 @@ else on the site, it says where. A verb's card also carries its full **ṣarf
 prohibition, place/time and instrument — with the form you tapped marked
 "this word".
 
-Currently **46 surahs, 1,010 words, 913 verses, 4,336 words of Qur'an text** —
-every surah from Al-Ḥāqqah (69) to An-Nās (114). An-Nabaʾ (78) and ʿAbasa (80)
-are the newest; their Qur'an text and grammar are fetched by the publish workflow
-the first time it runs with them.
+Currently **51 surahs, 1,239 words, 1,078 verses, 5,970 words of Qur'an text** —
+every surah from Al-Ḥāqqah (69) to An-Nās (114), plus Al-Wāqiʿah (56), Al-Ḥashr (59),
+Al-Mumtaḥanah (60), Aṣ-Ṣaff (61) and At-Taghābun (64), the newest; their Qur'an text
+and grammar are fetched by the publish workflow the first time it runs with them.
+The home screen lists each surah under the juz it begins in, so a guide from any
+part of the Qur'an finds its own place.
 
 **The Qur'an's words in Arabic script.** The guides write Arabic in English
 letters inside their notes — *mā gharraka bi-rabbika'l-Karīm*. On the site, every
@@ -180,6 +182,9 @@ its bāb, and an English gloss. Each row was written out in full and the verbal
 forms cross-checked against an independent conjugator — except the eight added
 with An-Nabaʾ and ʿAbasa (fataḥa, dhāqa, takallama, taṣaddā, amāta, aqbara,
 ansharah, shaqqa), which were written by hand and are worth a second look.
+The five surahs added last bring 74 verbs that have no row yet (among them
+anfaqa, anshaʾa, afāʾa, tawakkala, bāyaʿa); their words show everything but the
+table until rows are added.
 `build_sarf.py` turns it into `data/sarf.js`, which the site loads; a verb with
 no row simply shows no table.
 
