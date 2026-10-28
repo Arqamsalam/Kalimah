@@ -39,6 +39,8 @@ API         = ("https://api.quran.com/api/v4/verses/by_chapter/{n}"
                "?words=true&word_fields=text_uthmani&fields=text_uthmani"
                "&translations={t}&per_page=300&language=en")
 
+RESOURCES   = "https://api.quran.com/api/v4/resources/translations?language=en"
+
 SUP_RE = re.compile(r"<sup\b[^>]*>.*?</sup>", re.S)   # footnote markers, number and all
 # Qur'anic recitation marks (waqf signs, small letters). They are pause and
 # tajwid aids, not part of a word's spelling, and the Amiri webfont has no
@@ -88,6 +90,18 @@ def clean_en(s):
     return re.sub(r"\s+([,.;:!?])", r"\1", s).strip()
 
 
+def list_english():
+    """what the API does offer in English, so a better id can be picked"""
+    try:
+        rows = get(RESOURCES).get("translations", [])
+    except Exception as e:
+        print("     (couldn't list the translations: %s)" % e)
+        return
+    for t in sorted(rows, key=lambda t: t.get("id", 0)):
+        if (t.get("language_name") or "").lower() == "english":
+            print("     %4s  %s" % (t.get("id"), t.get("name") or t.get("author_name")))
+
+
 def has_english(num, tid):
     data = get(API.format(n=num, t=tid))
     return bool((data["verses"][0].get("translations") or [{}])[0].get("text"))
@@ -125,6 +139,7 @@ def main():
     if not has_english(nums[0], tid):
         print("  !! translation %d came back empty — using %d (%s) instead"
               % (tid, FALLBACK, NAMES.get(FALLBACK, FALLBACK)))
+        list_english()
         tid = FALLBACK
     if "--all" in sys.argv:
         store = {}

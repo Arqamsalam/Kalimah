@@ -203,12 +203,13 @@ browser never pairs a new page with old cached data.
 ### Where the Qur'an text comes from
 
 `fetch_verses.py` reads the Quran.com API, which serves the Uthmani text and the
-word-by-word glosses of the Quranic Arabic Corpus. The verse translation is
-**The Clear Quran by Dr. Mustafa Khattab**, as the Quran.com API serves it. It
-is a copyrighted translation, so the site credits it under the verses. The translation number is the `TRANSLATION` line near the top of the
-script, with other options listed beside it. Change it and the next run fetches
-every surah again by itself. If the chosen translation ever comes back empty, the
-script uses Saheeh International instead, so the site never loses its English.
+word-by-word glosses of the Quranic Arabic Corpus. The script asks for **The
+Clear Quran by Dr. Mustafa Khattab** (`TRANSLATION = 131`), but the free API
+returns it empty, so the site shows **Saheeh International** (`FALLBACK`).
+Khattab's translation is copyrighted, and Quran.com keeps it out of its public
+API. When that happens the script prints the English translations the API does
+offer. Whichever one is used is credited on the site under the verses. Change
+`TRANSLATION` and the next run fetches every surah again by itself.
 
 One deliberate change is made to the text on the way in: the Qur'anic recitation
 marks (waqf signs and the small superscript letters, U+06D6–U+06ED) are removed.
